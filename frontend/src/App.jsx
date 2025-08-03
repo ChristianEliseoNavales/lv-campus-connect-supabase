@@ -1,20 +1,30 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { KioskLayout } from './components/layouts';
+import {
+  Home,
+  Announcement,
+  Search,
+  Map,
+  Directory,
+  Queue,
+  FAQ,
+  Help
+} from './components/pages';
 
 function App() {
   return (
-    <Router>
+    <Router future={{ v7_relativeSplatPath: true }}>
       <KioskLayout>
         <Routes>
-          <Route path="/" element={<div>Home</div>} />
-          <Route path="/announcement" element={<div>Announcement</div>} />
-          <Route path="/search" element={<div>Search</div>} />
-          <Route path="/map" element={<div>Map</div>} />
-          <Route path="/directory" element={<div>Directory</div>} />
-          <Route path="/queue" element={<div>Queue</div>} />
-          <Route path="/faq" element={<div>FAQs</div>} />
-          <Route path="/help" element={<div>Help</div>} />
+          <Route path="/" element={<Home />} />
+          <Route path="/announcement" element={<Announcement />} />
+          <Route path="/search" element={<Search />} />
+          <Route path="/map" element={<Map />} />
+          <Route path="/directory" element={<Directory />} />
+          <Route path="/queue" element={<Queue />} />
+          <Route path="/faq" element={<FAQ />} />
+          <Route path="/help" element={<Help />} />
         </Routes>
       </KioskLayout>
     </Router>
