@@ -1,0 +1,38 @@
+# Web Application Development Preferences
+- User prefers MERN stack with React+Vite frontend (ONLY port 5173, never 5174 or other ports), Node.js+Express backend, local JSON files before MongoDB Atlas migration, and WebSocket for real-time features in web applications.
+- User prefers Tailwind CSS utility classes over native CSS for UI components and wants to migrate from CSS files to Tailwind CSS utility classes throughout applications, removing CSS modules/styled-components in favor of Tailwind's utility-first approach.
+- User wants to maintain exactly TWO terminals (one for frontend, one for backend) without creating additional terminals.
+
+# Authentication and Access Control
+- User requires Google SSO authentication for admin interfaces with role-based access control (MIS Super Admin, Registrar Admin, Admissions Admin).
+- User wants Google SSO authentication for web applications.
+- User requires secure authentication systems with bcrypt password hashing, JWT tokens, rate limiting, input sanitization, and test/decoy admin credentials for testing admin modules.
+- User wants environment-based configuration for security features like rate limiting (strict in production, relaxed in development).
+
+# Kiosk Interface and System Architecture
+- User prefers 16:9 landscape format optimization for kiosk interfaces and requires MIS super admin functionality with user account management and role-based access control in university queue systems.
+- User wants public kiosk interface to be completely standalone without authentication and accessible at / or /kiosk endpoints.
+- User requires complete separation between public kiosk system (no auth, only submission, accessible at / or /kiosk) and private admin modules (Google SSO auth, role-based access, accessible only at /admin/* endpoints) with no cross-linking between systems.
+- User prefers minimal, functional UI styling for University Kiosk System - focus on layout, spacing, and positioning fixes using Tailwind utilities rather than decorative elements or complex visual effects, prioritizing usability over aesthetics.
+- User wants enhanced UI/UX for University Queue System maintaining minimalistic aesthetic with Tailwind CSS migration, 16:9 landscape optimization for kiosk displays, responsive sidebar navigation for admin modules, and complete separation between public kiosk (no auth) and private admin systems (Google SSO + role-based access).
+- User requires removing gradients from public kiosk interface in favor of solid colors, fixing sidebar-content gaps in admin modules, ensuring WCAG accessibility standards for text contrast, and implementing functional text-to-speech audio for queue announcements while maintaining 16:9 landscape optimization and Tailwind CSS utility-first approach.
+- User requires multi-window queue management systems for Registrar department with separate admin navigation for each window, maintaining role-based access control and complete separation between public kiosk and admin modules.
+- User prefers large room visibility optimization for university queue displays with significantly larger fonts, enhanced color contrast, simplified layouts focusing on 'Now Serving' as most prominent element, increased spacing, and professional university aesthetic while avoiding fast food styling.
+- User requires WCAG accessibility standards for text contrast in University Queue System buttons and prefers manual navigation controls over automatic redirects/timeouts in kiosk interfaces.
+- User requires global queue numbering system (01-99, no duplicates, sequential cycling) and window-specific service filtering for University Queue System's Registrar department with multi-window management, maintaining MERN stack with local JSON storage and role-based access control.
+
+# Role-Based Access Control
+- User requires strict role-based access control in University Queue System admin modules: Registrar Admin (only /admin/registrar/* access), Admissions Admin (only /admin/admissions/* access), MIS Super Admin (full system access), with role-specific navigation filtering and proper JWT token validation.
+
+# Text-to-Speech Preferences
+- User prefers professional female voices for text-to-speech systems with airline announcement style (slower rate 0.7-0.8, lower pitch, clear enunciation).
+- User prefers accent-neutral American English voices for text-to-speech systems with professional broadcast quality, avoiding regional dialects, and maintaining airline/hospital announcement style with slightly animated but authoritative tone.
+
+# System Administration and Security
+- User requires comprehensive MIS dashboard analysis including Tailwind CSS migration from native CSS/CSS modules/styled-components, systematic diagnosis of 'too many requests' errors (checking infinite loops, missing debouncing, excessive polling, rate limiting), and full system error checking while maintaining MERN stack with Google SSO and role-based access control.
+
+# Admin Interface Navigation and Styling
+- User requires website-style admin modules with responsive sidebar navigation at /admin/* with Google SSO.
+- User requires role-specific sidebar navigation structures for MIS Super Admin, Registrar Admin, and Admissions Admin roles.
+- User requires zero gaps between sidebar and main content in admin layouts.
+- User prefers standardized UI across all admin modules using Tailwind CSS utility classes, AdminLayout component structure, and consistent sidebar navigation styling to match MISAdminDashboard.jsx and AdminDashboard.jsx patterns.
