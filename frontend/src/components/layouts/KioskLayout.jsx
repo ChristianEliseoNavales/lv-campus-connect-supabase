@@ -78,41 +78,49 @@ const KioskLayout = ({ children }) => {
   );
 
   return (
-    <div className="flex flex-col h-screen bg-gray-50 overflow-hidden" style={{ aspectRatio: '16/9' }}>
+    <div
+      className="flex flex-col w-screen h-screen overflow-hidden kiosk-container bg-cover bg-center bg-no-repeat"
+      style={{
+        backgroundImage: 'url(/main-bg.jpg)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+        backgroundAttachment: 'fixed'
+      }}
+    >
       {/* Header */}
-      <header className="bg-blue-900 text-white px-6 py-4 flex justify-between items-center shadow-lg" style={{ height: '90px' }}>
+      <header className="pb-6 bg-white bg-opacity-80 text-white flex justify-between items-center shadow-md backdrop-blur-sm" style={{ height: '90px' }}>
         {/* Left side: Logo and title container with bottom-right border-radius */}
-        <div className="bg-blue-900 px-4 py-2 rounded-br-lg flex items-center">
+        <div className="bg-blue-900 px-6 py-4 rounded-br-lg flex items-center">
           {/* University Logo Placeholder */}
-          <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center mr-4">
+          <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center mr-4 mt-4">
             <span className="text-blue-900 font-bold text-lg">LV</span>
           </div>
-          <h1 className="text-2xl font-bold tracking-wide">LVCampusConnect</h1>
+          <h1 className="text-2xl font-bold tracking-wide mt-4">LVCampusConnect</h1>
         </div>
 
         {/* Right side: Date and time container with full border-radius */}
-        <div className="bg-white text-blue-900 px-4 py-2 rounded-lg shadow-md">
+        <div className="bg-white text-blue-900 px-4 py-2 rounded-lg shadow-md mr-6 mt-4">
           <p className="text-sm font-semibold">{formatDate(time)}</p>
           <p className="text-lg font-bold">{formatTime(time)}</p>
         </div>
       </header>
 
       {/* Main Content - Full width utilization for 16:9 landscape */}
-      <main className="flex-grow px-8 py-6 overflow-auto w-full">
+      <main className="flex-grow px-6 py-6 overflow-auto w-full bg-white bg-opacity-80 backdrop-blur-sm">
         {children}
       </main>
 
-      {/* Bottom Navigation - Navy blue background with proper color scheme */}
-      <footer className="bg-blue-900 px-6 py-4 shadow-lg">
-        <nav className="bg-transparent flex justify-center items-center space-x-6">
-          {/* Navigation Items 1-7: Oblong/Pill shaped with navy blue theme */}
+      {/* Bottom Navigation - White background with proper color scheme */}
+      <footer className="bg-white bg-opacity-80 px-6 py-6 w-full backdrop-blur-sm">
+        <nav className="bg-transparent flex justify-center items-center space-x-6 w-full">
           <NavLink
             to="/"
             className={({ isActive }) =>
-              `flex items-center px-6 py-3 rounded-full transition-all duration-200 ${
+              `flex items-center px-6 py-6 rounded-full transition-all duration-200 ${
                 isActive
                   ? 'bg-yellow-300 text-blue-900 font-bold shadow-md'
-                  : 'bg-blue-900 text-white hover:bg-blue-800 hover:text-yellow-100'
+                  : 'bg-blue-900 py-6 text-white hover:bg-blue-800 hover:text-yellow-100'
               }`
             }
           >
@@ -123,10 +131,10 @@ const KioskLayout = ({ children }) => {
           <NavLink
             to="/announcement"
             className={({ isActive }) =>
-              `flex items-center px-6 py-3 rounded-full transition-all duration-200 ${
+              `flex items-center px-6 py-6 rounded-full transition-all duration-200 ${
                 isActive
                   ? 'bg-yellow-300 text-blue-900 font-bold shadow-md'
-                  : 'bg-blue-900 text-white hover:bg-blue-800 hover:text-yellow-100'
+                  : 'bg-blue-900 py-6 text-white hover:bg-blue-800 hover:text-yellow-100'
               }`
             }
           >
@@ -137,10 +145,10 @@ const KioskLayout = ({ children }) => {
           <NavLink
             to="/search"
             className={({ isActive }) =>
-              `flex items-center px-6 py-3 rounded-full transition-all duration-200 ${
+              `flex items-center px-6 py-6 rounded-full transition-all duration-200 ${
                 isActive
                   ? 'bg-yellow-300 text-blue-900 font-bold shadow-md'
-                  : 'bg-blue-900 text-white hover:bg-blue-800 hover:text-yellow-100'
+                  : 'bg-blue-900 py-6 text-white hover:bg-blue-800 hover:text-yellow-100'
               }`
             }
           >
@@ -151,10 +159,10 @@ const KioskLayout = ({ children }) => {
           <NavLink
             to="/map"
             className={({ isActive }) =>
-              `flex items-center px-6 py-3 rounded-full transition-all duration-200 ${
+              `flex items-center px-6 py-6 rounded-full transition-all duration-200 ${
                 isActive
                   ? 'bg-yellow-300 text-blue-900 font-bold shadow-md'
-                  : 'bg-blue-900 text-white hover:bg-blue-800 hover:text-yellow-100'
+                  : 'bg-blue-900 py-6 text-white hover:bg-blue-800 hover:text-yellow-100'
               }`
             }
           >
@@ -165,10 +173,10 @@ const KioskLayout = ({ children }) => {
           <NavLink
             to="/directory"
             className={({ isActive }) =>
-              `flex items-center px-6 py-3 rounded-full transition-all duration-200 ${
+              `flex items-center px-6 py-6 rounded-full transition-all duration-200 ${
                 isActive
                   ? 'bg-yellow-300 text-blue-900 font-bold shadow-md'
-                  : 'bg-blue-900 text-white hover:bg-blue-800 hover:text-yellow-100'
+                  : 'bg-blue-900 py-6 text-white hover:bg-blue-800 hover:text-yellow-100'
               }`
             }
           >
@@ -179,10 +187,10 @@ const KioskLayout = ({ children }) => {
           <NavLink
             to="/queue"
             className={({ isActive }) =>
-              `flex items-center px-6 py-3 rounded-full transition-all duration-200 ${
+              `flex items-center px-6 py-6 rounded-full transition-all duration-200 ${
                 isActive
                   ? 'bg-yellow-300 text-blue-900 font-bold shadow-md'
-                  : 'bg-blue-900 text-white hover:bg-blue-800 hover:text-yellow-100'
+                  : 'bg-blue-900 py-6 text-white hover:bg-blue-800 hover:text-yellow-100'
               }`
             }
           >
@@ -193,10 +201,10 @@ const KioskLayout = ({ children }) => {
           <NavLink
             to="/faq"
             className={({ isActive }) =>
-              `flex items-center px-6 py-3 rounded-full transition-all duration-200 ${
+              `flex items-center px-6 py-6 rounded-full transition-all duration-200 ${
                 isActive
                   ? 'bg-yellow-300 text-blue-900 font-bold shadow-md'
-                  : 'bg-blue-900 text-white hover:bg-blue-800 hover:text-yellow-100'
+                  : 'bg-blue-900 py-6 text-white hover:bg-blue-800 hover:text-yellow-100'
               }`
             }
           >
@@ -225,3 +233,8 @@ const KioskLayout = ({ children }) => {
 };
 
 export default KioskLayout;
+
+// HMR compatibility check
+if (import.meta.hot) {
+  import.meta.hot.accept();
+}

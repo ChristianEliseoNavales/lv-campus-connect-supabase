@@ -11,7 +11,7 @@ const Queue = () => {
     email: ''
   });
 
-  // Sample departments and services
+  // Departments within system scope: Registrar and Admissions only
   const departments = [
     {
       id: 'registrar',
@@ -42,36 +42,6 @@ const Queue = () => {
       ],
       currentQueue: 3,
       estimatedWait: '10-15 minutes'
-    },
-    {
-      id: 'financial',
-      name: 'Financial Services',
-      description: 'Tuition payments, financial aid, scholarships',
-      icon: '💰',
-      services: [
-        'Tuition Payment',
-        'Financial Aid Application',
-        'Scholarship Information',
-        'Payment Plan Setup',
-        'Refund Request'
-      ],
-      currentQueue: 7,
-      estimatedWait: '20-25 minutes'
-    },
-    {
-      id: 'student-services',
-      name: 'Student Services',
-      description: 'General student support and assistance',
-      icon: '🎯',
-      services: [
-        'Student ID Card',
-        'Parking Permit',
-        'Locker Assignment',
-        'General Information',
-        'Student Complaint'
-      ],
-      currentQueue: 2,
-      estimatedWait: '5-10 minutes'
     }
   ];
 

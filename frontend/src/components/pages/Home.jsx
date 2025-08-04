@@ -1,4 +1,5 @@
 import React from 'react';
+import HMRTest from '../HMRTest';
 
 const Home = () => {
   return (
@@ -61,30 +62,6 @@ const Home = () => {
             </div>
             <h3 className="text-lg font-semibold text-gray-800 mb-2">Announcements</h3>
             <p className="text-sm text-gray-600">Latest university news and updates</p>
-          </div>
-        </div>
-      </div>
-
-      {/* University Info Section */}
-      <div className="mt-8 bg-blue-50 rounded-lg p-6">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold text-blue-900 mb-4">University Information</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-sm">
-            <div>
-              <h3 className="font-semibold text-gray-800 mb-2">Office Hours</h3>
-              <p className="text-gray-600">Monday - Friday: 8:00 AM - 5:00 PM</p>
-              <p className="text-gray-600">Saturday: 8:00 AM - 12:00 PM</p>
-            </div>
-            <div>
-              <h3 className="font-semibold text-gray-800 mb-2">Emergency Contact</h3>
-              <p className="text-gray-600">Campus Security: (123) 456-7890</p>
-              <p className="text-gray-600">Medical Emergency: 911</p>
-            </div>
-            <div>
-              <h3 className="font-semibold text-gray-800 mb-2">Quick Tips</h3>
-              <p className="text-gray-600">Use the navigation menu below to access services</p>
-              <p className="text-gray-600">Touch any button to get started</p>
-            </div>
           </div>
         </div>
       </div>

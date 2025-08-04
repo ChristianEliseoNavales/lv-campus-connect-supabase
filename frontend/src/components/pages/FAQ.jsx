@@ -196,29 +196,6 @@ const FAQ = () => {
         )}
       </div>
 
-      {/* Contact Info */}
-      <div className="mt-6 bg-blue-50 rounded-lg p-4">
-        <div className="text-center">
-          <h3 className="font-semibold text-blue-900 mb-2">Still have questions?</h3>
-          <p className="text-sm text-blue-800 mb-3">
-            If you can't find the answer you're looking for, please contact us:
-          </p>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-            <div>
-              <span className="font-medium text-blue-900">Information Desk:</span>
-              <p className="text-blue-700">(123) 456-7800</p>
-            </div>
-            <div>
-              <span className="font-medium text-blue-900">Email:</span>
-              <p className="text-blue-700">info@university.edu</p>
-            </div>
-            <div>
-              <span className="font-medium text-blue-900">Hours:</span>
-              <p className="text-blue-700">Mon-Fri 8:00 AM - 5:00 PM</p>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
   );
 };

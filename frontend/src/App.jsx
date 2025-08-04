@@ -32,3 +32,8 @@ function App() {
 }
 
 export default App;
+
+// HMR compatibility
+if (import.meta.hot) {
+  import.meta.hot.accept();
+}
