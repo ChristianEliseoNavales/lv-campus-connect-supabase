@@ -1,68 +1,153 @@
-import React from 'react';
-import HMRTest from '../HMRTest';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const Home = () => {
+  const navigate = useNavigate();
+  const [queueData, setQueueData] = useState({
+    registrar: { currentNumber: 0, nextNumber: 0, queue: [] },
+    admissions: { currentNumber: 0, nextNumber: 0, queue: [] }
+  });
+  const [loading, setLoading] = useState(true);
+
+  // Fetch queue data from API
+  useEffect(() => {
+    const fetchQueueData = async () => {
+      try {
+        const [registrarResponse, admissionsResponse] = await Promise.all([
+          fetch('http://localhost:3001/api/public/queue/registrar'),
+          fetch('http://localhost:3001/api/public/queue/admissions')
+        ]);
+
+        const registrarData = await registrarResponse.json();
+        const admissionsData = await admissionsResponse.json();
+
+        setQueueData({
+          registrar: {
+            currentNumber: registrarData.currentNumber || 0,
+            nextNumber: registrarData.queue?.[0]?.queueNumber || 0,
+            queue: registrarData.queue || []
+          },
+          admissions: {
+            currentNumber: admissionsData.currentNumber || 0,
+            nextNumber: admissionsData.queue?.[0]?.queueNumber || 0,
+            queue: admissionsData.queue || []
+          }
+        });
+      } catch (error) {
+        console.error('Error fetching queue data:', error);
+        // Use fallback data if API is not available
+        setQueueData({
+          registrar: { currentNumber: 5, nextNumber: 6, queue: [] },
+          admissions: { currentNumber: 3, nextNumber: 4, queue: [] }
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchQueueData();
+    // Refresh queue data every 30 seconds
+    const interval = setInterval(fetchQueueData, 30000);
+    return () => clearInterval(interval);
+  }, []);
+
+  // Queue Display Component
+  const QueueDisplay = ({ department, title, icon }) => {
+    const data = queueData[department];
+
+    return (
+      <div className="h-full bg-white rounded-lg shadow-lg p-6 border-l-4 border-blue-900 flex flex-col">
+        <div className="text-center mb-4">
+          <div className="text-3xl mb-2">{icon}</div>
+          <h3 className="text-xl font-bold text-blue-900 mb-4">{title}</h3>
+        </div>
+
+        <div className="flex-grow grid grid-cols-2 gap-4">
+          {/* Now Serving */}
+          <div className="bg-blue-50 rounded-lg p-4 flex items-center justify-center">
+            <div className="text-center">
+              <p className="text-sm font-medium text-blue-700 mb-1">NOW SERVING</p>
+              <p className="text-4xl font-bold text-blue-900">
+                {loading ? '--' : String(data.currentNumber).padStart(2, '0')}
+              </p>
+            </div>
+          </div>
+
+          {/* Next */}
+          <div className="bg-gray-50 rounded-lg p-4 flex items-center justify-center">
+            <div className="text-center">
+              <p className="text-sm font-medium text-gray-600 mb-1">NEXT</p>
+              <p className="text-2xl font-semibold text-gray-800">
+                {loading ? '--' : String(data.nextNumber).padStart(2, '0')}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="h-full flex flex-col">
-      {/* Welcome Section - Full width utilization */}
-      <div className="text-center mb-8">
-        <h1 className="text-4xl font-bold text-blue-900 mb-4">
-          Welcome to LVCampusConnect
-        </h1>
-        <p className="text-xl text-gray-700 mx-auto px-4">
-          Your gateway to university services and information. Navigate through our campus resources using the menu below.
-        </p>
-      </div>
 
-      {/* Quick Access Grid */}
-      <div className="flex-grow grid grid-cols-2 md:grid-cols-4 gap-6">
-        {/* Quick Access Cards */}
-        <div className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow duration-200 border-l-4 border-blue-900">
-          <div className="text-center">
-            <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg className="w-8 h-8 text-blue-900" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clipRule="evenodd" />
-              </svg>
-            </div>
-            <h3 className="text-lg font-semibold text-gray-800 mb-2">Queue System</h3>
-            <p className="text-sm text-gray-600">Join queues for various university services</p>
-          </div>
+      {/* 5-Column, 2-Row Grid Layout */}
+      <div className="flex-grow grid grid-cols-5 grid-rows-2 gap-6 h-full">
+        {/* Row 1, Columns 1-2: Registrar Queue Display */}
+        <div className="col-span-2 row-span-1">
+          <QueueDisplay
+            department="registrar"
+            title="Registrar's Office"
+            icon="📋"
+          />
         </div>
 
-        <div className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow duration-200 border-l-4 border-green-600">
-          <div className="text-center">
-            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg className="w-8 h-8 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
-              </svg>
+        {/* Row 1, Column 3: Map Button */}
+        <div className="col-span-1 row-span-1">
+          <button
+            onClick={() => navigate('/map')}
+            className="w-full h-full bg-white rounded-lg shadow-lg p-6 hover:shadow-xl transition-all duration-200 border-2 border-transparent hover:border-green-300 focus:outline-none focus:ring-4 focus:ring-green-200"
+          >
+            <div className="text-center h-full flex flex-col justify-center">
+              <div className="text-4xl mb-4">🗺️</div>
+              <h3 className="text-xl font-bold text-gray-800">Map</h3>
             </div>
-            <h3 className="text-lg font-semibold text-gray-800 mb-2">Campus Map</h3>
-            <p className="text-sm text-gray-600">Find your way around campus</p>
-          </div>
+          </button>
         </div>
 
-        <div className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow duration-200 border-l-4 border-purple-600">
-          <div className="text-center">
-            <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg className="w-8 h-8 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M4 4a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-5L9 2H4z" clipRule="evenodd" />
-              </svg>
+        {/* Row 1-2, Columns 4-5: Announcement Button */}
+        <div className="col-span-2 row-span-2">
+          <button
+            onClick={() => navigate('/announcement')}
+            className="w-full h-full bg-white rounded-lg shadow-lg p-8 hover:shadow-xl transition-all duration-200 border-2 border-transparent hover:border-orange-300 focus:outline-none focus:ring-4 focus:ring-orange-200"
+          >
+            <div className="text-center h-full flex flex-col justify-center">
+              <div className="text-6xl mb-6">📢</div>
+              <h3 className="text-3xl font-bold text-gray-800">Announcements</h3>
+              <p className="text-lg text-gray-600 mt-4">Latest university news and updates</p>
             </div>
-            <h3 className="text-lg font-semibold text-gray-800 mb-2">Directory</h3>
-            <p className="text-sm text-gray-600">Find staff and department contacts</p>
-          </div>
+          </button>
         </div>
 
-        <div className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow duration-200 border-l-4 border-orange-600">
-          <div className="text-center">
-            <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg className="w-8 h-8 text-orange-600" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clipRule="evenodd" />
-              </svg>
+        {/* Row 2, Columns 1-2: Admissions Queue Display */}
+        <div className="col-span-2 row-span-1">
+          <QueueDisplay
+            department="admissions"
+            title="Admissions Office"
+            icon="🎓"
+          />
+        </div>
+
+        {/* Row 2, Column 3: Directory Button */}
+        <div className="col-span-1 row-span-1">
+          <button
+            onClick={() => navigate('/directory')}
+            className="w-full h-full bg-white rounded-lg shadow-lg p-6 hover:shadow-xl transition-all duration-200 border-2 border-transparent hover:border-purple-300 focus:outline-none focus:ring-4 focus:ring-purple-200"
+          >
+            <div className="text-center h-full flex flex-col justify-center">
+              <div className="text-4xl mb-4">📁</div>
+              <h3 className="text-xl font-bold text-gray-800">Directory</h3>
             </div>
-            <h3 className="text-lg font-semibold text-gray-800 mb-2">Announcements</h3>
-            <p className="text-sm text-gray-600">Latest university news and updates</p>
-          </div>
+          </button>
         </div>
       </div>
     </div>

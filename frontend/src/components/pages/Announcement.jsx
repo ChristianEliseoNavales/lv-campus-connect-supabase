@@ -125,18 +125,6 @@ const Announcement = () => {
           ))}
         </div>
       </div>
-
-      {/* Footer Info */}
-      <div className="mt-6 bg-blue-50 rounded-lg p-4">
-        <div className="text-center">
-          <p className="text-sm text-gray-600">
-            For more information, visit the university website or contact the information desk
-          </p>
-          <p className="text-xs text-gray-500 mt-1">
-            Last updated: {new Date().toLocaleDateString()}
-          </p>
-        </div>
-      </div>
     </div>
   );
 };

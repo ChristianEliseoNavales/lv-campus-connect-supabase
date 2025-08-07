@@ -9,22 +9,24 @@ const KioskLayout = ({ children }) => {
     return () => clearInterval(timer);
   }, []);
 
-  const formatDate = (date) => {
-    return date.toLocaleDateString('en-US', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
-  };
-
   const formatTime = (date) => {
     return date.toLocaleTimeString('en-US', {
       hour: '2-digit',
       minute: '2-digit',
-      second: '2-digit',
       hour12: true
     });
+  };
+
+  const formatDayOfWeek = (date) => {
+    return date.toLocaleDateString('en-US', { weekday: 'long' });
+  };
+
+  const formatDayOfMonth = (date) => {
+    return date.getDate().toString();
+  };
+
+  const formatMonth = (date) => {
+    return date.toLocaleDateString('en-US', { month: 'long' });
   };
 
   // Icon components with proper SVG icons
@@ -89,143 +91,166 @@ const KioskLayout = ({ children }) => {
       }}
     >
       {/* Header */}
-      <header className="pb-6 bg-white bg-opacity-80 text-white flex justify-between items-center shadow-md backdrop-blur-sm" style={{ height: '90px' }}>
-        {/* Left side: Logo and title container with bottom-right border-radius */}
-        <div className="bg-blue-900 px-6 py-4 rounded-br-lg flex items-center">
+      <header className="bg-white bg-opacity-50 text-white flex justify-between items-start" style={{ height: '90px' }}>
+        {/* Left side: Logo and title container with bottom-right border-radius - flush to top */}
+        <div className="bg-blue-900 px-6 pt-4 pb-4 rounded-br-lg flex items-center h-full">
           {/* University Logo Placeholder */}
-          <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center mr-4 mt-4">
+          <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center mr-4 m">
             <span className="text-blue-900 font-bold text-lg">LV</span>
           </div>
-          <h1 className="text-2xl font-bold tracking-wide mt-4">LVCampusConnect</h1>
+          <h1 className="text-2xl font-bold tracking-wide">LVCampusConnect</h1>
         </div>
 
         {/* Right side: Date and time container with full border-radius */}
-        <div className="bg-white text-blue-900 px-4 py-2 rounded-lg shadow-md mr-6 mt-4">
-          <p className="text-sm font-semibold">{formatDate(time)}</p>
-          <p className="text-lg font-bold">{formatTime(time)}</p>
+        <div className="bg-blue-900 text-white px-4 py-2 rounded-lg shadow-md mr-6 mt-1 flex items-center space-x-4">
+          {/* Time Display - Left side with border */}
+          <div className="bg-white text-blue-900 border-2 border-blue-900 rounded-lg px-3 py-4">
+            <p className="text-lg font-bold">{formatTime(time)}</p>
+          </div>
+
+          {/* Date Display - Right side with multi-line layout */}
+          <div className="text-center text-white">
+            <p className="text-sm font-medium">{formatDayOfWeek(time)}</p>
+            <p className="text-2xl font-bold leading-tight">{formatDayOfMonth(time)}</p>
+            <p className="text-sm font-medium">{formatMonth(time)}</p>
+          </div>
         </div>
       </header>
 
       {/* Main Content - Full width utilization for 16:9 landscape */}
-      <main className="flex-grow px-6 py-6 overflow-auto w-full bg-white bg-opacity-80 backdrop-blur-sm">
+      <main className="flex-grow px-6 py-6 overflow-auto w-full bg-white bg-opacity-50">
         {children}
       </main>
 
       {/* Bottom Navigation - White background with proper color scheme */}
-      <footer className="bg-white bg-opacity-80 px-6 py-6 w-full backdrop-blur-sm">
+      <footer className="bg-white bg-opacity-50 px-6 py-8 w-full">
         <nav className="bg-transparent flex justify-center items-center space-x-6 w-full">
           <NavLink
             to="/"
             className={({ isActive }) =>
-              `flex items-center px-6 py-6 rounded-full transition-all duration-200 ${
-                isActive
-                  ? 'bg-yellow-300 text-blue-900 font-bold shadow-md'
-                  : 'bg-blue-900 py-6 text-white hover:bg-blue-800 hover:text-yellow-100'
-              }`
-            }
-          >
-            <HomeIcon />
-            <span className="ml-2 font-semibold">HOME</span>
-          </NavLink>
-
-          <NavLink
-            to="/announcement"
-            className={({ isActive }) =>
-              `flex items-center px-6 py-6 rounded-full transition-all duration-200 ${
-                isActive
-                  ? 'bg-yellow-300 text-blue-900 font-bold shadow-md'
-                  : 'bg-blue-900 py-6 text-white hover:bg-blue-800 hover:text-yellow-100'
-              }`
-            }
-          >
-            <AnnouncementIcon />
-            <span className="ml-2 font-semibold">ANNOUNCEMENT</span>
-          </NavLink>
-
-          <NavLink
-            to="/search"
-            className={({ isActive }) =>
-              `flex items-center px-6 py-6 rounded-full transition-all duration-200 ${
-                isActive
-                  ? 'bg-yellow-300 text-blue-900 font-bold shadow-md'
-                  : 'bg-blue-900 py-6 text-white hover:bg-blue-800 hover:text-yellow-100'
-              }`
-            }
-          >
-            <SearchIcon />
-            <span className="ml-2 font-semibold">SEARCH</span>
-          </NavLink>
-
-          <NavLink
-            to="/map"
-            className={({ isActive }) =>
-              `flex items-center px-6 py-6 rounded-full transition-all duration-200 ${
-                isActive
-                  ? 'bg-yellow-300 text-blue-900 font-bold shadow-md'
-                  : 'bg-blue-900 py-6 text-white hover:bg-blue-800 hover:text-yellow-100'
-              }`
-            }
-          >
-            <MapIcon />
-            <span className="ml-2 font-semibold">MAP</span>
-          </NavLink>
-
-          <NavLink
-            to="/directory"
-            className={({ isActive }) =>
-              `flex items-center px-6 py-6 rounded-full transition-all duration-200 ${
-                isActive
-                  ? 'bg-yellow-300 text-blue-900 font-bold shadow-md'
-                  : 'bg-blue-900 py-6 text-white hover:bg-blue-800 hover:text-yellow-100'
-              }`
-            }
-          >
-            <DirectoryIcon />
-            <span className="ml-2 font-semibold">DIRECTORY</span>
-          </NavLink>
-
-          <NavLink
-            to="/queue"
-            className={({ isActive }) =>
-              `flex items-center px-6 py-6 rounded-full transition-all duration-200 ${
-                isActive
-                  ? 'bg-yellow-300 text-blue-900 font-bold shadow-md'
-                  : 'bg-blue-900 py-6 text-white hover:bg-blue-800 hover:text-yellow-100'
-              }`
-            }
-          >
-            <QueueIcon />
-            <span className="ml-2 font-semibold">QUEUE</span>
-          </NavLink>
-
-          <NavLink
-            to="/faq"
-            className={({ isActive }) =>
-              `flex items-center px-6 py-6 rounded-full transition-all duration-200 ${
-                isActive
-                  ? 'bg-yellow-300 text-blue-900 font-bold shadow-md'
-                  : 'bg-blue-900 py-6 text-white hover:bg-blue-800 hover:text-yellow-100'
-              }`
-            }
-          >
-            <FaqIcon />
-            <span className="ml-2 font-semibold">FAQs</span>
-          </NavLink>
-
-          {/* Navigation Item 8: Circular Help Button with consistent styling */}
-          <NavLink
-            to="/help"
-            className={({ isActive }) =>
-              `w-12 h-12 rounded-full flex items-center justify-center transition-all duration-200 ${
+              `w-36 h-24 flex flex-col items-center justify-center px-6 py-4 rounded-full transition-all duration-200 ${
                 isActive
                   ? 'bg-yellow-300 text-blue-900 font-bold shadow-md'
                   : 'bg-blue-900 text-white hover:bg-blue-800 hover:text-yellow-100'
               }`
             }
-            title="Help & Support"
           >
-            <HelpIcon />
+            <HomeIcon />
+            <span className="mt-2 font-semibold text-sm">HOME</span>
           </NavLink>
+
+          <NavLink
+            to="/announcement"
+            className={({ isActive }) =>
+              `w-36 h-24 flex flex-col items-center justify-center px-6 py-4 rounded-full transition-all duration-200 ${
+                isActive
+                  ? 'bg-yellow-300 text-blue-900 font-bold shadow-md'
+                  : 'bg-blue-900 text-white hover:bg-blue-800 hover:text-yellow-100'
+              }`
+            }
+          >
+            <AnnouncementIcon />
+            <span className="mt-1 font-semibold text-xs text-center leading-tight">ANNOUNCEMENT</span>
+          </NavLink>
+
+          <NavLink
+            to="/search"
+            className={({ isActive }) =>
+              `w-36 h-24 flex flex-col items-center justify-center px-6 py-4 rounded-full transition-all duration-200 ${
+                isActive
+                  ? 'bg-yellow-300 text-blue-900 font-bold shadow-md'
+                  : 'bg-blue-900 text-white hover:bg-blue-800 hover:text-yellow-100'
+              }`
+            }
+          >
+            <SearchIcon />
+            <span className="mt-2 font-semibold text-sm">SEARCH</span>
+          </NavLink>
+
+          <NavLink
+            to="/map"
+            className={({ isActive }) =>
+              `w-36 h-24 flex flex-col items-center justify-center px-6 py-4 rounded-full transition-all duration-200 ${
+                isActive
+                  ? 'bg-yellow-300 text-blue-900 font-bold shadow-md'
+                  : 'bg-blue-900 text-white hover:bg-blue-800 hover:text-yellow-100'
+              }`
+            }
+          >
+            <MapIcon />
+            <span className="mt-2 font-semibold text-sm">MAP</span>
+          </NavLink>
+
+          <NavLink
+            to="/directory"
+            className={({ isActive }) =>
+              `w-36 h-24 flex flex-col items-center justify-center px-6 py-4 rounded-full transition-all duration-200 ${
+                isActive
+                  ? 'bg-yellow-300 text-blue-900 font-bold shadow-md'
+                  : 'bg-blue-900 text-white hover:bg-blue-800 hover:text-yellow-100'
+              }`
+            }
+          >
+            <DirectoryIcon />
+            <span className="mt-2 font-semibold text-sm">DIRECTORY</span>
+          </NavLink>
+
+          <NavLink
+            to="/queue"
+            className={({ isActive }) =>
+              `w-36 h-24 flex flex-col items-center justify-center px-6 py-4 rounded-full transition-all duration-200 ${
+                isActive
+                  ? 'bg-yellow-300 text-blue-900 font-bold shadow-md'
+                  : 'bg-blue-900 text-white hover:bg-blue-800 hover:text-yellow-100'
+              }`
+            }
+          >
+            <QueueIcon />
+            <span className="mt-2 font-semibold text-sm">QUEUE</span>
+          </NavLink>
+
+          <NavLink
+            to="/faq"
+            className={({ isActive }) =>
+              `w-36 h-24 flex flex-col items-center justify-center px-6 py-4 rounded-full transition-all duration-200 ${
+                isActive
+                  ? 'bg-yellow-300 text-blue-900 font-bold shadow-md'
+                  : 'bg-blue-900 text-white hover:bg-blue-800 hover:text-yellow-100'
+              }`
+            }
+          >
+            <FaqIcon />
+            <span className="mt-2 font-semibold text-sm">FAQs</span>
+          </NavLink>
+
+          {/* Help Button with Dialogue Bubble Tooltip */}
+          <div className="relative">
+            {/* Dialogue Bubble Tooltip - Compact version */}
+            <div className="absolute bottom-16 left-1/2 transform -translate-x-1/2 -translate-y-1 z-10">
+              <div className="relative bg-white bg-opacity-65 text-black px-2 py-2 rounded-md shadow-md whitespace-nowrap animate-pulse">
+                <span className="text-xs font-medium">Need help? Touch here.</span>
+                {/* Speech bubble pointer/tail pointing downward - positioned outside container */}
+                <div className="absolute top-full left-1/2 transform -translate-x-1/2 z-20 mt-1">
+                  <div className="w-0 h-0 border-l-6 border-r-6 border-t-6 border-l-transparent border-r-transparent border-t-white relative z-10"></div>
+                  <div className="absolute -top-1 left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-white z-20"></div>
+                </div>
+              </div>
+            </div>
+
+            <NavLink
+              to="/help"
+              className={({ isActive }) =>
+                `w-16 h-16 flex items-center justify-center border-2 border-white rounded-full transition-all duration-200 ${
+                  isActive
+                    ? 'bg-yellow-300 text-blue-900 font-bold shadow-md'
+                    : 'bg-blue-900 text-white hover:bg-blue-800 hover:text-yellow-100'
+                }`
+              }
+              title="Help & Support"
+            >
+              <HelpIcon />
+            </NavLink>
+          </div>
         </nav>
       </footer>
     </div>

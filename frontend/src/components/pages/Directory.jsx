@@ -1,15 +1,14 @@
 import React, { useState } from 'react';
 
 const Directory = () => {
-  const [selectedDepartment, setSelectedDepartment] = useState('admissions');
-  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedDepartment, setSelectedDepartment] = useState(null);
 
   // Organizational chart data for each department
   const organizationalData = {
     admissions: {
       name: "Admissions Office",
       description: "Responsible for student recruitment, application processing, and enrollment management",
-      email: "admissions@university.edu",
+      email: "admissions@lv.edu.ph",
       head: {
         id: 1,
         name: "Dr. Patricia Williams",
@@ -45,7 +44,7 @@ const Directory = () => {
     registrar: {
       name: "Registrar Office",
       description: "Manages student records, transcripts, enrollment verification, and academic scheduling",
-      email: "registrar@university.edu",
+      email: "registrar@lv.edu.ph",
       head: {
         id: 1,
         name: "Sarah Johnson",
@@ -81,7 +80,7 @@ const Directory = () => {
     academic: {
       name: "Academic Affairs",
       description: "Oversees curriculum development, faculty affairs, and academic policy implementation",
-      email: "academic.affairs@university.edu",
+      email: "academic.affairs@lv.edu.ph",
       head: {
         id: 1,
         name: "Dr. Michael Harrison",
@@ -117,7 +116,7 @@ const Directory = () => {
     student_services: {
       name: "Student Services",
       description: "Provides comprehensive support services for student success and campus life",
-      email: "student.services@university.edu",
+      email: "student.services@lv.edu.ph",
       head: {
         id: 1,
         name: "Dr. Maria Garcia",
@@ -151,9 +150,9 @@ const Directory = () => {
       ]
     },
     it_mis: {
-      name: "Information Technology / MIS",
+      name: "MIS Office",
       description: "Manages university technology infrastructure, systems, and digital services",
-      email: "it.support@university.edu",
+      email: "it.support@lv.edu.ph",
       head: {
         id: 1,
         name: "Dr. Steven Taylor",
@@ -187,9 +186,9 @@ const Directory = () => {
       ]
     },
     hr: {
-      name: "Human Resources",
+      name: "Human Resource Office",
       description: "Manages employee relations, benefits, recruitment, and organizational development",
-      email: "hr@university.edu",
+      email: "hr@lv.edu.ph",
       head: {
         id: 1,
         name: "Linda Johnson",
@@ -219,7 +218,7 @@ const Directory = () => {
     finance: {
       name: "Finance & Administration",
       description: "Oversees financial operations, budgeting, accounting, and administrative services",
-      email: "finance@university.edu",
+      email: "finance@lv.edu.ph",
       head: {
         id: 1,
         name: "Dr. Richard Thompson",
@@ -251,205 +250,216 @@ const Directory = () => {
           reports_to: 1
         }
       ]
+    },
+    communications: {
+      name: "Communications Office",
+      description: "Manages university communications, public relations, and marketing initiatives",
+      email: "communications@lv.edu.ph",
+      head: {
+        id: 1,
+        name: "Ms. Jennifer Adams",
+        title: "Director of Communications"
+      },
+      staff: [
+        {
+          id: 2,
+          name: "Mark Thompson",
+          title: "Public Relations Manager",
+          reports_to: 1
+        },
+        {
+          id: 3,
+          name: "Sarah Wilson",
+          title: "Marketing Specialist",
+          reports_to: 1
+        },
+        {
+          id: 4,
+          name: "David Martinez",
+          title: "Social Media Coordinator",
+          reports_to: 2
+        }
+      ]
     }
   };
 
   const departments = [
-    { key: 'admissions', name: 'Admissions Office', icon: '🎓' },
-    { key: 'registrar', name: 'Registrar Office', icon: '📋' },
-    { key: 'academic', name: 'Academic Affairs', icon: '📚' },
-    { key: 'student_services', name: 'Student Services', icon: '🏫' },
-    { key: 'it_mis', name: 'IT / MIS', icon: '💻' },
-    { key: 'hr', name: 'Human Resources', icon: '👥' },
-    { key: 'finance', name: 'Finance & Administration', icon: '💰' }
+    { key: 'registrar', name: "Registrar's Office" },
+    { key: 'admissions', name: 'Admissions Office' },
+    { key: 'hr', name: 'Human Resource Office' },
+    { key: 'communications', name: 'Communications Office' },
+    { key: 'it_mis', name: 'MIS Office' }
   ];
-
-  // Filter departments based on search term for dropdown
-  const filteredDepartments = departments.filter(dept =>
-    dept.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
 
   const currentDepartment = organizationalData[selectedDepartment];
 
-  // Component to render individual staff member cards
-  const StaffCard = ({ person, isHead = false }) => (
-    <div className={`bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow duration-200 ${
-      isHead ? 'border-2 border-blue-500 bg-blue-50' : ''
-    }`}>
-      <div className="flex items-center justify-between">
-        <div className="flex items-center">
-          <div className={`w-12 h-12 rounded-full flex items-center justify-center mr-4 ${
-            isHead ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-600'
-          }`}>
-            <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
-            </svg>
-          </div>
-          <div>
-            <h3 className={`text-lg font-semibold ${isHead ? 'text-blue-900' : 'text-gray-800'}`}>
-              {person.name}
-            </h3>
-            <p className={`text-sm ${isHead ? 'text-blue-700' : 'text-gray-600'}`}>
-              {person.title}
-            </p>
-          </div>
-        </div>
-        {isHead && (
-          <span className="px-3 py-1 bg-blue-600 text-white text-xs font-medium rounded-full">
-            Department Head
-          </span>
-        )}
+  // Component to render individual staff member in triangular org chart
+  const StaffMember = ({ person, isHead = false }) => (
+    <div className="flex flex-col items-center justify-center space-y-3 w-40">
+      {/* Avatar Icon - Perfectly Centered with Enhanced Styling */}
+      <div className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto ${
+        isHead ? 'text-white' : 'text-white'
+      }`} style={{ backgroundColor: 'transparent', border: '2px solid #2F0FE4' }}>
+        <svg className="w-8 h-8" viewBox="0 0 24 24" style={{ color: '#2F0FE4' }}>
+          {/* Person figure - solid fill with same color as text */}
+          <g fill="currentColor">
+            {/* Head */}
+            <circle cx="12" cy="8.5" r="2.5" />
+            {/* Body */}
+            <path d="M12 13c-3.5 0-6 2.5-6 5.5v1h12v-1c0-3-2.5-5.5-6-5.5z" />
+          </g>
+        </svg>
+      </div>
+
+      {/* Name and Title - Center Aligned with Consistent Purple-Blue Color */}
+      <div className="text-center w-full">
+        <h3 className="text-lg font-semibold text-center leading-tight whitespace-nowrap" style={{ color: '#2F0FE4' }}>
+          {person.name}
+        </h3>
+        <p className="text-sm text-center mt-1 whitespace-nowrap" style={{ color: '#2F0FE4' }}>
+          {person.title}
+        </p>
       </div>
     </div>
   );
 
+  // Function to organize staff into triangular pyramid structure
+  const organizeStaffInPyramid = (department) => {
+    const allStaff = [department.head, ...department.staff];
+    const rows = [];
+    let currentIndex = 0;
+    let rowSize = 1;
+
+    // Create proper triangular distribution: 1, 2, 3, 4, etc.
+    while (currentIndex < allStaff.length) {
+      const remainingStaff = allStaff.length - currentIndex;
+      const currentRowSize = Math.min(rowSize, remainingStaff);
+      const row = allStaff.slice(currentIndex, currentIndex + currentRowSize);
+      rows.push(row);
+      currentIndex += currentRowSize;
+      rowSize++;
+    }
+
+    return rows;
+  };
+
   return (
     <div className="h-full flex flex-col">
-      {/* Header */}
-      <div className="text-center mb-6">
-        <h1 className="text-4xl font-bold text-blue-900 mb-2">
-          University Organizational Directory
-        </h1>
-        <p className="text-lg text-gray-600">
-          Explore departmental organizational charts and staff hierarchies
-        </p>
-      </div>
 
-      {/* Department Selection */}
-      <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-        <h2 className="text-lg font-semibold text-gray-800 mb-4">Select Department</h2>
-
-        {/* Search and Filter Controls */}
-        <div className="flex flex-col md:flex-row gap-4 mb-6">
-          {/* Search Input */}
-          <div className="flex-grow">
-            <label htmlFor="department-search" className="block text-sm font-medium text-gray-700 mb-2">
-              Search Departments
-            </label>
-            <input
-              type="text"
-              id="department-search"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Enter department name..."
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg"
-            />
+      {!selectedDepartment ? (
+        /* Department Selection Grid */
+        <div className="flex-grow flex flex-col">
+          {/* Fixed Header */}
+          <div className="pt-8 pb-6">
+            <h2 className="text-4xl font-semibold text-center drop-shadow-lg" style={{ color: '#2F0FE4' }}>
+              Select a department
+            </h2>
           </div>
 
-          {/* Department Dropdown */}
-          <div className="md:w-64">
-            <label htmlFor="department-select" className="block text-sm font-medium text-gray-700 mb-2">
-              Quick Select
-            </label>
-            <select
-              id="department-select"
-              value={selectedDepartment}
-              onChange={(e) => setSelectedDepartment(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg"
-            >
-              {filteredDepartments.length > 0 ? (
-                filteredDepartments.map((dept) => (
-                  <option key={dept.key} value={dept.key}>
-                    {dept.icon} {dept.name}
-                  </option>
-                ))
-              ) : (
-                <option value="" disabled>
-                  No departments match your search
-                </option>
-              )}
-            </select>
+          {/* Centered Grid Container */}
+          <div className="flex-grow flex items-center justify-center">
+            {/* 5 Department Grid: 3 in first row, 2 in second row */}
+            <div className="grid grid-cols-3 gap-8 max-w-4xl mx-auto">
+              {/* First Row - 3 departments */}
+              {departments.slice(0, 3).map((department) => (
+                <button
+                  key={department.key}
+                  onClick={() => setSelectedDepartment(department.key)}
+                  className="bg-white rounded-full shadow-lg drop-shadow-md p-6 hover:shadow-xl hover:drop-shadow-lg transition-all duration-200 border-2 border-transparent hover:border-blue-300 focus:outline-none focus:ring-4 focus:ring-blue-200"
+                >
+                  <div className="text-center">
+                    <h3 className="text-xl font-semibold" style={{ color: '#2F0FE4' }}>
+                      {department.name}
+                    </h3>
+                  </div>
+                </button>
+              ))}
+
+              {/* Second Row - 2 departments, centered */}
+              <div className="col-span-3 grid grid-cols-2 gap-8 max-w-xl mx-auto">
+                {departments.slice(3, 5).map((department) => (
+                  <button
+                    key={department.key}
+                    onClick={() => setSelectedDepartment(department.key)}
+                    className="bg-white rounded-full shadow-lg drop-shadow-md p-6 hover:shadow-xl hover:drop-shadow-lg transition-all duration-200 border-2 border-transparent hover:border-blue-300 focus:outline-none focus:ring-4 focus:ring-blue-200"
+                  >
+                    <div className="text-center">
+                      <h3 className="text-xl font-semibold" style={{ color: '#2F0FE4' }}>
+                        {department.name}
+                      </h3>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
-      </div>
+      ) : (
+        /* Department Details View - Fixed Header/Footer with Scrollable Content */
+        <div className="flex-grow flex flex-col bg-white bg-opacity-80 rounded-2xl shadow-sm overflow-hidden">
+          {currentDepartment && (
+            <>
+              {/* Fixed Header with Department Navigation - Light Background */}
+              <div className="bg-gray-200 px-8 py-6 flex-shrink-0 relative border-b border-gray-200">
+                {/* Left: Back Button - Positioned Absolutely */}
+                <button
+                  onClick={() => setSelectedDepartment(null)}
+                  className="absolute left-8 top-1/2 transform -translate-y-1/2 flex items-center transition-colors duration-200 font-semibold z-10 hover:opacity-80"
+                  style={{ color: '#2F0FE4' }}
+                >
+                  <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clipRule="evenodd" />
+                  </svg>
+                  Back
+                </button>
 
-      {/* Organizational Chart */}
-      <div className="flex-grow overflow-auto">
-        {currentDepartment && (
-          <div className="space-y-6">
-            {/* Department Info */}
-            <div className="bg-white rounded-lg shadow-md p-6">
-              <h2 className="text-2xl font-bold text-blue-900 mb-2">
-                {currentDepartment.name}
-              </h2>
-              <p className="text-gray-600 text-lg mb-4">
-                {currentDepartment.description}
-              </p>
-              <div className="flex items-center text-blue-700 bg-blue-50 px-4 py-2 rounded-lg">
-                <svg className="w-5 h-5 mr-3" fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
-                  <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
-                </svg>
-                <span className="font-medium">Department Email: {currentDepartment.email}</span>
-              </div>
-            </div>
-
-            {/* Department Head */}
-            <div>
-              <h3 className="text-xl font-semibold text-gray-800 mb-4 flex items-center">
-                <svg className="w-6 h-6 mr-2 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-6-3a2 2 0 11-4 0 2 2 0 014 0zm-2 4a5 5 0 00-4.546 2.916A5.986 5.986 0 0010 16a5.986 5.986 0 004.546-2.084A5 5 0 0010 11z" clipRule="evenodd" />
-                </svg>
-                Department Leadership
-              </h3>
-              <div className="mb-8">
-                <StaffCard person={currentDepartment.head} isHead={true} />
-              </div>
-            </div>
-
-            {/* Staff Members */}
-            <div>
-              <h3 className="text-xl font-semibold text-gray-800 mb-4 flex items-center">
-                <svg className="w-6 h-6 mr-2 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3z" />
-                </svg>
-                Department Staff ({currentDepartment.staff.length})
-              </h3>
-
-              {/* Direct Reports */}
-              <div className="space-y-6">
-                {/* Level 1 - Direct reports to head */}
-                <div>
-                  <h4 className="text-lg font-medium text-gray-700 mb-3">Direct Reports</h4>
-                  <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
-                    {currentDepartment.staff
-                      .filter(person => person.reports_to === currentDepartment.head.id)
-                      .map((person) => (
-                        <StaffCard key={person.id} person={person} />
-                      ))}
-                  </div>
+                {/* Center: Department Name - Perfectly Centered Across Full Width */}
+                <div className="flex justify-center items-center w-full">
+                  <h1 className="text-3xl font-bold text-center" style={{ color: '#2F0FE4' }}>
+                    {currentDepartment.name}
+                  </h1>
                 </div>
 
-                {/* Level 2 - Reports to direct reports */}
-                {currentDepartment.staff.some(person =>
-                  person.reports_to !== currentDepartment.head.id
-                ) && (
-                  <div>
-                    <h4 className="text-lg font-medium text-gray-700 mb-3">Team Members</h4>
-                    <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
-                      {currentDepartment.staff
-                        .filter(person => person.reports_to !== currentDepartment.head.id)
-                        .map((person) => {
-                          const supervisor = currentDepartment.staff.find(s => s.id === person.reports_to);
-                          return (
-                            <div key={person.id} className="relative">
-                              <StaffCard person={person} />
-                              {supervisor && (
-                                <div className="mt-2 text-xs text-gray-500 text-center">
-                                  Reports to: {supervisor.name}
-                                </div>
-                              )}
-                            </div>
-                          );
-                        })}
-                    </div>
-                  </div>
-                )}
+                {/* Right: Find Location - Positioned Absolutely */}
+                <button className="absolute right-8 top-1/2 transform -translate-y-1/2 flex items-center transition-colors duration-200 font-semibold z-10 hover:opacity-80" style={{ color: '#2F0FE4' }}>
+                  <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
+                  </svg>
+                  Find Location
+                </button>
               </div>
-            </div>
-          </div>
-        )}
-      </div>
+
+              {/* Scrollable Staff Content Area */}
+              <div className="flex-grow overflow-y-auto px-8 py-8">
+                <div className="flex flex-col items-center justify-center space-y-8 min-h-full w-full">
+                  {organizeStaffInPyramid(currentDepartment).map((row, rowIndex) => (
+                    <div key={rowIndex} className="flex justify-center items-center gap-16 w-full">
+                      <div className="flex justify-center items-center gap-16 flex-wrap">
+                        {row.map((person, personIndex) => (
+                          <StaffMember
+                            key={person.id}
+                            person={person}
+                            isHead={rowIndex === 0 && personIndex === 0}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Fixed Footer with Department Email - Seamlessly Integrated */}
+              <div className="px-8 py-4 flex-shrink-0">
+                <div className="text-center">
+                  <p className="text-lg font-medium" style={{ color: '#2F0FE4' }}>
+                    <span>Email:</span> <span>{currentDepartment.email}</span>
+                  </p>
+                </div>
+              </div>
+            </>
+          )}
+        </div>
+      )}
     </div>
   );
 };
