@@ -1,6 +1,14 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { KioskLayout } from './components/layouts';
+import { AuthProvider } from './contexts/AuthContext';
+import { KioskLayout, AdminLayout } from './components/layouts';
+import { ProtectedRoute, Login, Unauthorized } from './components/auth';
+import {
+  AdminDashboard,
+  MISAdminDashboard,
+  RegistrarAdminDashboard,
+  AdmissionsAdminDashboard
+} from './components/pages/admin';
 import {
   Home,
   Announcement,
@@ -14,20 +22,95 @@ import {
 
 function App() {
   return (
-    <Router future={{ v7_relativeSplatPath: true }}>
-      <KioskLayout>
+    <AuthProvider>
+      <Router future={{ v7_relativeSplatPath: true }}>
         <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/announcement" element={<Announcement />} />
-          <Route path="/search" element={<Search />} />
-          <Route path="/map" element={<Map />} />
-          <Route path="/directory" element={<Directory />} />
-          <Route path="/queue" element={<Queue />} />
-          <Route path="/faq" element={<FAQ />} />
-          <Route path="/help" element={<Help />} />
+          {/* Public Kiosk Routes - No Authentication Required */}
+          <Route path="/" element={
+            <KioskLayout>
+              <Home />
+            </KioskLayout>
+          } />
+          <Route path="/announcement" element={
+            <KioskLayout>
+              <Announcement />
+            </KioskLayout>
+          } />
+          <Route path="/search" element={
+            <KioskLayout>
+              <Search />
+            </KioskLayout>
+          } />
+          <Route path="/map" element={
+            <KioskLayout>
+              <Map />
+            </KioskLayout>
+          } />
+          <Route path="/directory" element={
+            <KioskLayout>
+              <Directory />
+            </KioskLayout>
+          } />
+          <Route path="/queue" element={
+            <KioskLayout>
+              <Queue />
+            </KioskLayout>
+          } />
+          <Route path="/faq" element={
+            <KioskLayout>
+              <FAQ />
+            </KioskLayout>
+          } />
+          <Route path="/help" element={
+            <KioskLayout>
+              <Help />
+            </KioskLayout>
+          } />
+
+          {/* Authentication Routes */}
+          <Route path="/login" element={<Login />} />
+
+          {/* Admin Routes - Authentication Required */}
+          <Route path="/admin" element={
+            <ProtectedRoute requiredRoles={['super_admin', 'registrar_admin', 'admissions_admin']}>
+              <AdminLayout>
+                <AdminDashboard />
+              </AdminLayout>
+            </ProtectedRoute>
+          } />
+
+          {/* MIS Super Admin Routes */}
+          <Route path="/admin/mis" element={
+            <ProtectedRoute requiredRoles={['super_admin']}>
+              <AdminLayout>
+                <MISAdminDashboard />
+              </AdminLayout>
+            </ProtectedRoute>
+          } />
+
+          {/* Registrar Admin Routes */}
+          <Route path="/admin/registrar" element={
+            <ProtectedRoute requiredRoles={['super_admin', 'registrar_admin']}>
+              <AdminLayout>
+                <RegistrarAdminDashboard />
+              </AdminLayout>
+            </ProtectedRoute>
+          } />
+
+          {/* Admissions Admin Routes */}
+          <Route path="/admin/admissions" element={
+            <ProtectedRoute requiredRoles={['super_admin', 'admissions_admin']}>
+              <AdminLayout>
+                <AdmissionsAdminDashboard />
+              </AdminLayout>
+            </ProtectedRoute>
+          } />
+
+          {/* Unauthorized Access */}
+          <Route path="/admin/unauthorized" element={<Unauthorized />} />
         </Routes>
-      </KioskLayout>
-    </Router>
+      </Router>
+    </AuthProvider>
   );
 }
 

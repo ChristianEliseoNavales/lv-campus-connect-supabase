@@ -159,6 +159,38 @@
     transition: all 0.15s ease-in-out;
   }
 
+  /* Enhanced sidebar animations */
+  .sidebar-text-fade {
+    transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out, width 0.3s ease-in-out;
+  }
+
+  .sidebar-text-fade.collapsed {
+    opacity: 0;
+    transform: translateX(1rem);
+    width: 0;
+  }
+
+  .sidebar-text-fade.expanded {
+    opacity: 1;
+    transform: translateX(0);
+    width: auto;
+  }
+
+  /* Prevent layout shift during sidebar animations */
+  .sidebar-container {
+    transition: width 0.3s ease-in-out;
+    will-change: width;
+  }
+
+  /* Smooth icon transitions */
+  .sidebar-icon {
+    transition: transform 0.2s ease-in-out;
+  }
+
+  .sidebar-icon:hover {
+    transform: scale(1.1);
+  }
+
   .touch-feedback:active {
     transform: scale(0.98);
     filter: brightness(0.95);

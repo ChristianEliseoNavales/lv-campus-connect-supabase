@@ -157,7 +157,7 @@ const Search = () => {
               id="category"
               value={searchCategory}
               onChange={(e) => setSearchCategory(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg"
+              className="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg"
             >
               <option value="all">All Categories</option>
               <option value="department">Departments</option>

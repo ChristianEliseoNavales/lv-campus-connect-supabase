@@ -13,7 +13,7 @@ const Input = ({
 }) => {
   const inputId = id || `input-${Math.random().toString(36).substr(2, 9)}`;
 
-  const baseClasses = 'w-full border rounded-xl transition-all duration-300 focus:outline-none focus:ring-4';
+  const baseClasses = 'w-full border rounded-md transition-all duration-300 focus:outline-none focus:ring-4';
   
   const variants = {
     default: 'border-gray-300 focus:border-blue-500 focus:ring-blue-200',
@@ -82,7 +82,7 @@ export const TextArea = ({
 }) => {
   const inputId = id || `textarea-${Math.random().toString(36).substr(2, 9)}`;
 
-  const baseClasses = 'w-full border rounded-xl transition-all duration-300 focus:outline-none focus:ring-4 resize-vertical';
+  const baseClasses = 'w-full border rounded-md transition-all duration-300 focus:outline-none focus:ring-4 resize-vertical';
   
   const variants = {
     default: 'border-gray-300 focus:border-blue-500 focus:ring-blue-200',
@@ -152,7 +152,7 @@ export const Select = ({
 }) => {
   const inputId = id || `select-${Math.random().toString(36).substr(2, 9)}`;
 
-  const baseClasses = 'w-full border rounded-xl transition-all duration-300 focus:outline-none focus:ring-4 bg-white';
+  const baseClasses = 'w-full border rounded-md transition-all duration-300 focus:outline-none focus:ring-4 bg-white';
   
   const variants = {
     default: 'border-gray-300 focus:border-blue-500 focus:ring-blue-200',

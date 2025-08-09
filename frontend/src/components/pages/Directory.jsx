@@ -365,7 +365,7 @@ const Directory = () => {
                 <button
                   key={department.key}
                   onClick={() => setSelectedDepartment(department.key)}
-                  className="bg-white rounded-full shadow-lg drop-shadow-md p-6 hover:shadow-xl hover:drop-shadow-lg transition-all duration-200 border-2 border-transparent hover:border-blue-300 focus:outline-none focus:ring-4 focus:ring-blue-200"
+                  className="bg-white rounded-3xl shadow-lg drop-shadow-md p-6 hover:shadow-xl hover:drop-shadow-lg transition-all duration-200 border-2 border-transparent hover:border-blue-300 focus:outline-none focus:ring-4 focus:ring-blue-200"
                 >
                   <div className="text-center">
                     <h3 className="text-xl font-semibold" style={{ color: '#2F0FE4' }}>
@@ -381,7 +381,7 @@ const Directory = () => {
                   <button
                     key={department.key}
                     onClick={() => setSelectedDepartment(department.key)}
-                    className="bg-white rounded-full shadow-lg drop-shadow-md p-6 hover:shadow-xl hover:drop-shadow-lg transition-all duration-200 border-2 border-transparent hover:border-blue-300 focus:outline-none focus:ring-4 focus:ring-blue-200"
+                    className="bg-white rounded-3xl shadow-lg drop-shadow-md p-6 hover:shadow-xl hover:drop-shadow-lg transition-all duration-200 border-2 border-transparent hover:border-blue-300 focus:outline-none focus:ring-4 focus:ring-blue-200"
                   >
                     <div className="text-center">
                       <h3 className="text-xl font-semibold" style={{ color: '#2F0FE4' }}>

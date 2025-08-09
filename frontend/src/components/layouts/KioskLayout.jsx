@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
 
-const KioskLayout = ({ children }) => {
+const KioskLayout = ({ children, hideHeader = false, customFooter = null }) => {
   const [time, setTime] = useState(new Date());
 
   useEffect(() => {
@@ -90,32 +90,34 @@ const KioskLayout = ({ children }) => {
         backgroundAttachment: 'fixed'
       }}
     >
-      {/* Header */}
-      <header className="bg-white bg-opacity-50 text-white flex justify-between items-start" style={{ height: '90px' }}>
-        {/* Left side: Logo and title container with bottom-right border-radius - flush to top */}
-        <div className="bg-blue-900 px-6 pt-4 pb-4 rounded-br-lg flex items-center h-full">
-          {/* University Logo Placeholder */}
-          <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center mr-4 m">
-            <span className="text-blue-900 font-bold text-lg">LV</span>
-          </div>
-          <h1 className="text-2xl font-bold tracking-wide">LVCampusConnect</h1>
-        </div>
-
-        {/* Right side: Date and time container with full border-radius */}
-        <div className="bg-blue-900 text-white px-4 py-2 rounded-lg shadow-md mr-6 mt-1 flex items-center space-x-4">
-          {/* Time Display - Left side with border */}
-          <div className="bg-white text-blue-900 border-2 border-blue-900 rounded-lg px-3 py-4">
-            <p className="text-lg font-bold">{formatTime(time)}</p>
+      {/* Header - Conditionally rendered */}
+      {!hideHeader && (
+        <header className="bg-white bg-opacity-50 text-white flex justify-between items-start" style={{ height: '90px' }}>
+          {/* Left side: Logo and title container with bottom-right border-radius - flush to top */}
+          <div className="bg-blue-900 px-6 pt-4 pb-4 rounded-br-lg flex items-center h-full">
+            {/* University Logo Placeholder */}
+            <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center mr-4 m">
+              <span className="text-blue-900 font-bold text-lg">LV</span>
+            </div>
+            <h1 className="text-2xl font-bold tracking-wide">LVCampusConnect</h1>
           </div>
 
-          {/* Date Display - Right side with multi-line layout */}
-          <div className="text-center text-white">
-            <p className="text-sm font-medium">{formatDayOfWeek(time)}</p>
-            <p className="text-2xl font-bold leading-tight">{formatDayOfMonth(time)}</p>
-            <p className="text-sm font-medium">{formatMonth(time)}</p>
+          {/* Right side: Date and time container with full border-radius */}
+          <div className="bg-blue-900 text-white px-1 py-1 pr-2 rounded-lg shadow-md mr-6 mt-4 flex items-center space-x-4">
+            {/* Time Display - Left side with border */}
+            <div className="bg-white text-blue-900 border-2 border-blue-900 rounded-lg px-3 py-4">
+              <p className="text-xl font-bold">{formatTime(time)}</p>
+            </div>
+
+            {/* Date Display - Right side with multi-line layout */}
+            <div className="text-center text-white">
+              <p className="text-sm font-medium">{formatDayOfWeek(time)}</p>
+              <p className="text-1xl font-bold leading-tight">{formatDayOfMonth(time)}</p>
+              <p className="text-sm font-medium">{formatMonth(time)}</p>
+            </div>
           </div>
-        </div>
-      </header>
+        </header>
+      )}
 
       {/* Main Content - Full width utilization for 16:9 landscape */}
       <main className="flex-grow px-6 py-6 overflow-auto w-full bg-white bg-opacity-50">
@@ -123,8 +125,11 @@ const KioskLayout = ({ children }) => {
       </main>
 
       {/* Bottom Navigation - White background with proper color scheme */}
-      <footer className="bg-white bg-opacity-50 px-6 py-8 w-full">
-        <nav className="bg-transparent flex justify-center items-center space-x-6 w-full">
+      <footer className="bg-white bg-opacity-50 px-6 pb-3 w-full">
+        {customFooter ? (
+          customFooter
+        ) : (
+          <nav className="bg-transparent flex justify-center items-center space-x-6 w-full">
           <NavLink
             to="/"
             className={({ isActive }) =>
@@ -252,6 +257,7 @@ const KioskLayout = ({ children }) => {
             </NavLink>
           </div>
         </nav>
+        )}
       </footer>
     </div>
   );
