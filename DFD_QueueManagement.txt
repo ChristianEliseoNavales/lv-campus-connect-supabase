@@ -1,0 +1,53 @@
+flowchart TD
+    %% Queue-Related Data Flow Diagram
+    %% University Queue System - Simplified DFD focusing on queue management functionality
+    
+    %% External Entities
+    Student["👤<br/>Student/Visitor"]
+    RegistrarAdmin["👨‍💼<br/>Registrar<br/>Admin"]
+    AdmissionsAdmin["👩‍💼<br/>Admissions<br/>Admin"]
+    
+    %% Processes
+    P1("1.0<br/>Submit Queue<br/>Request")
+    P2("2.0<br/>Assign Queue<br/>Number")
+    P3("3.0<br/>Display Queue<br/>Status")
+    P4("4.0<br/>Call Next<br/>Number")
+    P5("5.0<br/>Update Queue<br/>Status")
+    
+    %% Data Stores
+    DS1["|D1| Queue Database|"]
+    DS2["|D2| Window Assignments|"]
+    
+    %% Data Flows - Student Queue Submission
+    Student -->|"queue form data"| P1
+    P1 -->|"queue ticket"| Student
+    P1 -->|"validated request"| P2
+    P2 -->|"assigned number"| DS1
+    
+    %% Data Flows - Queue Display
+    Student -->|"status request"| P3
+    P3 -->|"current queue status"| Student
+    P3 <-->|"read queue data"| DS1
+    P3 <-->|"read window status"| DS2
+    
+    %% Data Flows - Admin Queue Management
+    RegistrarAdmin -->|"call next command"| P4
+    AdmissionsAdmin -->|"call next command"| P4
+    P4 -->|"next number called"| RegistrarAdmin
+    P4 -->|"next number called"| AdmissionsAdmin
+    P4 -->|"update status"| P5
+    
+    P5 <-->|"update queue"| DS1
+    P5 <-->|"update window"| DS2
+    
+    %% Real-time updates
+    P5 -->|"status update"| P3
+    
+    %% Styling
+    classDef entity fill:#e1f5fe,stroke:#01579b,stroke-width:2px
+    classDef process fill:#f3e5f5,stroke:#4a148c,stroke-width:2px
+    classDef datastore fill:#e8f5e8,stroke:#1b5e20,stroke-width:2px
+    
+    class Student,RegistrarAdmin,AdmissionsAdmin entity
+    class P1,P2,P3,P4,P5 process
+    class DS1,DS2 datastore

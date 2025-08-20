@@ -1,8 +1,27 @@
-import React, { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
-// On-screen QWERTY Keyboard Component
+// On-screen QWERTY Keyboard Component - Optimized for Kiosk Touchscreen
 const OnScreenKeyboard = ({ onKeyPress, onBackspace, onSpace, onEnter, isVisible }) => {
-  if (!isVisible) return null;
+  const [isAnimating, setIsAnimating] = useState(false);
+  const keyboardRef = useRef(null);
+
+  useEffect(() => {
+    if (isVisible) {
+      setIsAnimating(true);
+      if (keyboardRef.current) {
+        keyboardRef.current.classList.remove('kiosk-keyboard-exit');
+        keyboardRef.current.classList.add('kiosk-keyboard-enter');
+      }
+    } else {
+      if (keyboardRef.current) {
+        keyboardRef.current.classList.remove('kiosk-keyboard-enter');
+        keyboardRef.current.classList.add('kiosk-keyboard-exit');
+        setTimeout(() => setIsAnimating(false), 300);
+      }
+    }
+  }, [isVisible]);
+
+  if (!isVisible && !isAnimating) return null;
 
   const keyboardRows = [
     ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P'],
@@ -13,14 +32,17 @@ const OnScreenKeyboard = ({ onKeyPress, onBackspace, onSpace, onEnter, isVisible
   const numberRow = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'];
 
   return (
-    <div className="bg-white border-2 border-gray-300 rounded-lg p-4 shadow-lg">
+    <div
+      ref={keyboardRef}
+      className="bg-white border-2 border-gray-300 rounded-xl p-6 shadow-xl max-w-5xl mx-auto"
+    >
       {/* Number Row */}
-      <div className="flex justify-center gap-1 mb-2">
+      <div className="flex justify-center gap-3 mb-4">
         {numberRow.map((key) => (
           <button
             key={key}
             onClick={() => onKeyPress(key)}
-            className="w-12 h-12 bg-white border border-gray-400 rounded text-lg font-semibold hover:bg-gray-100 active:bg-gray-200 transition-colors"
+            className="w-20 h-16 bg-white border-2 border-gray-400 rounded-lg text-2xl font-bold kiosk-touch-feedback select-none"
           >
             {key}
           </button>
@@ -29,12 +51,12 @@ const OnScreenKeyboard = ({ onKeyPress, onBackspace, onSpace, onEnter, isVisible
 
       {/* Letter Rows */}
       {keyboardRows.map((row, rowIndex) => (
-        <div key={rowIndex} className="flex justify-center gap-1 mb-2">
+        <div key={rowIndex} className="flex justify-center gap-3 mb-4">
           {row.map((key) => (
             <button
               key={key}
               onClick={() => onKeyPress(key)}
-              className="w-12 h-12 bg-white border border-gray-400 rounded text-lg font-semibold hover:bg-gray-100 active:bg-gray-200 transition-colors"
+              className="w-20 h-16 bg-white border-2 border-gray-400 rounded-lg text-2xl font-bold kiosk-touch-feedback select-none"
             >
               {key}
             </button>
@@ -43,22 +65,22 @@ const OnScreenKeyboard = ({ onKeyPress, onBackspace, onSpace, onEnter, isVisible
       ))}
 
       {/* Bottom Row with Special Keys */}
-      <div className="flex justify-center gap-1">
+      <div className="flex justify-center gap-3">
         <button
           onClick={onBackspace}
-          className="w-20 h-12 bg-white border border-gray-400 rounded text-sm font-semibold hover:bg-gray-100 active:bg-gray-200 transition-colors"
+          className="w-32 h-16 bg-white border-2 border-gray-400 rounded-lg text-lg font-bold kiosk-touch-feedback select-none"
         >
-          ⌫ DEL
+          ⌫ DELETE
         </button>
         <button
           onClick={onSpace}
-          className="w-32 h-12 bg-white border border-gray-400 rounded text-sm font-semibold hover:bg-gray-100 active:bg-gray-200 transition-colors"
+          className="w-48 h-16 bg-white border-2 border-gray-400 rounded-lg text-lg font-bold kiosk-touch-feedback select-none"
         >
           SPACE
         </button>
         <button
           onClick={onEnter}
-          className="w-20 h-12 bg-white border border-gray-400 rounded text-sm font-semibold hover:bg-gray-100 active:bg-gray-200 transition-colors"
+          className="w-32 h-16 bg-white border-2 border-gray-400 rounded-lg text-lg font-bold kiosk-touch-feedback select-none"
         >
           ↵ ENTER
         </button>
@@ -72,8 +94,10 @@ const Queue = () => {
   const [selectedService, setSelectedService] = useState(null);
   const [showForm, setShowForm] = useState(false);
   const [showKeyboard, setShowKeyboard] = useState(true);
-  const [showMenu, setShowMenu] = useState(true);
+  const [showMenu, setShowMenu] = useState(false);
+  const [isMenuAnimating, setIsMenuAnimating] = useState(false);
   const [activeField, setActiveField] = useState('name');
+  const menuRef = useRef(null);
   const [formData, setFormData] = useState({
     name: '',
     contactNumber: ''
@@ -110,12 +134,74 @@ const Queue = () => {
     }
   };
 
+  // Helper function to hide navigation menu with proper animation
+  const hideNavigationWithAnimation = () => {
+    if (showMenu) {
+      setIsMenuAnimating(true);
+      if (menuRef.current) {
+        menuRef.current.classList.remove('kiosk-nav-enter');
+        menuRef.current.classList.add('kiosk-nav-exit');
+        setTimeout(() => {
+          setShowMenu(false);
+          setIsMenuAnimating(false);
+        }, 300);
+      } else {
+        // Fallback if ref is not available
+        setTimeout(() => {
+          setShowMenu(false);
+          setIsMenuAnimating(false);
+        }, 300);
+      }
+    }
+  };
+
   const toggleMenu = () => {
-    setShowMenu(!showMenu);
+    const newShowMenu = !showMenu;
+
+    if (newShowMenu) {
+      // Show menu with animation
+      setShowMenu(true);
+      setIsMenuAnimating(true);
+      if (menuRef.current) {
+        menuRef.current.classList.remove('kiosk-nav-exit');
+        menuRef.current.classList.add('kiosk-nav-enter');
+      }
+    } else {
+      // Hide menu with animation
+      setIsMenuAnimating(true);
+      if (menuRef.current) {
+        menuRef.current.classList.remove('kiosk-nav-enter');
+        menuRef.current.classList.add('kiosk-nav-exit');
+        setTimeout(() => {
+          setShowMenu(false);
+          setIsMenuAnimating(false);
+        }, 300);
+      } else {
+        // Fallback if ref is not available
+        setTimeout(() => {
+          setShowMenu(false);
+          setIsMenuAnimating(false);
+        }, 300);
+      }
+    }
+
+    // Auto-hide keyboard when hamburger menu is pressed (showing navigation items)
+    if (newShowMenu && showKeyboard) {
+      setShowKeyboard(false);
+      // Note: Keyboard animation is handled by the OnScreenKeyboard component's useEffect
+    }
   };
 
   const toggleKeyboard = () => {
-    setShowKeyboard(!showKeyboard);
+    const newShowKeyboard = !showKeyboard;
+
+    // Auto-hide navigation items BEFORE showing keyboard to prevent animation conflicts
+    if (newShowKeyboard && showMenu) {
+      hideNavigationWithAnimation();
+    }
+
+    // Set keyboard state after handling navigation
+    setShowKeyboard(newShowKeyboard);
   };
 
   // Departments following Directory.jsx structure
@@ -167,6 +253,8 @@ const Queue = () => {
     setShowForm(true);
     setShowKeyboard(true);
     setActiveField('name');
+    // Auto-hide navigation items when starting form with keyboard visible
+    setShowMenu(false);
     // Reset form data when starting new form
     setFormData({ name: '', contactNumber: '' });
   };
@@ -193,6 +281,9 @@ const Queue = () => {
     setActiveField(fieldName);
     // Auto-show keyboard when any input field is focused
     setShowKeyboard(true);
+
+    // Auto-hide navigation items when keyboard is shown (with proper animation)
+    hideNavigationWithAnimation();
   };
 
   // Check if form is valid (both fields have content)
@@ -256,93 +347,103 @@ const Queue = () => {
     );
 
     return (
-      <nav className="bg-transparent flex justify-center items-center space-x-6 w-full">
-        {/* Menu Button */}
-        <button
-          onClick={toggleMenu}
-          className="w-36 h-24 flex flex-col items-center justify-center px-6 py-4 rounded-full transition-all duration-200 bg-blue-900 text-white hover:bg-blue-800 hover:text-yellow-100"
-        >
-          <MenuIcon />
-          <span className="mt-2 font-semibold text-sm">MENU</span>
-        </button>
+      <nav className="bg-transparent flex items-center justify-between w-full px-6">
+        {/* Fixed Left Anchor - Menu Button */}
+        <div className="flex-shrink-0">
+          <button
+            onClick={toggleMenu}
+            className={`w-36 h-24 flex flex-col items-center justify-center px-6 py-4 rounded-full kiosk-touch-feedback ${
+              showMenu && !showKeyboard
+                ? 'bg-yellow-300 text-blue-900 font-bold shadow-md'
+                : 'bg-blue-900 text-white hover:bg-blue-800 hover:text-yellow-100'
+            }`}
+          >
+            <MenuIcon />
+            <span className="mt-2 font-semibold text-sm">MENU</span>
+          </button>
+        </div>
 
-        {/* Conditional Navigation Items - Show ALL navigation items when menu is expanded */}
-        {showMenu && (
-          <>
-            <button
-              onClick={() => {
-                setShowForm(false);
-                setSelectedService(null);
-                setSelectedDepartment(null);
-              }}
-              className="w-36 h-24 flex flex-col items-center justify-center px-6 py-4 rounded-full transition-all duration-200 bg-blue-900 text-white hover:bg-blue-800 hover:text-yellow-100"
-            >
-              <HomeIcon />
-              <span className="mt-2 font-semibold text-sm">HOME</span>
-            </button>
+        {/* Expandable Middle Section - Navigation Items */}
+        <div className="flex-grow flex justify-center items-center">
+          {(showMenu || isMenuAnimating) && !showKeyboard && (
+            <div ref={menuRef} className="flex items-center space-x-6">
+              <button
+                onClick={() => {
+                  setShowForm(false);
+                  setSelectedService(null);
+                  setSelectedDepartment(null);
+                }}
+                className="kiosk-nav-item w-36 h-24 flex flex-col items-center justify-center px-6 py-4 rounded-full kiosk-touch-feedback bg-blue-900 text-white hover:bg-blue-800 hover:text-yellow-100"
+              >
+                <HomeIcon />
+                <span className="mt-2 font-semibold text-sm">HOME</span>
+              </button>
 
-            <button
-              onClick={() => window.location.href = '/announcement'}
-              className="w-36 h-24 flex flex-col items-center justify-center px-6 py-4 rounded-full transition-all duration-200 bg-blue-900 text-white hover:bg-blue-800 hover:text-yellow-100"
-            >
-              <AnnouncementIcon />
-              <span className="mt-1 font-semibold text-xs text-center leading-tight">ANNOUNCEMENT</span>
-            </button>
+              <button
+                onClick={() => window.location.href = '/announcement'}
+                className="kiosk-nav-item w-36 h-24 flex flex-col items-center justify-center px-6 py-4 rounded-full kiosk-touch-feedback bg-blue-900 text-white hover:bg-blue-800 hover:text-yellow-100"
+              >
+                <AnnouncementIcon />
+                <span className="mt-1 font-semibold text-xs text-center leading-tight">ANNOUNCEMENT</span>
+              </button>
 
-            <button
-              onClick={() => window.location.href = '/search'}
-              className="w-36 h-24 flex flex-col items-center justify-center px-6 py-4 rounded-full transition-all duration-200 bg-blue-900 text-white hover:bg-blue-800 hover:text-yellow-100"
-            >
-              <SearchIcon />
-              <span className="mt-2 font-semibold text-sm">SEARCH</span>
-            </button>
+              <button
+                onClick={() => window.location.href = '/search'}
+                className="kiosk-nav-item w-36 h-24 flex flex-col items-center justify-center px-6 py-4 rounded-full kiosk-touch-feedback bg-blue-900 text-white hover:bg-blue-800 hover:text-yellow-100"
+              >
+                <SearchIcon />
+                <span className="mt-2 font-semibold text-sm">SEARCH</span>
+              </button>
 
-            <button
-              onClick={() => window.location.href = '/map'}
-              className="w-36 h-24 flex flex-col items-center justify-center px-6 py-4 rounded-full transition-all duration-200 bg-blue-900 text-white hover:bg-blue-800 hover:text-yellow-100"
-            >
-              <MapIcon />
-              <span className="mt-2 font-semibold text-sm">MAP</span>
-            </button>
+              <button
+                onClick={() => window.location.href = '/map'}
+                className="kiosk-nav-item w-36 h-24 flex flex-col items-center justify-center px-6 py-4 rounded-full kiosk-touch-feedback bg-blue-900 text-white hover:bg-blue-800 hover:text-yellow-100"
+              >
+                <MapIcon />
+                <span className="mt-2 font-semibold text-sm">MAP</span>
+              </button>
 
-            <button
-              onClick={() => window.location.href = '/directory'}
-              className="w-36 h-24 flex flex-col items-center justify-center px-6 py-4 rounded-full transition-all duration-200 bg-blue-900 text-white hover:bg-blue-800 hover:text-yellow-100"
-            >
-              <DirectoryIcon />
-              <span className="mt-2 font-semibold text-sm">DIRECTORY</span>
-            </button>
+              <button
+                onClick={() => window.location.href = '/directory'}
+                className="kiosk-nav-item w-36 h-24 flex flex-col items-center justify-center px-6 py-4 rounded-full kiosk-touch-feedback bg-blue-900 text-white hover:bg-blue-800 hover:text-yellow-100"
+              >
+                <DirectoryIcon />
+                <span className="mt-2 font-semibold text-sm">DIRECTORY</span>
+              </button>
 
-            <button
-              onClick={() => window.location.href = '/faq'}
-              className="w-36 h-24 flex flex-col items-center justify-center px-6 py-4 rounded-full transition-all duration-200 bg-blue-900 text-white hover:bg-blue-800 hover:text-yellow-100"
-            >
-              <FaqIcon />
-              <span className="mt-2 font-semibold text-sm">FAQs</span>
-            </button>
+              <button
+                onClick={() => window.location.href = '/faq'}
+                className="kiosk-nav-item w-36 h-24 flex flex-col items-center justify-center px-6 py-4 rounded-full kiosk-touch-feedback bg-blue-900 text-white hover:bg-blue-800 hover:text-yellow-100"
+              >
+                <FaqIcon />
+                <span className="mt-2 font-semibold text-sm">FAQs</span>
+              </button>
 
-            <button
-              onClick={() => window.location.href = '/help'}
-              className="w-16 h-16 flex items-center justify-center border-2 border-white rounded-full transition-all duration-200 bg-blue-900 text-white hover:bg-blue-800 hover:text-yellow-100"
-              title="Help & Support"
-            >
-              <HelpIcon />
-            </button>
-          </>
-        )}
+              <button
+                onClick={() => window.location.href = '/help'}
+                className="kiosk-nav-item w-16 h-16 flex items-center justify-center border-2 border-white rounded-full kiosk-touch-feedback bg-blue-900 text-white hover:bg-blue-800 hover:text-yellow-100"
+                title="Help & Support"
+              >
+                <HelpIcon />
+              </button>
+            </div>
+          )}
+        </div>
 
-        {/* Keyboard Toggle Button */}
-        <button
-          onClick={toggleKeyboard}
-          className={`w-36 h-24 flex flex-col items-center justify-center px-6 py-4 rounded-full transition-all duration-200 ${
-            showKeyboard
-              ? 'bg-yellow-300 text-blue-900 font-bold shadow-md'
-              : 'bg-blue-900 text-white hover:bg-blue-800 hover:text-yellow-100'
-          }`}
-        >
-          <KeyboardIcon />
-          <span className="mt-2 font-semibold text-sm">KEYBOARD</span>
-        </button>
+        {/* Fixed Right Anchor - Keyboard Toggle Button */}
+        <div className="flex-shrink-0">
+          <button
+            onClick={toggleKeyboard}
+            className={`w-36 h-24 flex flex-col items-center justify-center px-6 py-4 rounded-full kiosk-touch-feedback ${
+              showKeyboard
+                ? 'bg-yellow-300 text-blue-900 font-bold shadow-md'
+                : 'bg-blue-900 text-white hover:bg-blue-800 hover:text-yellow-100'
+            }`}
+          >
+            <KeyboardIcon />
+            <span className="mt-2 font-semibold text-sm">KEYBOARD</span>
+          </button>
+        </div>
       </nav>
     );
   };
@@ -358,83 +459,77 @@ const Queue = () => {
         `}</style>
 
         <div className={`h-full flex flex-col ${showKeyboard ? 'justify-start' : 'justify-center'}`}>
-          {/* Form Container with NEXT Button - Perfectly centered horizontally */}
-          <div className={`flex justify-center items-center w-full px-8 ${showKeyboard ? 'mb-4' : ''}`}>
-            <div className="flex items-center justify-center gap-8 w-full max-w-4xl mx-auto">
-              {/* Form Section - Reduced dimensions */}
-              <div className="bg-white rounded-lg shadow-lg p-6 w-96">
-                <div className="space-y-5">
-                  {/* Name Field */}
-                  <div>
-                    <label htmlFor="name" className="block text-lg font-semibold text-gray-700 mb-2">
-                      NAME <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      id="name"
-                      type="text"
-                      value={formData.name}
-                      onFocus={() => handleFieldFocus('name')}
-                      readOnly
-                      className={`w-full px-3 py-3 border-2 rounded-lg text-lg focus:outline-none ${
-                        activeField === 'name'
-                          ? 'border-blue-500 bg-blue-50'
-                          : 'border-gray-300 bg-gray-50'
-                      }`}
-                      placeholder="Enter your full name"
-                    />
-                  </div>
+          {/* Form Container - Centered horizontally with positioned NEXT button */}
+          <div className={`flex items-center justify-center w-full px-8 ${showKeyboard ? 'mb-4' : ''} relative`}>
+            {/* Form Section - Perfectly centered regardless of button */}
+            <div className="bg-white rounded-lg shadow-lg p-6 w-96">
+              <div className="space-y-5">
+                {/* Name Field */}
+                <div>
+                  <label htmlFor="name" className="block text-lg font-semibold text-gray-700 mb-2">
+                    NAME <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    id="name"
+                    type="text"
+                    value={formData.name}
+                    onFocus={() => handleFieldFocus('name')}
+                    readOnly
+                    className={`w-full px-3 py-3 border-2 rounded-lg text-lg focus:outline-none ${
+                      activeField === 'name'
+                        ? 'border-blue-500 bg-blue-50'
+                        : 'border-gray-300 bg-gray-50'
+                    }`}
+                    placeholder="Enter your full name"
+                  />
+                </div>
 
-                  {/* Contact Number Field */}
-                  <div>
-                    <label htmlFor="contactNumber" className="block text-lg font-semibold text-gray-700 mb-2">
-                      CONTACT NUMBER <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      id="contactNumber"
-                      type="text"
-                      value={formData.contactNumber}
-                      onFocus={() => handleFieldFocus('contactNumber')}
-                      readOnly
-                      className={`w-full px-3 py-3 border-2 rounded-lg text-lg focus:outline-none ${
-                        activeField === 'contactNumber'
-                          ? 'border-blue-500 bg-blue-50'
-                          : 'border-gray-300 bg-gray-50'
-                      }`}
-                      placeholder="Enter your contact number"
-                    />
-                  </div>
+                {/* Contact Number Field */}
+                <div>
+                  <label htmlFor="contactNumber" className="block text-lg font-semibold text-gray-700 mb-2">
+                    CONTACT NUMBER <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    id="contactNumber"
+                    type="text"
+                    value={formData.contactNumber}
+                    onFocus={() => handleFieldFocus('contactNumber')}
+                    readOnly
+                    className={`w-full px-3 py-3 border-2 rounded-lg text-lg focus:outline-none ${
+                      activeField === 'contactNumber'
+                        ? 'border-blue-500 bg-blue-50'
+                        : 'border-gray-300 bg-gray-50'
+                    }`}
+                    placeholder="Enter your contact number"
+                  />
                 </div>
               </div>
-
-              {/* NEXT Button - Vertically centered relative to form container */}
-              <div className="flex items-center">
-                <button
-                  onClick={handleFormSubmit}
-                  disabled={!isFormValid}
-                  className={`px-6 py-4 rounded-full font-bold text-xl transition-all duration-200 shadow-lg min-w-28 ${
-                    isFormValid
-                      ? 'bg-blue-900 text-white hover:bg-blue-800 hover:shadow-xl transform hover:scale-105'
-                      : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                  }`}
-                >
-                  NEXT
-                </button>
-              </div>
             </div>
+
+            {/* NEXT Button - Positioned to the right of form, vertically centered */}
+            <button
+              onClick={handleFormSubmit}
+              disabled={!isFormValid}
+              className={`absolute left-1/2 ml-60 px-6 py-4 rounded-full font-bold text-xl transition-all duration-200 shadow-lg min-w-28 ${
+                isFormValid
+                  ? 'bg-blue-900 text-white hover:bg-blue-800 hover:shadow-xl transform hover:scale-105'
+                  : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+              }`}
+            >
+              NEXT
+            </button>
           </div>
 
           {/* On-Screen Keyboard - Moved closer to form */}
-          {showKeyboard && (
-            <div className="flex justify-center w-full mt-2">
-              <OnScreenKeyboard
-                onKeyPress={handleKeyPress}
-                onBackspace={handleBackspace}
-                onSpace={handleSpace}
-                onEnter={handleEnter}
-                isVisible={showKeyboard}
-              />
-            </div>
-          )}
+          <div className="flex justify-center w-full mt-2">
+            <OnScreenKeyboard
+              onKeyPress={handleKeyPress}
+              onBackspace={handleBackspace}
+              onSpace={handleSpace}
+              onEnter={handleEnter}
+              isVisible={showKeyboard}
+            />
+          </div>
         </div>
 
         {/* Custom Footer Navigation for Form State */}

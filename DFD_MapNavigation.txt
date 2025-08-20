@@ -1,0 +1,46 @@
+flowchart TD
+    %% Map Navigation-Related Data Flow Diagram
+    %% University Queue System - Simplified DFD focusing on map and navigation functionality
+    
+    %% External Entities
+    Student["👤<br/>Student/Visitor"]
+    AdminUser["👨‍💼<br/>Admin User<br/>(MIS)"]
+    
+    %% Processes
+    P1("1.0<br/>Display<br/>Campus Map")
+    P2("2.0<br/>Search<br/>Locations")
+    P3("3.0<br/>Provide<br/>Directions")
+    P4("4.0<br/>Update<br/>Map Data")
+    
+    %% Data Stores
+    DS1["|D1| Map Database|"]
+    DS2["|D2| Directory Database|"]
+    
+    %% Data Flows - Public Navigation
+    Student -->|"map request"| P1
+    P1 -->|"campus map display"| Student
+    P1 <-->|"read map data"| DS1
+    
+    Student -->|"search query"| P2
+    P2 -->|"location results"| Student
+    P2 <-->|"read locations"| DS2
+    
+    Student -->|"direction request"| P3
+    P3 -->|"navigation path"| Student
+    P3 <-->|"read map data"| DS1
+    P3 <-->|"read directory"| DS2
+    
+    %% Data Flows - Admin Management
+    AdminUser -->|"map update data"| P4
+    P4 -->|"update confirmation"| AdminUser
+    P4 <-->|"update map"| DS1
+    P4 <-->|"update directory"| DS2
+    
+    %% Styling
+    classDef entity fill:#e1f5fe,stroke:#01579b,stroke-width:2px
+    classDef process fill:#f3e5f5,stroke:#4a148c,stroke-width:2px
+    classDef datastore fill:#e8f5e8,stroke:#1b5e20,stroke-width:2px
+    
+    class Student,AdminUser entity
+    class P1,P2,P3,P4 process
+    class DS1,DS2 datastore
