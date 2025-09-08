@@ -8,6 +8,7 @@ const Home = () => {
     admissions: { currentNumber: 0, nextNumber: 0, queue: [] }
   });
   const [loading, setLoading] = useState(true);
+  const [currentTime, setCurrentTime] = useState(new Date());
 
   // Fetch queue data from API
   useEffect(() => {
@@ -51,37 +52,128 @@ const Home = () => {
     return () => clearInterval(interval);
   }, []);
 
-  // Queue Display Component
-  const QueueDisplay = ({ department, title, icon }) => {
+  // Update digital clock every second
+  useEffect(() => {
+    const clockInterval = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+    return () => clearInterval(clockInterval);
+  }, []);
+
+  // Enhanced Queue Display Component
+  const EnhancedQueueDisplay = ({ department, title }) => {
     const data = queueData[department];
 
     return (
-      <div className="h-full bg-white rounded-lg shadow-lg p-6 border-l-4 border-blue-900 flex flex-col">
-        <div className="text-center mb-4">
-          <div className="text-3xl mb-2">{icon}</div>
-          <h3 className="text-xl font-bold text-blue-900 mb-4">{title}</h3>
+      <div className="h-full bg-white rounded-lg shadow-lg flex flex-col">
+        {/* Office Name Header */}
+        <div className="bg-[#1F3463] text-white text-center py-4 rounded-t-lg">
+          <h3 className="text-xl font-bold">{title}</h3>
         </div>
 
-        <div className="flex-grow grid grid-cols-2 gap-4">
-          {/* Now Serving */}
-          <div className="bg-blue-50 rounded-lg p-4 flex items-center justify-center">
-            <div className="text-center">
-              <p className="text-sm font-medium text-blue-700 mb-1">NOW SERVING</p>
-              <p className="text-4xl font-bold text-blue-900">
-                {loading ? '--' : String(data.currentNumber).padStart(2, '0')}
-              </p>
-            </div>
-          </div>
+        {/* NOW SERVING Section */}
+        <div className="text-center py-4">
+          <p className="text-lg font-bold" style={{ color: '#1F3463' }}>NOW SERVING</p>
+        </div>
 
-          {/* Next */}
-          <div className="bg-gray-50 rounded-lg p-4 flex items-center justify-center">
+        {/* Labels positioned OUTSIDE and ABOVE the grid */}
+        <div className="mx-4 mb-2">
+          <div className="grid grid-cols-3 gap-2">
             <div className="text-center">
-              <p className="text-sm font-medium text-gray-600 mb-1">NEXT</p>
-              <p className="text-2xl font-semibold text-gray-800">
-                {loading ? '--' : String(data.nextNumber).padStart(2, '0')}
-              </p>
+              <span className="font-semibold text-gray-700 text-sm">WINDOW</span>
+            </div>
+            <div className="col-span-2 text-center">
+              <span className="font-semibold text-gray-700 text-sm">QUEUE NO.</span>
             </div>
           </div>
+        </div>
+
+        {/* Queue Grid Container */}
+        <div className="flex-grow mx-4 mb-4">
+          <div className="h-full bg-white p-2">
+            {/* Grid Layout: 4 rows with unified row borders */}
+            <div className="flex flex-col gap-2 h-full">
+              {/* Row 1 */}
+              <div className="flex-1 border border-gray-300 rounded flex">
+                <div className="flex items-center justify-center bg-white rounded-l flex-1">
+                  <span className="text-lg font-bold text-gray-800">1</span>
+                </div>
+                <div className="flex items-center justify-center bg-gray-100 rounded-r flex-[2]">
+                  <span className="text-lg font-bold" style={{ color: '#1F3463' }}>
+                    {loading ? '--' : String(data.currentNumber).padStart(2, '0')}
+                  </span>
+                </div>
+              </div>
+
+              {/* Row 2 */}
+              <div className="flex-1 border border-gray-300 rounded flex">
+                <div className="flex items-center justify-center bg-white rounded-l flex-1">
+                  <span className="text-lg font-bold text-gray-800">2</span>
+                </div>
+                <div className="flex items-center justify-center bg-gray-100 rounded-r flex-[2]">
+                  <span className="text-lg font-bold text-gray-600">
+                    {loading ? '--' : String(data.nextNumber).padStart(2, '0')}
+                  </span>
+                </div>
+              </div>
+
+              {/* Row 3 */}
+              <div className="flex-1 border border-gray-300 rounded flex">
+                <div className="flex items-center justify-center bg-white rounded-l flex-1">
+                  <span className="text-lg font-bold text-gray-800">3</span>
+                </div>
+                <div className="flex items-center justify-center bg-gray-100 rounded-r flex-[2]">
+                  <span className="text-lg font-bold text-gray-400">--</span>
+                </div>
+              </div>
+
+              {/* Row 4 */}
+              <div className="flex-1 border border-gray-300 rounded flex">
+                <div className="flex items-center justify-center bg-white rounded-l flex-1">
+                  <span className="text-lg font-bold text-gray-800">Priority</span>
+                </div>
+                <div className="flex items-center justify-center bg-gray-100 rounded-r flex-[2]">
+                  <span className="text-lg font-bold text-gray-400">--</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  // Digital Clock Component
+  const DigitalClock = () => {
+    const formatTime = (date) => {
+      return date.toLocaleTimeString('en-US', {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false
+      });
+    };
+
+    const formatDay = (date) => {
+      return date.toLocaleDateString('en-US', { weekday: 'long' });
+    };
+
+    const formatDate = (date) => {
+      const day = date.getDate();
+      const month = date.toLocaleDateString('en-US', { month: 'long' });
+      return { day, month };
+    };
+
+    const time = formatTime(currentTime);
+    const dayName = formatDay(currentTime);
+    const { day, month } = formatDate(currentTime);
+
+    return (
+      <div className="w-full h-full bg-[#1F3463] rounded-lg shadow-lg p-4 flex flex-col items-center justify-center text-white">
+        <div className="text-center">
+          <div className="text-2xl text-black font-bold mb-2 bg-white rounded-xl p-2 px-20">{time}</div>
+          <div className="text-sm font-medium mb-1">{dayName}</div>
+          <div className="text-3xl font-bold">{day}</div>
+          <div className="text-sm font-medium">{month}</div>
         </div>
       </div>
     );
@@ -90,62 +182,61 @@ const Home = () => {
   return (
     <div className="h-full flex flex-col">
 
-      {/* 5-Column, 2-Row Grid Layout */}
-      <div className="flex-grow grid grid-cols-5 grid-rows-2 gap-6 h-full">
-        {/* Row 1, Columns 1-2: Registrar Queue Display */}
-        <div className="col-span-2 row-span-1">
-          <QueueDisplay
-            department="registrar"
-            title="Registrar's Office"
-            icon="📋"
-          />
-        </div>
-
-        {/* Row 1, Column 3: Map Button */}
-        <div className="col-span-1 row-span-1">
+      {/* 4-Column, 3-Row Grid Layout */}
+      <div className="flex-grow grid grid-cols-[1fr_1fr_1fr_0.5fr] grid-rows-3 gap-6 h-full">
+        {/* Column 1 (Left sidebar) - Row 1: MAP */}
+        <div className="col-span-1 row-span-1 col-start-1 row-start-1">
           <button
             onClick={() => navigate('/map')}
-            className="w-full h-full bg-white rounded-lg shadow-lg p-6 hover:shadow-xl transition-all duration-200 border-2 border-transparent hover:border-green-300 focus:outline-none focus:ring-4 focus:ring-green-200"
+            className="w-full h-full bg-[#1F3463] rounded-lg shadow-lg p-4 flex items-center justify-center hover:bg-[#2a4a7a] transition-colors duration-200 focus:outline-none focus:ring-4 focus:ring-blue-200"
           >
-            <div className="text-center h-full flex flex-col justify-center">
-              <div className="text-4xl mb-4">🗺️</div>
-              <h3 className="text-xl font-bold text-gray-800">Map</h3>
+            <div className="text-center">
+              <h3 className="text-lg font-bold text-white">MAP</h3>
             </div>
           </button>
         </div>
 
-        {/* Row 1-2, Columns 4-5: Announcement Button */}
-        <div className="col-span-2 row-span-2">
-          <button
-            onClick={() => navigate('/announcement')}
-            className="w-full h-full bg-white rounded-lg shadow-lg p-8 hover:shadow-xl transition-all duration-200 border-2 border-transparent hover:border-orange-300 focus:outline-none focus:ring-4 focus:ring-orange-200"
-          >
-            <div className="text-center h-full flex flex-col justify-center">
-              <div className="text-6xl mb-6">📢</div>
-              <h3 className="text-3xl font-bold text-gray-800">Announcements</h3>
-              <p className="text-lg text-gray-600 mt-4">Latest university news and updates</p>
-            </div>
-          </button>
-        </div>
-
-        {/* Row 2, Columns 1-2: Admissions Queue Display */}
-        <div className="col-span-2 row-span-1">
-          <QueueDisplay
-            department="admissions"
-            title="Admissions Office"
-            icon="🎓"
+        {/* Column 2 (Main content area 1) - Registrar's Office - Spans all 3 rows */}
+        <div className="col-span-1 row-span-3 col-start-2 row-start-1">
+          <EnhancedQueueDisplay
+            department="registrar"
+            title="Registrar's Office"
           />
         </div>
 
-        {/* Row 2, Column 3: Directory Button */}
-        <div className="col-span-1 row-span-1">
+        {/* Column 3 (Main content area 2) - Admissions Office - Spans all 3 rows */}
+        <div className="col-span-1 row-span-3 col-start-3 row-start-1">
+          <EnhancedQueueDisplay
+            department="admissions"
+            title="Admissions Office"
+          />
+        </div>
+
+        {/* Column 4 (Right sidebar) - Digital Clock - Row 1 only */}
+        <div className="col-span-1 row-span-1 col-start-4 row-start-1">
+          <DigitalClock />
+        </div>
+
+        {/* Column 1 (Left sidebar) - Row 2: DIRECTORY */}
+        <div className="col-span-1 row-span-1 col-start-1 row-start-2">
           <button
             onClick={() => navigate('/directory')}
-            className="w-full h-full bg-white rounded-lg shadow-lg p-6 hover:shadow-xl transition-all duration-200 border-2 border-transparent hover:border-purple-300 focus:outline-none focus:ring-4 focus:ring-purple-200"
+            className="w-full h-full bg-[#1F3463] rounded-lg shadow-lg p-4 flex items-center justify-center hover:bg-[#2a4a7a] transition-colors duration-200 focus:outline-none focus:ring-4 focus:ring-blue-200"
           >
-            <div className="text-center h-full flex flex-col justify-center">
-              <div className="text-4xl mb-4">📁</div>
-              <h3 className="text-xl font-bold text-gray-800">Directory</h3>
+            <div className="text-center">
+              <h3 className="text-lg font-bold text-white">DIRECTORY</h3>
+            </div>
+          </button>
+        </div>
+
+        {/* Column 1 (Left sidebar) - Row 3: HIGHLIGHTS */}
+        <div className="col-span-1 row-span-1 col-start-1 row-start-3">
+          <button
+            onClick={() => navigate('/highlights')}
+            className="w-full h-full bg-[#1F3463] rounded-lg shadow-lg p-4 flex items-center justify-center hover:bg-[#2a4a7a] transition-colors duration-200 focus:outline-none focus:ring-4 focus:ring-blue-200"
+          >
+            <div className="text-center">
+              <h3 className="text-lg font-bold text-white">HIGHLIGHTS</h3>
             </div>
           </button>
         </div>

@@ -150,7 +150,7 @@ The system enforces strict role-based access:
 
 ### Color Scheme
 - **Primary**: `#2F0FE4` (Purple-blue for accents)
-- **Navy Blue**: `#1e3a8a` (Sidebar and header background)
+- **Navy Blue**: `#1F3463` (Sidebar and header background)
 - **Background**: `bg-gray-50` (Light gray main content)
 - **Cards**: `bg-white` with subtle shadows
 - **Text**: White/light colors on navy, dark colors on light backgrounds

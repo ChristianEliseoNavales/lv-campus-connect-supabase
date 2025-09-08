@@ -15,11 +15,6 @@ This is a public kiosk interface for the University Queue System, designed speci
 - Priority-based announcement system (High, Medium, Low)
 - Searchable announcement archive
 
-### 🔍 **Search**
-- Find departments, services, and faculty
-- Category-based filtering
-- Comprehensive search results with contact information
-
 ### 🗺️ **Campus Map**
 - Interactive campus building map
 - Building information and department listings
@@ -35,33 +30,23 @@ This is a public kiosk interface for the University Queue System, designed speci
 - Department and service selection
 - Real-time queue status and wait times
 
-### ❓ **FAQs**
-- Frequently asked questions by category
-- Searchable knowledge base
-- Contact information for additional help
 
-### 🆘 **Help & Support**
-- System usage instructions
-- Emergency contact information
-- Technical support details
 
 ## Design Specifications
 
 ### Layout
 - **Aspect Ratio**: 16:9 landscape orientation
 - **Header**: University branding with real-time date/time
-- **Navigation**: Bottom navigation bar with 8 items
-- **Color Scheme**: Navy blue (#1e3a8a) primary, white text
+- **Navigation**: Bottom navigation bar with 6 items
+- **Color Scheme**: Navy blue (#1F3463) primary, white text
 
 ### Navigation Structure
 1. **HOME** - Main landing page
 2. **ANNOUNCEMENT** - University news
-3. **SEARCH** - Find information
-4. **MAP** - Campus navigation
-5. **DIRECTORY** - Contact information
-6. **QUEUE** - Service queues
-7. **FAQs** - Help articles
-8. **?** - Help & support (circular button)
+3. **MAP** - Campus navigation
+4. **DIRECTORY** - Contact information
+5. **QUEUE** - Service queues
+6. **FAQ** - Help articles
 
 ### Accessibility Features
 - High contrast text for visibility
@@ -85,12 +70,10 @@ src/
 │   ├── pages/
 │   │   ├── Home.jsx            # Home page
 │   │   ├── Announcement.jsx    # Announcements
-│   │   ├── Search.jsx          # Search functionality
 │   │   ├── Map.jsx             # Campus map
 │   │   ├── Directory.jsx       # Contact directory
 │   │   ├── Queue.jsx           # Queue system
 │   │   ├── FAQ.jsx             # FAQ system
-│   │   ├── Help.jsx            # Help & support
 │   │   └── index.js
 │   └── ui/                     # Reusable UI components
 ├── App.jsx                     # Main app component

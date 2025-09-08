@@ -47,10 +47,8 @@ const AdminLayout = ({ children }) => {
       super_admin: [
         { name: 'MIS Dashboard', path: '/admin/mis', icon: '⚙️' },
         { name: 'User Management', path: '/admin/mis/users', icon: '👥' },
-        { name: 'System Settings', path: '/admin/mis/settings', icon: '🔧' },
         { name: 'Registrar Module', path: '/admin/registrar', icon: '📋' },
         { name: 'Admissions Module', path: '/admin/admissions', icon: '🎓' },
-        { name: 'Reports', path: '/admin/reports', icon: '📈' }
       ],
       registrar_admin: [
         { name: 'Queue Management', path: '/admin/registrar/queue', icon: '📋' },
@@ -103,7 +101,7 @@ const AdminLayout = ({ children }) => {
       <div
         className={`shadow-lg transition-all duration-300 ease-in-out ${isSidebarCollapsed ? 'w-16' : 'w-64'} flex flex-col relative z-20 overflow-hidden`}
         style={{
-          backgroundColor: '#1e3a8a',
+          backgroundColor: '#1F3463',
           // Ensure smooth transitions by preventing layout shifts
           minWidth: isSidebarCollapsed ? '4rem' : '16rem'
         }}
@@ -113,7 +111,7 @@ const AdminLayout = ({ children }) => {
           <div className="flex items-center space-x-3">
             {/* Logo - prevent squishing with fixed dimensions */}
             <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center flex-shrink-0">
-              <span className="text-blue-900 font-bold text-sm">LV</span>
+              <span className="font-bold text-sm" style={{ color: '#1F3463' }}>LV</span>
             </div>
             {/* Title with fade animation */}
             <div

@@ -1,4 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
+import KioskLayout from '../layouts/KioskLayout';
+import QueueLayout from '../layouts/QueueLayout';
 
 // On-screen QWERTY Keyboard Component - Optimized for Kiosk Touchscreen
 const OnScreenKeyboard = ({ onKeyPress, onBackspace, onSpace, onEnter, isVisible }) => {
@@ -94,10 +96,7 @@ const Queue = () => {
   const [selectedService, setSelectedService] = useState(null);
   const [showForm, setShowForm] = useState(false);
   const [showKeyboard, setShowKeyboard] = useState(true);
-  const [showMenu, setShowMenu] = useState(false);
-  const [isMenuAnimating, setIsMenuAnimating] = useState(false);
   const [activeField, setActiveField] = useState('name');
-  const menuRef = useRef(null);
   const [formData, setFormData] = useState({
     name: '',
     contactNumber: ''
@@ -134,74 +133,8 @@ const Queue = () => {
     }
   };
 
-  // Helper function to hide navigation menu with proper animation
-  const hideNavigationWithAnimation = () => {
-    if (showMenu) {
-      setIsMenuAnimating(true);
-      if (menuRef.current) {
-        menuRef.current.classList.remove('kiosk-nav-enter');
-        menuRef.current.classList.add('kiosk-nav-exit');
-        setTimeout(() => {
-          setShowMenu(false);
-          setIsMenuAnimating(false);
-        }, 300);
-      } else {
-        // Fallback if ref is not available
-        setTimeout(() => {
-          setShowMenu(false);
-          setIsMenuAnimating(false);
-        }, 300);
-      }
-    }
-  };
-
-  const toggleMenu = () => {
-    const newShowMenu = !showMenu;
-
-    if (newShowMenu) {
-      // Show menu with animation
-      setShowMenu(true);
-      setIsMenuAnimating(true);
-      if (menuRef.current) {
-        menuRef.current.classList.remove('kiosk-nav-exit');
-        menuRef.current.classList.add('kiosk-nav-enter');
-      }
-    } else {
-      // Hide menu with animation
-      setIsMenuAnimating(true);
-      if (menuRef.current) {
-        menuRef.current.classList.remove('kiosk-nav-enter');
-        menuRef.current.classList.add('kiosk-nav-exit');
-        setTimeout(() => {
-          setShowMenu(false);
-          setIsMenuAnimating(false);
-        }, 300);
-      } else {
-        // Fallback if ref is not available
-        setTimeout(() => {
-          setShowMenu(false);
-          setIsMenuAnimating(false);
-        }, 300);
-      }
-    }
-
-    // Auto-hide keyboard when hamburger menu is pressed (showing navigation items)
-    if (newShowMenu && showKeyboard) {
-      setShowKeyboard(false);
-      // Note: Keyboard animation is handled by the OnScreenKeyboard component's useEffect
-    }
-  };
-
   const toggleKeyboard = () => {
-    const newShowKeyboard = !showKeyboard;
-
-    // Auto-hide navigation items BEFORE showing keyboard to prevent animation conflicts
-    if (newShowKeyboard && showMenu) {
-      hideNavigationWithAnimation();
-    }
-
-    // Set keyboard state after handling navigation
-    setShowKeyboard(newShowKeyboard);
+    setShowKeyboard(!showKeyboard);
   };
 
   // Departments following Directory.jsx structure
@@ -248,13 +181,20 @@ const Queue = () => {
     setShowForm(false);
   };
 
+  const handleBackToDepartments = () => {
+    setSelectedDepartment(null);
+    setSelectedService(null);
+    setShowForm(false);
+    setShowKeyboard(true);
+    setActiveField('name');
+    setFormData({ name: '', contactNumber: '' });
+  };
+
   const handleServiceSelect = (service) => {
     setSelectedService(service);
     setShowForm(true);
     setShowKeyboard(true);
     setActiveField('name');
-    // Auto-hide navigation items when starting form with keyboard visible
-    setShowMenu(false);
     // Reset form data when starting new form
     setFormData({ name: '', contactNumber: '' });
   };
@@ -281,181 +221,36 @@ const Queue = () => {
     setActiveField(fieldName);
     // Auto-show keyboard when any input field is focused
     setShowKeyboard(true);
-
-    // Auto-hide navigation items when keyboard is shown (with proper animation)
-    hideNavigationWithAnimation();
   };
 
   // Check if form is valid (both fields have content)
   const isFormValid = formData.name.trim() && formData.contactNumber.trim();
 
-  // Custom Footer Navigation for Form State
-  const FormFooterNavigation = () => {
-    const MenuIcon = () => (
-      <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-        <path fillRule="evenodd" d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 15a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clipRule="evenodd" />
+  // Back Button Component
+  const BackButton = () => (
+    <button
+      onClick={handleBackToDepartments}
+      className="fixed bottom-6 left-6 w-20 h-20 bg-[#1F3463] text-white rounded-full shadow-lg hover:bg-[#1A2E56] transition-all duration-200 flex items-center justify-center z-50 focus:outline-none focus:ring-4 focus:ring-blue-200"
+      aria-label="Go back to department selection"
+    >
+      <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
       </svg>
-    );
+    </button>
+  );
 
-    const KeyboardIcon = () => (
-      <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-        <path fillRule="evenodd" d="M3 5a2 2 0 012-2h10a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V5zm5.293 1.293a1 1 0 011.414 0l3 3a1 1 0 010 1.414l-3 3a1 1 0 01-1.414-1.414L10.586 10 8.293 7.707a1 1 0 010-1.414z" clipRule="evenodd" />
-      </svg>
-    );
 
-    const HomeIcon = () => (
-      <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-        <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
-      </svg>
-    );
-
-    const AnnouncementIcon = () => (
-      <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clipRule="evenodd" />
-      </svg>
-    );
-
-    const SearchIcon = () => (
-      <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-        <path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clipRule="evenodd" />
-      </svg>
-    );
-
-    const MapIcon = () => (
-      <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-        <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
-      </svg>
-    );
-
-    const DirectoryIcon = () => (
-      <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-        <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-        <path fillRule="evenodd" d="M4 4a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-5L9 2H4z" clipRule="evenodd" />
-      </svg>
-    );
-
-    const FaqIcon = () => (
-      <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clipRule="evenodd" />
-      </svg>
-    );
-
-    const HelpIcon = () => (
-      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clipRule="evenodd" />
-      </svg>
-    );
-
-    return (
-      <nav className="bg-transparent flex items-center justify-between w-full px-6">
-        {/* Fixed Left Anchor - Menu Button */}
-        <div className="flex-shrink-0">
-          <button
-            onClick={toggleMenu}
-            className={`w-36 h-24 flex flex-col items-center justify-center px-6 py-4 rounded-full kiosk-touch-feedback ${
-              showMenu && !showKeyboard
-                ? 'bg-yellow-300 text-blue-900 font-bold shadow-md'
-                : 'bg-blue-900 text-white hover:bg-blue-800 hover:text-yellow-100'
-            }`}
-          >
-            <MenuIcon />
-            <span className="mt-2 font-semibold text-sm">MENU</span>
-          </button>
-        </div>
-
-        {/* Expandable Middle Section - Navigation Items */}
-        <div className="flex-grow flex justify-center items-center">
-          {(showMenu || isMenuAnimating) && !showKeyboard && (
-            <div ref={menuRef} className="flex items-center space-x-6">
-              <button
-                onClick={() => {
-                  setShowForm(false);
-                  setSelectedService(null);
-                  setSelectedDepartment(null);
-                }}
-                className="kiosk-nav-item w-36 h-24 flex flex-col items-center justify-center px-6 py-4 rounded-full kiosk-touch-feedback bg-blue-900 text-white hover:bg-blue-800 hover:text-yellow-100"
-              >
-                <HomeIcon />
-                <span className="mt-2 font-semibold text-sm">HOME</span>
-              </button>
-
-              <button
-                onClick={() => window.location.href = '/announcement'}
-                className="kiosk-nav-item w-36 h-24 flex flex-col items-center justify-center px-6 py-4 rounded-full kiosk-touch-feedback bg-blue-900 text-white hover:bg-blue-800 hover:text-yellow-100"
-              >
-                <AnnouncementIcon />
-                <span className="mt-1 font-semibold text-xs text-center leading-tight">ANNOUNCEMENT</span>
-              </button>
-
-              <button
-                onClick={() => window.location.href = '/search'}
-                className="kiosk-nav-item w-36 h-24 flex flex-col items-center justify-center px-6 py-4 rounded-full kiosk-touch-feedback bg-blue-900 text-white hover:bg-blue-800 hover:text-yellow-100"
-              >
-                <SearchIcon />
-                <span className="mt-2 font-semibold text-sm">SEARCH</span>
-              </button>
-
-              <button
-                onClick={() => window.location.href = '/map'}
-                className="kiosk-nav-item w-36 h-24 flex flex-col items-center justify-center px-6 py-4 rounded-full kiosk-touch-feedback bg-blue-900 text-white hover:bg-blue-800 hover:text-yellow-100"
-              >
-                <MapIcon />
-                <span className="mt-2 font-semibold text-sm">MAP</span>
-              </button>
-
-              <button
-                onClick={() => window.location.href = '/directory'}
-                className="kiosk-nav-item w-36 h-24 flex flex-col items-center justify-center px-6 py-4 rounded-full kiosk-touch-feedback bg-blue-900 text-white hover:bg-blue-800 hover:text-yellow-100"
-              >
-                <DirectoryIcon />
-                <span className="mt-2 font-semibold text-sm">DIRECTORY</span>
-              </button>
-
-              <button
-                onClick={() => window.location.href = '/faq'}
-                className="kiosk-nav-item w-36 h-24 flex flex-col items-center justify-center px-6 py-4 rounded-full kiosk-touch-feedback bg-blue-900 text-white hover:bg-blue-800 hover:text-yellow-100"
-              >
-                <FaqIcon />
-                <span className="mt-2 font-semibold text-sm">FAQs</span>
-              </button>
-
-              <button
-                onClick={() => window.location.href = '/help'}
-                className="kiosk-nav-item w-16 h-16 flex items-center justify-center border-2 border-white rounded-full kiosk-touch-feedback bg-blue-900 text-white hover:bg-blue-800 hover:text-yellow-100"
-                title="Help & Support"
-              >
-                <HelpIcon />
-              </button>
-            </div>
-          )}
-        </div>
-
-        {/* Fixed Right Anchor - Keyboard Toggle Button */}
-        <div className="flex-shrink-0">
-          <button
-            onClick={toggleKeyboard}
-            className={`w-36 h-24 flex flex-col items-center justify-center px-6 py-4 rounded-full kiosk-touch-feedback ${
-              showKeyboard
-                ? 'bg-yellow-300 text-blue-900 font-bold shadow-md'
-                : 'bg-blue-900 text-white hover:bg-blue-800 hover:text-yellow-100'
-            }`}
-          >
-            <KeyboardIcon />
-            <span className="mt-2 font-semibold text-sm">KEYBOARD</span>
-          </button>
-        </div>
-      </nav>
-    );
-  };
 
   if (showForm) {
-    // Form state: return form content with custom layout requirements
+    // Form state: return form content with QueueLayout and back button
     return (
-      <>
-        {/* Custom header hiding and footer for form state */}
+      <QueueLayout
+        showKeyboard={showKeyboard}
+        onToggleKeyboard={toggleKeyboard}
+      >
+        {/* Custom header hiding for form state */}
         <style>{`
           .kiosk-container header { display: none !important; }
-          .kiosk-container footer nav { display: none !important; }
         `}</style>
 
         <div className={`h-full flex flex-col ${showKeyboard ? 'justify-start' : 'justify-center'}`}>
@@ -532,79 +327,97 @@ const Queue = () => {
           </div>
         </div>
 
-        {/* Custom Footer Navigation for Form State */}
-        <div className="fixed bottom-0 left-0 right-0 bg-white bg-opacity-0 px-6 pb-3 w-full">
-          <FormFooterNavigation />
-        </div>
-      </>
+        {/* Back Button */}
+        <BackButton />
+      </QueueLayout>
     );
   }
 
-  // Normal state: return regular content
+  // Department Selection: Use KioskLayout with navigation
+  if (!selectedDepartment) {
+    return (
+      <KioskLayout>
+        <div className="h-full flex flex-col">
+          {/* Department Selection Grid */}
+          <div className="flex-grow flex flex-col">
+            {/* Fixed Header */}
+            <div className="pt-8 pb-6">
+              <h2 className="text-4xl font-semibold text-center drop-shadow-lg" style={{ color: '#161F55' }}>
+                Select a department
+              </h2>
+            </div>
+
+            {/* Centered Grid Container */}
+            <div className="flex-grow flex items-center justify-center">
+              {/* 2 Department Grid */}
+              <div className="grid grid-cols-2 gap-x-32 gap-y-8 max-w-5xl mx-auto">
+                {departments.map((department) => (
+                  <button
+                    key={department.key}
+                    onClick={() => handleDepartmentSelect(department.key)}
+                    className="text-white rounded-3xl shadow-lg drop-shadow-md p-6 hover:shadow-xl hover:drop-shadow-lg transition-all duration-200 border-2 border-transparent focus:outline-none focus:ring-4 focus:ring-blue-200"
+                    style={{ backgroundColor: '#1F3463' }}
+                    onMouseEnter={(e) => e.target.style.backgroundColor = '#1A2E56'}
+                    onMouseLeave={(e) => e.target.style.backgroundColor = '#1F3463'}
+                  >
+                    <div className="text-center">
+                      <h3 className="text-xl font-semibold text-white">
+                        {department.name}
+                      </h3>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </KioskLayout>
+    );
+  }
+
+  // Service Selection: Use QueueLayout without navigation and without keyboard (not a form input phase)
   return (
-    <div className="h-full flex flex-col">
-      {!selectedDepartment ? (
-        /* Department Selection Grid */
-        <div className="flex-grow flex flex-col">
-          {/* Fixed Header */}
-          <div className="pt-8 pb-6">
-            <h2 className="text-4xl font-semibold text-center drop-shadow-lg" style={{ color: '#2F0FE4' }}>
-              Select a department
-            </h2>
-          </div>
+    <QueueLayout>
+      <div className="h-full flex flex-col">
+        {!selectedService ? (
+          /* Service Selection */
+          <div className="flex-grow flex flex-col">
+            {/* Fixed Header */}
+            <div className="pt-8 pb-6">
+              <h2 className="text-4xl font-semibold text-center drop-shadow-lg" style={{ color: '#161F55' }}>
+                What would you like to do?
+              </h2>
+            </div>
 
-          {/* Centered Grid Container */}
-          <div className="flex-grow flex items-center justify-center">
-            {/* 2 Department Grid */}
-            <div className="grid grid-cols-2 gap-x-32 gap-y-8 max-w-5xl mx-auto">
-              {departments.map((department) => (
-                <button
-                  key={department.key}
-                  onClick={() => handleDepartmentSelect(department.key)}
-                  className="bg-white rounded-3xl shadow-lg drop-shadow-md p-6 hover:shadow-xl hover:drop-shadow-lg transition-all duration-200 border-2 border-transparent hover:border-blue-300 focus:outline-none focus:ring-4 focus:ring-blue-200"
-                >
-                  <div className="text-center">
-                    <h3 className="text-xl font-semibold" style={{ color: '#2F0FE4' }}>
-                      {department.name}
-                    </h3>
-                  </div>
-                </button>
-              ))}
+            {/* Centered Grid Container */}
+            <div className="flex-grow flex items-center justify-center">
+              {/* Services Grid */}
+              <div className="grid grid-cols-3 gap-x-32 gap-y-8 max-w-5xl mx-auto">
+                {selectedDepartment.services.map((service, index) => (
+                  <button
+                    key={index}
+                    onClick={() => handleServiceSelect(service)}
+                    className="text-white rounded-3xl shadow-lg drop-shadow-md p-6 hover:shadow-xl hover:drop-shadow-lg transition-all duration-200 border-2 border-transparent focus:outline-none focus:ring-4 focus:ring-blue-200"
+                    style={{ backgroundColor: '#1F3463' }}
+                    onMouseEnter={(e) => e.target.style.backgroundColor = '#1A2E56'}
+                    onMouseLeave={(e) => e.target.style.backgroundColor = '#1F3463'}
+                  >
+                    <div className="text-center">
+                      <h3 className="text-xl font-semibold text-white">
+                        {service}
+                      </h3>
+                    </div>
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
-        </div>
-      ) : !selectedService ? (
-        /* Service Selection */
-        <div className="flex-grow flex flex-col">
-          {/* Fixed Header */}
-          <div className="pt-8 pb-6">
-            <h2 className="text-4xl font-semibold text-center drop-shadow-lg" style={{ color: '#2F0FE4' }}>
-              What would you like to do?
-            </h2>
-          </div>
+        ) : null}
+      </div>
 
-          {/* Centered Grid Container */}
-          <div className="flex-grow flex items-center justify-center">
-            {/* Services Grid */}
-            <div className="grid grid-cols-3 gap-x-32 gap-y-8 max-w-5xl mx-auto">
-              {selectedDepartment.services.map((service, index) => (
-                <button
-                  key={index}
-                  onClick={() => handleServiceSelect(service)}
-                  className="bg-white rounded-3xl shadow-lg drop-shadow-md p-6 hover:shadow-xl hover:drop-shadow-lg transition-all duration-200 border-2 border-transparent hover:border-blue-300 focus:outline-none focus:ring-4 focus:ring-blue-200"
-                >
-                  <div className="text-center">
-                    <h3 className="text-xl font-semibold" style={{ color: '#2F0FE4' }}>
-                      {service}
-                    </h3>
-                  </div>
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-      ) : null}
-    </div>
+      {/* Show Back Button when in service selection or later stages */}
+      <BackButton />
+    </QueueLayout>
   );
 };
 

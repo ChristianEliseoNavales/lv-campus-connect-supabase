@@ -11,13 +11,12 @@ import {
 } from './components/pages/admin';
 import {
   Home,
-  Announcement,
-  Search,
+  Highlights,
   Map,
   Directory,
   Queue,
   FAQ,
-  Help
+  IdlePage
 } from './components/pages';
 
 function App() {
@@ -31,41 +30,27 @@ function App() {
               <Home />
             </KioskLayout>
           } />
-          <Route path="/announcement" element={
+          <Route path="/highlights" element={
             <KioskLayout>
-              <Announcement />
+              <Highlights />
             </KioskLayout>
           } />
-          <Route path="/search" element={
-            <KioskLayout>
-              <Search />
-            </KioskLayout>
-          } />
-          <Route path="/map" element={
-            <KioskLayout>
-              <Map />
-            </KioskLayout>
-          } />
+
+          <Route path="/map" element={<Map />} />
           <Route path="/directory" element={
             <KioskLayout>
               <Directory />
             </KioskLayout>
           } />
-          <Route path="/queue" element={
-            <KioskLayout>
-              <Queue />
-            </KioskLayout>
-          } />
+          <Route path="/queue" element={<Queue />} />
           <Route path="/faq" element={
             <KioskLayout>
               <FAQ />
             </KioskLayout>
           } />
-          <Route path="/help" element={
-            <KioskLayout>
-              <Help />
-            </KioskLayout>
-          } />
+
+          {/* Idle Page - No Layout Wrapper */}
+          <Route path="/idle" element={<IdlePage />} />
 
           {/* Authentication Routes */}
           <Route path="/login" element={<Login />} />

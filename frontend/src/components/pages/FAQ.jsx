@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 
 const FAQ = () => {
   const [openFAQ, setOpenFAQ] = useState(null);
-  const [searchTerm, setSearchTerm] = useState('');
 
   const faqData = [
     {
@@ -67,116 +66,63 @@ const FAQ = () => {
     }
   ];
 
-  const categories = ['All', ...new Set(faqData.map(faq => faq.category))];
-  const [selectedCategory, setSelectedCategory] = useState('All');
-
-  const filteredFAQs = faqData.filter(faq => {
-    const matchesCategory = selectedCategory === 'All' || faq.category === selectedCategory;
-    const matchesSearch = !searchTerm || 
-      faq.question.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      faq.answer.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    return matchesCategory && matchesSearch;
-  });
-
   const toggleFAQ = (id) => {
     setOpenFAQ(openFAQ === id ? null : id);
   };
 
-  const getCategoryColor = (category) => {
-    const colors = {
-      'General': 'bg-blue-100 text-blue-800',
-      'Registration': 'bg-green-100 text-green-800',
-      'Financial': 'bg-yellow-100 text-yellow-800',
-      'Academic': 'bg-purple-100 text-purple-800',
-      'Campus Life': 'bg-pink-100 text-pink-800',
-      'Technology': 'bg-indigo-100 text-indigo-800'
-    };
-    return colors[category] || 'bg-gray-100 text-gray-800';
-  };
-
   return (
     <div className="h-full flex flex-col">
-      {/* Header */}
-      <div className="text-center mb-6">
-        <h1 className="text-4xl font-bold text-blue-900 mb-2">
-          Frequently Asked Questions
-        </h1>
-        <p className="text-lg text-gray-600">
-          Find answers to common questions about university services
-        </p>
-      </div>
-
-      {/* Search and Filter */}
-      <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-        <div className="flex flex-col md:flex-row gap-4">
-          <div className="flex-grow">
-            <label htmlFor="search" className="block text-sm font-medium text-gray-700 mb-2">
-              Search FAQs
-            </label>
-            <input
-              type="text"
-              id="search"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Search questions and answers..."
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg"
-            />
-          </div>
-          <div className="md:w-48">
-            <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-2">
-              Category
-            </label>
-            <select
-              id="category"
-              value={selectedCategory}
-              onChange={(e) => setSelectedCategory(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg"
-            >
-              {categories.map(category => (
-                <option key={category} value={category}>{category}</option>
-              ))}
-            </select>
-          </div>
+      {/* Main Content Area */}
+      <div className="flex-grow flex flex-col">
+        {/* Fixed Header */}
+        <div className="pt-8 pb-6">
+          <h1 className="text-4xl font-semibold text-center drop-shadow-lg" style={{ color: '#161F55' }}>
+            FREQUENTLY ASKED QUESTIONS
+          </h1>
         </div>
-      </div>
 
-      {/* FAQ List */}
-      <div className="flex-grow overflow-auto">
-        {filteredFAQs.length > 0 ? (
-          <div className="space-y-4">
-            {filteredFAQs.map((faq) => (
+        {/* FAQ Accordion List */}
+        <div className="flex-grow overflow-auto px-8">
+          <div className="space-y-3 max-w-4xl mx-auto">
+            {faqData.map((faq) => (
               <div
                 key={faq.id}
-                className="bg-white rounded-lg shadow-md overflow-hidden"
+                className="bg-white rounded-lg shadow-md border border-gray-200 overflow-hidden"
               >
                 <button
                   onClick={() => toggleFAQ(faq.id)}
                   className="w-full px-6 py-4 text-left hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition-colors duration-200"
                 >
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center">
-                      <span className={`px-3 py-1 rounded-full text-xs font-medium mr-4 ${getCategoryColor(faq.category)}`}>
-                        {faq.category}
-                      </span>
-                      <h3 className="text-lg font-semibold text-gray-800">
-                        {faq.question}
-                      </h3>
+                    <h3 className="text-lg font-semibold text-gray-800 pr-4">
+                      {faq.question}
+                    </h3>
+                    <div className="flex-shrink-0">
+                      {openFAQ === faq.id ? (
+                        <svg
+                          className="w-6 h-6 transition-transform duration-200"
+                          style={{ color: '#1F3463' }}
+                          fill="currentColor"
+                          viewBox="0 0 20 20"
+                        >
+                          <path fillRule="evenodd" d="M5 10a1 1 0 011-1h8a1 1 0 110 2H6a1 1 0 01-1-1z" clipRule="evenodd" />
+                        </svg>
+                      ) : (
+                        <svg
+                          className="w-6 h-6 transition-transform duration-200"
+                          style={{ color: '#1F3463' }}
+                          fill="currentColor"
+                          viewBox="0 0 20 20"
+                        >
+                          <path fillRule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clipRule="evenodd" />
+                        </svg>
+                      )}
                     </div>
-                    <svg
-                      className={`w-5 h-5 text-gray-500 transition-transform duration-200 ${
-                        openFAQ === faq.id ? 'transform rotate-180' : ''
-                      }`}
-                      fill="currentColor"
-                      viewBox="0 0 20 20"
-                    >
-                      <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
-                    </svg>
                   </div>
                 </button>
-                
+
                 {openFAQ === faq.id && (
-                  <div className="px-6 pb-4 border-t border-gray-100">
+                  <div className="px-6 pb-4 border-t border-gray-100 animate-fadeIn">
                     <p className="text-gray-700 leading-relaxed pt-4">
                       {faq.answer}
                     </p>
@@ -185,17 +131,8 @@ const FAQ = () => {
               </div>
             ))}
           </div>
-        ) : (
-          <div className="text-center py-12">
-            <svg className="w-16 h-16 text-gray-400 mx-auto mb-4" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clipRule="evenodd" />
-            </svg>
-            <h3 className="text-lg font-medium text-gray-800 mb-2">No FAQs found</h3>
-            <p className="text-gray-600">Try adjusting your search terms or category filter</p>
-          </div>
-        )}
+        </div>
       </div>
-
     </div>
   );
 };

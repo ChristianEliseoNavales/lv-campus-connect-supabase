@@ -31,7 +31,8 @@ export default {
           800: '#1e293b',
           900: '#0f172a',
         },
-        'navy-blue': '#000080'
+        'navy-blue': '#1F3463',
+        'navy-primary': '#1F3463'
       },
       fontFamily: {
         sans: ['Segoe UI', 'Tahoma', 'Geneva', 'Verdana', 'sans-serif'],

@@ -1,0 +1,149 @@
+flowchart TD
+    %% LEVEL 0 DFD - University Queue System (Simplified for Readability)
+    %% Following 7±2 rule: 6 high-level processes for optimal cognitive load
+
+    %% External Entities (Squares) - Gane & Sarson
+    subgraph " "
+        Student["<b>Student/Visitor</b>"]
+    end
+
+    subgraph "  "
+        MISAdmin["<b>MIS Super Admin</b>"]
+    end
+
+    subgraph "   "
+        RegistrarAdmin["<b>Registrar Admin</b>"]
+    end
+
+    subgraph "    "
+        AdmissionsAdmin["<b>Admissions Admin</b>"]
+    end
+
+    subgraph "     "
+        CommOffice["<b>Communications<br/>Office</b>"]
+    end
+
+    subgraph "      "
+        GoogleSSO["<b>Google SSO<br/>Service</b>"]
+    end
+
+    %% High-Level Processes (Rounded rectangles with numbers) - Gane & Sarson
+    P1("1.0<br/>Provide Public<br/>Information Services")
+    P2("2.0<br/>Process Queue<br/>Requests")
+    P3("3.0<br/>Manage User<br/>Authentication")
+    P4("4.0<br/>Administer<br/>Queue Operations")
+    P5("5.0<br/>Manage System<br/>Administration")
+    P6("6.0<br/>Generate Reports<br/>& Analytics")
+
+    %% Consolidated Data Stores (Open rectangles with parallel lines) - Gane & Sarson
+    DS1["|D1| Content Repository|"]
+    DS2["|D2| Queue Database|"]
+    DS3["|D3| User Management|"]
+    DS4["|D4| System Configuration|"]
+    DS5["|D5| Audit & Logs|"]
+    
+    %% Data Flows from External Entities to Processes
+    %% Public Kiosk Interactions (No Authentication Required)
+    Student -->|"information requests"| P1
+    Student -->|"queue submissions"| P2
+
+    %% Admin Authentication Flows
+    MISAdmin -->|"login credentials"| P3
+    RegistrarAdmin -->|"login credentials"| P3
+    AdmissionsAdmin -->|"login credentials"| P3
+    GoogleSSO -->|"OAuth response"| P3
+
+    %% Admin Management Flows
+    CommOffice -->|"content updates"| P1
+    MISAdmin -->|"admin commands"| P5
+    RegistrarAdmin -->|"queue operations"| P4
+    AdmissionsAdmin -->|"queue operations"| P4
+    MISAdmin -->|"report requests"| P6
+    RegistrarAdmin -->|"report requests"| P6
+    AdmissionsAdmin -->|"report requests"| P6
+
+    %% Data Flows from Processes to External Entities
+    %% Public Kiosk Responses
+    P1 -->|"information display"| Student
+    P2 -->|"queue confirmations"| Student
+
+    %% Admin Responses
+    P3 -->|"authentication results"| MISAdmin
+    P3 -->|"authentication results"| RegistrarAdmin
+    P3 -->|"authentication results"| AdmissionsAdmin
+    P3 -->|"OAuth requests"| GoogleSSO
+    P4 -->|"operation status"| RegistrarAdmin
+    P4 -->|"operation status"| AdmissionsAdmin
+    P5 -->|"system status"| MISAdmin
+    P6 -->|"reports & analytics"| MISAdmin
+    P6 -->|"reports & analytics"| RegistrarAdmin
+    P6 -->|"reports & analytics"| AdmissionsAdmin
+    
+    %% Data Flows between Processes and Data Stores
+    %% Public Information Services
+    DS1 -.->|"read content"| P1
+    P1 -.->|"update content"| DS1
+    P1 -.->|"log access"| DS5
+
+    %% Queue Processing
+    P2 -.->|"store requests"| DS2
+    DS2 -.->|"read queue data"| P2
+    P2 -.->|"log submissions"| DS5
+
+    %% Authentication Management
+    DS3 -.->|"read credentials"| P3
+    P3 -.->|"create sessions"| DS3
+    P3 -.->|"log authentication"| DS5
+
+    %% Queue Operations Administration
+    DS2 -.->|"read queue data"| P4
+    P4 -.->|"update queue status"| DS2
+    DS4 -.->|"read configuration"| P4
+    P4 -.->|"log operations"| DS5
+
+    %% System Administration
+    DS3 -.->|"read user data"| P5
+    P5 -.->|"update users"| DS3
+    DS4 -.->|"read settings"| DS4
+    P5 -.->|"update configuration"| DS4
+    P5 -.->|"log admin actions"| DS5
+
+    %% Reporting & Analytics
+    DS2 -.->|"read queue statistics"| P6
+    DS3 -.->|"read user statistics"| P6
+    DS5 -.->|"read audit data"| P6
+    P6 -.->|"log report generation"| DS5
+
+    %% Process-to-Process Flows (Simplified Authentication Chain)
+    P3 -->|"authenticated users"| P4
+    P3 -->|"authenticated users"| P5
+    P3 -->|"authenticated users"| P6
+    
+    %% Error Handling Flows (Simplified)
+    P1 -->|"access errors"| Student
+    P2 -->|"validation errors"| Student
+    P3 -->|"authentication errors"| MISAdmin
+    P3 -->|"authentication errors"| RegistrarAdmin
+    P3 -->|"authentication errors"| AdmissionsAdmin
+    P4 -->|"operation errors"| RegistrarAdmin
+    P4 -->|"operation errors"| AdmissionsAdmin
+    P5 -->|"system errors"| MISAdmin
+
+    %% Real-time Update Flows
+    P4 -->|"live queue updates"| P2
+    P5 -->|"system status updates"| P4
+
+    %% Styling for Gane & Sarson symbols
+    classDef external fill:#ffffff,stroke:#000000,stroke-width:2px
+    classDef datastore fill:#ffffff,stroke:#000000,stroke-width:2px
+    classDef publicProcess fill:#e3f2fd,stroke:#1976d2,stroke-width:2px
+    classDef adminProcess fill:#fff3e0,stroke:#f57c00,stroke-width:2px
+    classDef authProcess fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px
+    classDef reportProcess fill:#e8f5e8,stroke:#2e7d32,stroke-width:2px
+
+    class Student,MISAdmin,RegistrarAdmin,AdmissionsAdmin,CommOffice,GoogleSSO external
+    class P1,P2 publicProcess
+    class P3 authProcess
+    class P4,P5 adminProcess
+    class P6 reportProcess
+    class DS1,DS2,DS3,DS4,DS5 datastore

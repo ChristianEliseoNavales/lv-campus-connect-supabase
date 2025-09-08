@@ -299,8 +299,8 @@ const Directory = () => {
       {/* Avatar Icon - Perfectly Centered with Enhanced Styling */}
       <div className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto ${
         isHead ? 'text-white' : 'text-white'
-      }`} style={{ backgroundColor: 'transparent', border: '2px solid #2F0FE4' }}>
-        <svg className="w-8 h-8" viewBox="0 0 24 24" style={{ color: '#2F0FE4' }}>
+      }`} style={{ backgroundColor: 'transparent', border: '2px solid #161F55' }}>
+        <svg className="w-8 h-8" viewBox="0 0 24 24" style={{ color: '#161F55' }}>
           {/* Person figure - solid fill with same color as text */}
           <g fill="currentColor">
             {/* Head */}
@@ -313,10 +313,10 @@ const Directory = () => {
 
       {/* Name and Title - Center Aligned with Consistent Purple-Blue Color */}
       <div className="text-center w-full">
-        <h3 className="text-lg font-semibold text-center leading-tight whitespace-nowrap" style={{ color: '#2F0FE4' }}>
+        <h3 className="text-lg font-semibold text-center leading-tight whitespace-nowrap" style={{ color: '#161F55' }}>
           {person.name}
         </h3>
-        <p className="text-sm text-center mt-1 whitespace-nowrap" style={{ color: '#2F0FE4' }}>
+        <p className="text-sm text-center mt-1 whitespace-nowrap" style={{ color: '#161F55' }}>
           {person.title}
         </p>
       </div>
@@ -351,7 +351,7 @@ const Directory = () => {
         <div className="flex-grow flex flex-col">
           {/* Fixed Header */}
           <div className="pt-8 pb-6">
-            <h2 className="text-4xl font-semibold text-center drop-shadow-lg" style={{ color: '#2F0FE4' }}>
+            <h2 className="text-4xl font-semibold text-center drop-shadow-lg" style={{ color: '#161F55' }}>
               Select a department
             </h2>
           </div>
@@ -365,10 +365,13 @@ const Directory = () => {
                 <button
                   key={department.key}
                   onClick={() => setSelectedDepartment(department.key)}
-                  className="bg-white rounded-3xl shadow-lg drop-shadow-md p-6 hover:shadow-xl hover:drop-shadow-lg transition-all duration-200 border-2 border-transparent hover:border-blue-300 focus:outline-none focus:ring-4 focus:ring-blue-200"
+                  className="text-white rounded-3xl shadow-lg drop-shadow-md p-6 hover:shadow-xl hover:drop-shadow-lg transition-all duration-200 border-2 border-transparent focus:outline-none focus:ring-4 focus:ring-blue-200"
+                  style={{ backgroundColor: '#1F3463' }}
+                  onMouseEnter={(e) => e.target.style.backgroundColor = '#1A2E56'}
+                  onMouseLeave={(e) => e.target.style.backgroundColor = '#1F3463'}
                 >
                   <div className="text-center">
-                    <h3 className="text-xl font-semibold" style={{ color: '#2F0FE4' }}>
+                    <h3 className="text-xl font-semibold text-white">
                       {department.name}
                     </h3>
                   </div>
@@ -381,10 +384,13 @@ const Directory = () => {
                   <button
                     key={department.key}
                     onClick={() => setSelectedDepartment(department.key)}
-                    className="bg-white rounded-3xl shadow-lg drop-shadow-md p-6 hover:shadow-xl hover:drop-shadow-lg transition-all duration-200 border-2 border-transparent hover:border-blue-300 focus:outline-none focus:ring-4 focus:ring-blue-200"
+                    className="text-white rounded-3xl shadow-lg drop-shadow-md p-6 hover:shadow-xl hover:drop-shadow-lg transition-all duration-200 border-2 border-transparent focus:outline-none focus:ring-4 focus:ring-blue-200"
+                    style={{ backgroundColor: '#1F3463' }}
+                    onMouseEnter={(e) => e.target.style.backgroundColor = '#1A2E56'}
+                    onMouseLeave={(e) => e.target.style.backgroundColor = '#1F3463'}
                   >
                     <div className="text-center">
-                      <h3 className="text-xl font-semibold" style={{ color: '#2F0FE4' }}>
+                      <h3 className="text-xl font-semibold text-white">
                         {department.name}
                       </h3>
                     </div>
@@ -405,7 +411,7 @@ const Directory = () => {
                 <button
                   onClick={() => setSelectedDepartment(null)}
                   className="absolute left-8 top-1/2 transform -translate-y-1/2 flex items-center transition-colors duration-200 font-semibold z-10 hover:opacity-80"
-                  style={{ color: '#2F0FE4' }}
+                  style={{ color: '#161F55' }}
                 >
                   <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clipRule="evenodd" />
@@ -415,13 +421,13 @@ const Directory = () => {
 
                 {/* Center: Department Name - Perfectly Centered Across Full Width */}
                 <div className="flex justify-center items-center w-full">
-                  <h1 className="text-3xl font-bold text-center" style={{ color: '#2F0FE4' }}>
+                  <h1 className="text-3xl font-bold text-center" style={{ color: '#161F55' }}>
                     {currentDepartment.name}
                   </h1>
                 </div>
 
                 {/* Right: Find Location - Positioned Absolutely */}
-                <button className="absolute right-8 top-1/2 transform -translate-y-1/2 flex items-center transition-colors duration-200 font-semibold z-10 hover:opacity-80" style={{ color: '#2F0FE4' }}>
+                <button className="absolute right-8 top-1/2 transform -translate-y-1/2 flex items-center transition-colors duration-200 font-semibold z-10 hover:opacity-80" style={{ color: '#161F55' }}>
                   <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
                   </svg>
@@ -451,7 +457,7 @@ const Directory = () => {
               {/* Fixed Footer with Department Email - Seamlessly Integrated */}
               <div className="px-8 py-4 flex-shrink-0">
                 <div className="text-center">
-                  <p className="text-lg font-medium" style={{ color: '#2F0FE4' }}>
+                  <p className="text-lg font-medium" style={{ color: '#161F55' }}>
                     <span>Email:</span> <span>{currentDepartment.email}</span>
                   </p>
                 </div>

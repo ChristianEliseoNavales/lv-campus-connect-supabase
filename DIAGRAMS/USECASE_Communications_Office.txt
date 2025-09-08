@@ -1,0 +1,47 @@
+graph TB
+    %% Actor
+    CommOffice[📢 Communications Office]
+
+    %% System Boundary
+    subgraph System["University Queue System - Communications Office Use Cases"]
+        %% Authentication Use Cases
+        UC9((Authenticate with Google SSO))
+        UC10((Validate User Role))
+
+        %% Communications Office Use Cases
+        subgraph CommModule["Communications Module"]
+            UC33((Post Announcements))
+            UC34((Edit Announcements))
+            UC35((Archive Announcements))
+            UC36((Restore Announcements))
+        end
+
+        %% Shared Admin Use Cases
+        UC30((Access Admin Dashboard))
+        UC31((Update Profile))
+        UC32((View Activity Logs))
+    end
+
+    %% Actor-Use Case Relationships
+    CommOffice --> UC9
+    CommOffice --> UC30
+    CommOffice --> UC33
+    CommOffice --> UC34
+    CommOffice --> UC35
+    CommOffice --> UC36
+
+    %% Include Relationships (base use case → included use case)
+    UC9 -.->|"≪include≫"| UC10
+    UC30 -.->|"≪include≫"| UC31
+    UC30 -.->|"≪include≫"| UC32
+
+    %% Styling
+    classDef actor fill:#e8f5e8,stroke:#2e7d32,stroke-width:3px,color:#000
+    classDef usecase fill:#e3f2fd,stroke:#1976d2,stroke-width:2px,color:#000
+    classDef system fill:#f5f5f5,stroke:#424242,stroke-width:2px,color:#000
+    classDef module fill:#fff8e1,stroke:#f57f17,stroke-width:2px,color:#000
+
+    class CommOffice actor
+    class UC9,UC10,UC30,UC31,UC32,UC33,UC34,UC35,UC36 usecase
+    class System system
+    class CommModule module
