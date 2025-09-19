@@ -113,14 +113,14 @@ const Map = () => {
                 className={`w-full px-4 py-3 border-2 rounded-3xl text-lg focus:outline-none transition-colors shadow-lg focus:shadow-xl ${
                   isSearchFocused
                     ? 'border-[#1F3463] bg-blue-50'
-                    : 'border-gray-300 hover:border-gray-400'
+                    : 'border-gray-300 active:border-gray-400'
                 }`}
                 readOnly
               />
             </div>
             <button
               onClick={handleSearch}
-              className="bg-[#FFE251] text-[#1A2E56] px-6 py-3 rounded-3xl transition-colors focus:outline-none focus:ring-4 focus:ring-blue-200 flex items-center gap-2 shadow-lg hover:shadow-xl drop-shadow-md hover:drop-shadow-lg"
+              className="bg-[#FFE251] text-[#1A2E56] px-6 py-3 rounded-3xl transition-all duration-150 focus:outline-none focus:ring-4 focus:ring-blue-200 flex items-center gap-2 shadow-lg active:shadow-md active:scale-95 drop-shadow-md"
             >
               <FaSearch className="w-5 h-5" />
               <span className="font-semibold">Search</span>
@@ -197,7 +197,7 @@ const Map = () => {
               <div className="flex h-14 shadow-lg drop-shadow-md rounded-2xl overflow-hidden">
                 <button
                   onClick={handleAccessibility}
-                  className="flex-1 bg-[#1F3463] text-white px-3 py-4 hover:bg-[#1A2E56] transition-colors focus:outline-none focus:ring-4 focus:ring-blue-200 flex items-center justify-center gap-2 border-r border-[#1A2E56]"
+                  className="flex-1 bg-[#1F3463] text-white px-3 py-4 active:bg-[#1A2E56] active:scale-95 transition-all duration-150 focus:outline-none focus:ring-4 focus:ring-blue-200 flex items-center justify-center gap-2 border-r border-[#1A2E56]"
                   title="Accessibility Features"
                   aria-label="Toggle accessibility features"
                 >
@@ -205,21 +205,21 @@ const Map = () => {
                 </button>
                 <button
                   onClick={handleZoomIn}
-                  className="flex-1 bg-[#1F3463] text-white px-3 py-4 hover:bg-[#1A2E56] transition-colors focus:outline-none focus:ring-4 focus:ring-blue-200 flex items-center justify-center gap-2 border-r border-[#1A2E56]"
+                  className="flex-1 bg-[#1F3463] text-white px-3 py-4 active:bg-[#1A2E56] active:scale-95 transition-all duration-150 focus:outline-none focus:ring-4 focus:ring-blue-200 flex items-center justify-center gap-2 border-r border-[#1A2E56]"
                   title="Zoom In"
                 >
                   <FaSearchPlus className="w-6 h-6" />
                 </button>
                 <button
                   onClick={handleZoomOut}
-                  className="flex-1 bg-[#1F3463] text-white px-3 py-4 hover:bg-[#1A2E56] transition-colors focus:outline-none focus:ring-4 focus:ring-blue-200 flex items-center justify-center gap-2 border-r border-[#1A2E56]"
+                  className="flex-1 bg-[#1F3463] text-white px-3 py-4 active:bg-[#1A2E56] active:scale-95 transition-all duration-150 focus:outline-none focus:ring-4 focus:ring-blue-200 flex items-center justify-center gap-2 border-r border-[#1A2E56]"
                   title="Zoom Out"
                 >
                   <FaSearchMinus className="w-6 h-6" />
                 </button>
                 <button
                   onClick={handleFullscreen}
-                  className="flex-1 bg-[#1F3463] text-white px-3 py-4 hover:bg-[#1A2E56] transition-colors focus:outline-none focus:ring-4 focus:ring-blue-200 flex items-center justify-center"
+                  className="flex-1 bg-[#1F3463] text-white px-3 py-4 active:bg-[#1A2E56] active:scale-95 transition-all duration-150 focus:outline-none focus:ring-4 focus:ring-blue-200 flex items-center justify-center"
                   title="Fullscreen"
                 >
                   <FaExpand className="w-6 h-6" />

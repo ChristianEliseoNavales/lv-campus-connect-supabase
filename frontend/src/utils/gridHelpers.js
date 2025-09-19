@@ -97,17 +97,17 @@ export const calculatePagination = (items, itemsPerPage = 6, currentPage = 0) =>
 };
 
 /**
- * Generates default button styling for kiosk interface
+ * Generates default button styling for kiosk interface with touch press animations
  * @param {string} additionalClasses - Additional CSS classes
  * @returns {string} Complete button class string
  */
 export const getKioskButtonClasses = (additionalClasses = '') => {
   const baseClasses = `
-    text-white rounded-3xl shadow-lg drop-shadow-md p-6 
-    hover:shadow-xl hover:drop-shadow-lg transition-all duration-200 
+    text-white rounded-3xl shadow-lg drop-shadow-md p-6
+    active:scale-95 active:shadow-md transition-all duration-150
     border-2 border-transparent focus:outline-none focus:ring-4 focus:ring-blue-200
   `.trim().replace(/\s+/g, ' ');
-  
+
   return `${baseClasses} ${additionalClasses}`.trim();
 };
 
@@ -120,20 +120,38 @@ export const getKioskButtonStyles = () => ({
 });
 
 /**
- * Generates hover event handlers for kiosk buttons
- * @returns {Object} Event handlers for mouse enter/leave
+ * Generates touch press event handlers for kiosk buttons (optimized for touchscreen)
+ * @returns {Object} Event handlers for touch press effects
  */
 export const getKioskButtonHandlers = () => ({
-  onMouseEnter: (e) => {
+  onTouchStart: (e) => {
+    // Add pressed state styling for immediate feedback
+    e.target.style.transform = 'scale(0.95)';
     e.target.style.backgroundColor = '#1A2E56';
   },
+  onTouchEnd: (e) => {
+    // Reset to normal state
+    e.target.style.transform = 'scale(1)';
+    e.target.style.backgroundColor = '#1F3463';
+  },
+  // Fallback for mouse events on non-touch devices
+  onMouseDown: (e) => {
+    e.target.style.transform = 'scale(0.95)';
+    e.target.style.backgroundColor = '#1A2E56';
+  },
+  onMouseUp: (e) => {
+    e.target.style.transform = 'scale(1)';
+    e.target.style.backgroundColor = '#1F3463';
+  },
   onMouseLeave: (e) => {
+    // Reset state if mouse leaves while pressed
+    e.target.style.transform = 'scale(1)';
     e.target.style.backgroundColor = '#1F3463';
   }
 });
 
 /**
- * Creates a complete button configuration for kiosk interface
+ * Creates a complete button configuration for kiosk interface with touch press animations
  * @param {string} additionalClasses - Additional CSS classes
  * @returns {Object} Complete button configuration
  */

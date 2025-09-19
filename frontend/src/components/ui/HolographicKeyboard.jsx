@@ -21,6 +21,20 @@ const HolographicKeyboard = ({
   const keyboardRef = useRef(null);
   const overlayRef = useRef(null);
 
+  // Helper function to calculate cursor position based on text content
+  const calculateCursorPosition = (text, fontSize = '20px', fontFamily = 'SF Pro Rounded, ui-rounded, system-ui, sans-serif') => {
+    // Create a temporary canvas element to measure text width
+    const canvas = document.createElement('canvas');
+    const context = canvas.getContext('2d');
+    context.font = `${fontSize} ${fontFamily}`;
+
+    // Measure the width of the text
+    const textWidth = context.measureText(text || '').width;
+
+    // Add padding (16px = px-4 in Tailwind) and return position
+    return textWidth + 16; // 16px for left padding
+  };
+
   // Keyboard layout
   const numberRow = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'];
   const keyboardRows = [
@@ -86,14 +100,17 @@ const HolographicKeyboard = ({
                       placeholder={field.placeholder}
                       readOnly
                       onClick={() => onFieldFocus && onFieldFocus(field.name)}
-                      className={`w-full px-4 py-4 border-2 rounded-lg text-xl bg-white focus:outline-none shadow-inner cursor-pointer transition-all duration-200 ${
+                      className={`w-full px-4 py-4 border-2 rounded-lg text-xl bg-white focus:outline-none shadow-inner cursor-pointer transition-all duration-150 ${
                         activeFieldName === field.name
                           ? 'border-[#1F3463] bg-blue-50'
-                          : 'border-gray-300 hover:border-[#1F3463]'
+                          : 'border-gray-300 active:border-[#1F3463]'
                       }`}
                     />
                     {activeFieldName === field.name && (
-                      <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                      <div
+                        className="absolute top-1/2 transform -translate-y-1/2"
+                        style={{ left: `${calculateCursorPosition(field.value, '20px')}px` }}
+                      >
                         <div className="w-1 h-6 bg-[#1F3463] animate-pulse"></div>
                       </div>
                     )}
@@ -117,7 +134,10 @@ const HolographicKeyboard = ({
                   readOnly
                   className="w-full px-4 py-4 border-2 border-[#1F3463] rounded-lg text-xl bg-white focus:outline-none shadow-inner"
                 />
-                <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                <div
+                  className="absolute top-1/2 transform -translate-y-1/2"
+                  style={{ left: `${calculateCursorPosition(activeInputValue, '20px')}px` }}
+                >
                   <div className="w-1 h-6 bg-[#1F3463] animate-pulse"></div>
                 </div>
               </div>
@@ -137,7 +157,7 @@ const HolographicKeyboard = ({
             <button
               key={key}
               onClick={() => onKeyPress(key)}
-              className="w-20 h-16 bg-transparent border-2 border-white border-opacity-50 rounded-lg text-2xl font-bold text-white hover:bg-white hover:bg-opacity-20 hover:border-opacity-80 shadow-lg hover:shadow-xl transition-all duration-200 select-none"
+              className="w-20 h-16 bg-transparent border-2 border-white border-opacity-50 rounded-lg text-2xl font-bold text-white active:bg-white active:bg-opacity-20 active:border-opacity-80 active:scale-95 shadow-lg active:shadow-md transition-all duration-150 select-none"
             >
               {key}
             </button>
@@ -151,28 +171,29 @@ const HolographicKeyboard = ({
               <button
                 key={key}
                 onClick={() => onKeyPress(key)}
-                className="w-20 h-16 bg-transparent border-2 border-white border-opacity-50 rounded-lg text-2xl font-bold text-white hover:bg-white hover:bg-opacity-20 hover:border-opacity-80 shadow-lg hover:shadow-xl transition-all duration-200 select-none"
+                className="w-20 h-16 bg-transparent border-2 border-white border-opacity-50 rounded-lg text-2xl font-bold text-white active:bg-white active:bg-opacity-20 active:border-opacity-80 active:scale-95 shadow-lg active:shadow-md transition-all duration-150 select-none"
               >
                 {key}
               </button>
             ))}
+            {/* Add backspace button to the third row (after 'M' key) */}
+            {rowIndex === 2 && (
+              <button
+                onClick={onBackspace}
+                className="w-32 h-16 bg-transparent border-2 border-white border-opacity-50 rounded-lg text-lg font-bold text-white active:bg-white active:bg-opacity-20 active:border-opacity-80 active:scale-95 shadow-lg active:shadow-md transition-all duration-150 select-none"
+              >
+                ⌫ BACK
+              </button>
+            )}
           </div>
         ))}
 
-        {/* Bottom Row with Special Keys */}
+        {/* Bottom Row with Spacebar */}
         <div className="flex justify-center gap-3 mb-4">
-          {/* Backspace */}
-          <button
-            onClick={onBackspace}
-            className="w-32 h-16 bg-transparent border-2 border-white border-opacity-50 rounded-lg text-lg font-bold text-white hover:bg-white hover:bg-opacity-20 hover:border-opacity-80 shadow-lg hover:shadow-xl transition-all duration-200 select-none"
-          >
-            ⌫ BACK
-          </button>
-
           {/* Spacebar */}
           <button
             onClick={onSpace}
-            className="w-80 h-16 bg-transparent border-2 border-white border-opacity-50 rounded-lg text-lg font-bold text-white hover:bg-white hover:bg-opacity-20 hover:border-opacity-80 shadow-lg hover:shadow-xl transition-all duration-200 select-none"
+            className="w-80 h-16 bg-transparent border-2 border-white border-opacity-50 rounded-lg text-lg font-bold text-white active:bg-white active:bg-opacity-20 active:border-opacity-80 active:scale-95 shadow-lg active:shadow-md transition-all duration-150 select-none"
           >
             SPACE
           </button>
@@ -182,7 +203,7 @@ const HolographicKeyboard = ({
         <div className="flex justify-center mt-6">
           <button
             onClick={onHide}
-            className="flex items-center gap-2 px-6 py-3 bg-transparent border-2 border-white border-opacity-50 rounded-lg text-white font-semibold hover:bg-white hover:bg-opacity-20 hover:border-opacity-80 shadow-lg hover:shadow-xl transition-all duration-200"
+            className="flex items-center gap-2 px-6 py-3 bg-transparent border-2 border-white border-opacity-50 rounded-lg text-white font-semibold active:bg-white active:bg-opacity-20 active:border-opacity-80 active:scale-95 shadow-lg active:shadow-md transition-all duration-150"
           >
             <FaChevronDown className="w-4 h-4" />
             Click to hide keyboard

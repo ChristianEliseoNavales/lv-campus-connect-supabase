@@ -48,10 +48,10 @@ const QueueLayout = ({ children, customFooter = null, showKeyboard = false, onTo
         {onToggleKeyboard && (
           <button
             onClick={onToggleKeyboard}
-            className={`absolute left-1/2 transform -translate-x-1/2 bottom-0 w-32 h-16 flex flex-col items-center justify-center transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-blue-200 z-50 ${
+            className={`absolute left-1/2 transform -translate-x-1/2 bottom-0 w-32 h-16 flex flex-col items-center justify-center transition-all duration-150 focus:outline-none focus:ring-4 focus:ring-blue-200 z-50 ${
               showKeyboard
                 ? 'bg-yellow-300 text-blue-900 font-bold shadow-md'
-                : 'bg-[#1F3463] text-white hover:bg-[#1A2E56]'
+                : 'bg-[#1F3463] text-white active:bg-[#1A2E56] active:scale-95'
             }`}
             style={{
               borderTopLeftRadius: '50px',

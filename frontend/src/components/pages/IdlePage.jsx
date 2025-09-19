@@ -152,7 +152,7 @@ const IdlePage = () => {
                 e.stopPropagation();
                 goToPrevious();
               }}
-              className="flex-shrink-0 z-10 bg-white bg-opacity-80 hover:bg-opacity-100 rounded-full p-4 shadow-lg transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-blue-200 ml-4"
+              className="flex-shrink-0 z-10 bg-white bg-opacity-80 active:bg-opacity-100 active:scale-95 rounded-full p-4 shadow-lg transition-all duration-150 focus:outline-none focus:ring-4 focus:ring-blue-200 ml-4"
             >
               <FaChevronLeft className="w-8 h-8" style={{ color: '#1F3463' }} />
             </button>
@@ -218,7 +218,7 @@ const IdlePage = () => {
                 e.stopPropagation();
                 goToNext();
               }}
-              className="flex-shrink-0 z-10 bg-white bg-opacity-80 hover:bg-opacity-100 rounded-full p-4 shadow-lg transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-blue-200 mr-4"
+              className="flex-shrink-0 z-10 bg-white bg-opacity-80 active:bg-opacity-100 active:scale-95 rounded-full p-4 shadow-lg transition-all duration-150 focus:outline-none focus:ring-4 focus:ring-blue-200 mr-4"
             >
               <FaChevronRight className="w-8 h-8" style={{ color: '#1F3463' }} />
             </button>

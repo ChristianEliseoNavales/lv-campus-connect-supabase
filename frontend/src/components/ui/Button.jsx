@@ -12,17 +12,17 @@ const Button = ({
   type = 'button',
   ...props 
 }) => {
-  const baseClasses = 'inline-flex items-center justify-center font-medium rounded-xl transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed';
+  const baseClasses = 'inline-flex items-center justify-center font-medium rounded-xl transition-all duration-150 focus:outline-none focus:ring-4 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed';
   
   const variants = {
-    primary: 'bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-xl hover:-translate-y-1 focus:ring-blue-200',
-    secondary: 'bg-gray-600 hover:bg-gray-700 text-white shadow-lg hover:shadow-xl hover:-translate-y-1 focus:ring-gray-200',
-    success: 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg hover:shadow-xl hover:-translate-y-1 focus:ring-emerald-200',
-    danger: 'bg-red-600 hover:bg-red-700 text-white shadow-lg hover:shadow-xl hover:-translate-y-1 focus:ring-red-200',
-    warning: 'bg-amber-600 hover:bg-amber-700 text-white shadow-lg hover:shadow-xl hover:-translate-y-1 focus:ring-amber-200',
-    outline: 'border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white shadow-md hover:shadow-lg focus:ring-blue-200',
-    ghost: 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 shadow-sm hover:shadow-md focus:ring-gray-200',
-    kiosk: 'bg-white/20 border-2 border-white/30 text-white hover:bg-white/30 hover:border-white/50 backdrop-blur-md shadow-lg hover:shadow-xl hover:-translate-y-1 focus:ring-white/20'
+    primary: 'bg-blue-600 active:bg-blue-700 text-white shadow-lg active:shadow-md active:scale-95 focus:ring-blue-200',
+    secondary: 'bg-gray-600 active:bg-gray-700 text-white shadow-lg active:shadow-md active:scale-95 focus:ring-gray-200',
+    success: 'bg-emerald-600 active:bg-emerald-700 text-white shadow-lg active:shadow-md active:scale-95 focus:ring-emerald-200',
+    danger: 'bg-red-600 active:bg-red-700 text-white shadow-lg active:shadow-md active:scale-95 focus:ring-red-200',
+    warning: 'bg-amber-600 active:bg-amber-700 text-white shadow-lg active:shadow-md active:scale-95 focus:ring-amber-200',
+    outline: 'border-2 border-blue-600 text-blue-600 active:bg-blue-600 active:text-white shadow-md active:shadow-sm active:scale-95 focus:ring-blue-200',
+    ghost: 'text-gray-600 active:bg-gray-100 active:text-gray-900 shadow-sm active:shadow-none active:scale-95 focus:ring-gray-200',
+    kiosk: 'bg-white/20 border-2 border-white/30 text-white active:bg-white/30 active:border-white/50 backdrop-blur-md shadow-lg active:shadow-md active:scale-95 focus:ring-white/20'
   };
 
   const sizes = {

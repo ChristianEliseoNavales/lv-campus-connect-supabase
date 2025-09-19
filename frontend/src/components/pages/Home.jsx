@@ -177,7 +177,7 @@ const Home = () => {
         {/* Column 3 - New Queue/Directory Section */}
         <div className="col-span-1 flex flex-col gap-6 pl-6">
           {/* Row 1 - FIND OFFICE LOCATIONS */}
-          <div className="flex-1 bg-[#FFE251] rounded-2xl shadow-xl drop-shadow-lg hover:shadow-2xl hover:drop-shadow-xl transition-all duration-200 p-6 cursor-pointer relative overflow-hidden">
+          <div className="flex-1 bg-[#FFE251] rounded-2xl shadow-xl drop-shadow-lg active:shadow-lg active:scale-95 transition-all duration-150 p-6 cursor-pointer relative overflow-hidden">
             {/* Button text positioned at top-left */}
             <div className="absolute top-6 left-6">
               <h3 className="text-2xl font-bold text-[#1F3463] leading-tight">FIND OFFICE LOCATIONS</h3>
@@ -211,7 +211,7 @@ const Home = () => {
           </div>
 
           {/* Row 2 - GET A QUEUE NUMBER */}
-          <div className="flex-1 bg-[#FFE251] rounded-2xl shadow-xl drop-shadow-lg hover:shadow-2xl hover:drop-shadow-xl transition-all duration-200 p-6 cursor-pointer relative overflow-hidden">
+          <div className="flex-1 bg-[#FFE251] rounded-2xl shadow-xl drop-shadow-lg active:shadow-lg active:scale-95 transition-all duration-150 p-6 cursor-pointer relative overflow-hidden">
             {/* Button text positioned at top-left */}
             <div className="absolute top-6 left-6">
               <h3 className="text-2xl font-bold text-[#1F3463] leading-tight">GET A QUEUE NUMBER</h3>

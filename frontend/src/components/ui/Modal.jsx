@@ -70,7 +70,7 @@ const Modal = ({
               {showCloseButton && (
                 <button
                   onClick={onClose}
-                  className="text-gray-400 hover:text-gray-600 transition-colors"
+                  className="text-gray-400 active:text-gray-600 active:scale-95 transition-all duration-150"
                 >
                   <CloseIcon />
                 </button>
@@ -147,7 +147,7 @@ export const ConfirmModal = ({
         <div className="flex space-x-3 justify-center">
           <button
             onClick={onClose}
-            className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+            className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 active:bg-gray-50 active:scale-95 transition-all duration-150"
           >
             {cancelText}
           </button>

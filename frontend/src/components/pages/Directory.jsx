@@ -536,7 +536,7 @@ const Directory = () => {
             <div className="fixed bottom-6 left-6 flex flex-col space-y-4 z-50">
               {/* Location Button */}
               <button
-                className="w-20 h-20 bg-[#FFE251] text-[#1A2E56] border-2 border-white rounded-full shadow-lg hover:shadow-xl drop-shadow-md hover:drop-shadow-lg hover:bg-[#1A2E56] transition-all duration-200 flex flex-col items-center justify-center focus:outline-none focus:ring-4 focus:ring-blue-200"
+                className="w-20 h-20 bg-[#FFE251] text-[#1A2E56] border-2 border-white rounded-full shadow-lg active:shadow-md drop-shadow-md active:drop-shadow-sm active:bg-[#1A2E56] active:scale-95 transition-all duration-150 flex flex-col items-center justify-center focus:outline-none focus:ring-4 focus:ring-blue-200"
                 aria-label="Find office location"
               >
                 <FaLocationDot className="w-6 h-6 mb-1" />
@@ -546,7 +546,7 @@ const Directory = () => {
               {/* Back Button */}
               <button
                 onClick={() => setSelectedDepartment(null)}
-                className="w-20 h-20 bg-[#FFE251] text-[#1A2E56] border-2 border-white rounded-full shadow-lg hover:shadow-xl drop-shadow-md hover:drop-shadow-lg hover:bg-[#1A2E56] transition-all duration-200 flex flex-col items-center justify-center focus:outline-none focus:ring-4 focus:ring-blue-200"
+                className="w-20 h-20 bg-[#FFE251] text-[#1A2E56] border-2 border-white rounded-full shadow-lg active:shadow-md drop-shadow-md active:drop-shadow-sm active:bg-[#1A2E56] active:scale-95 transition-all duration-150 flex flex-col items-center justify-center focus:outline-none focus:ring-4 focus:ring-blue-200"
                 aria-label="Go back to directory listing"
               >
                 <span className="text-md font-semibold">BACK</span>

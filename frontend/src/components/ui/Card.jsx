@@ -11,7 +11,7 @@ const Card = ({
   hoverable = false,
   ...props 
 }) => {
-  const baseClasses = 'bg-white transition-all duration-300';
+  const baseClasses = 'bg-white transition-all duration-150';
   
   const variants = {
     default: 'border border-gray-200',
@@ -37,7 +37,7 @@ const Card = ({
     md: 'shadow-lg',
     lg: 'shadow-xl',
     xl: 'shadow-2xl',
-    kiosk: 'shadow-2xl hover:shadow-3xl drop-shadow-lg'
+    kiosk: 'shadow-2xl active:shadow-xl drop-shadow-lg'
   };
 
   const roundeds = {
@@ -49,7 +49,7 @@ const Card = ({
     kiosk: 'rounded-3xl'
   };
 
-  const hoverClasses = hoverable ? 'hover:-translate-y-2 hover:shadow-xl cursor-pointer' : '';
+  const hoverClasses = hoverable ? 'active:scale-95 active:shadow-lg cursor-pointer transition-transform duration-150' : '';
   const clickableClasses = onClick ? 'cursor-pointer' : '';
 
   const classes = `
@@ -77,8 +77,8 @@ const Card = ({
 // Specialized card components
 export const KioskCard = ({ children, department, ...props }) => {
   const departmentColors = {
-    registrar: 'border-blue-600 hover:border-blue-700',
-    admissions: 'border-red-600 hover:border-red-700'
+    registrar: 'border-blue-600 active:border-blue-700',
+    admissions: 'border-red-600 active:border-red-700'
   };
 
   const borderColor = department ? departmentColors[department] : 'border-gray-300';

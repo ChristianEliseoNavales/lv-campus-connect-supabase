@@ -93,7 +93,7 @@ const FAQ = () => {
                 >
                   <button
                     onClick={() => toggleFAQ(faq.id)}
-                    className="w-full px-6 py-4 text-left hover:bg-gray-100 focus:outline-none focus:bg-gray-100 transition-colors duration-200"
+                    className="w-full px-6 py-4 text-left active:bg-gray-100 focus:outline-none focus:bg-gray-100 active:scale-95 transition-all duration-150"
                   >
                     <div className="flex items-center justify-between">
                       <h3 className="text-lg font-semibold text-gray-800 pr-4">

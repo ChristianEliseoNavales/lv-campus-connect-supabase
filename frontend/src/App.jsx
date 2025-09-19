@@ -17,7 +17,8 @@ import {
   Queue,
   FAQ,
   IdlePage,
-  GridDemo
+  GridDemo,
+  PortalQueue
 } from './components/pages';
 
 function App() {
@@ -40,6 +41,7 @@ function App() {
           <Route path="/map" element={<Map />} />
           <Route path="/directory" element={<Directory />} />
           <Route path="/queue" element={<Queue />} />
+          <Route path="/portalqueue" element={<PortalQueue />} />
           <Route path="/faq" element={
             <KioskLayout>
               <FAQ />

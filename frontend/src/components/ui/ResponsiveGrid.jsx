@@ -75,10 +75,10 @@ const ResponsiveGrid = ({
 
   const layout = getGridLayout(itemCount);
 
-  // Default button styling for kiosk interface
+  // Default button styling for kiosk interface with touch press animations
   const defaultButtonClass = `
-    text-white rounded-3xl shadow-lg drop-shadow-md p-6 
-    hover:shadow-xl hover:drop-shadow-lg transition-all duration-200 
+    text-white rounded-3xl shadow-lg drop-shadow-md p-6
+    active:scale-95 active:shadow-md transition-all duration-150
     border-2 border-transparent focus:outline-none focus:ring-4 focus:ring-blue-200
     ${layout.itemClass}
   `;
@@ -87,12 +87,31 @@ const ResponsiveGrid = ({
     backgroundColor: '#1F3463'
   };
 
-  const handleMouseEnter = (e) => {
+  // Touch press handlers for kiosk interface
+  const handleTouchStart = (e) => {
     e.target.style.backgroundColor = '#1A2E56';
+    e.target.style.transform = 'scale(0.95)';
+  };
+
+  const handleTouchEnd = (e) => {
+    e.target.style.backgroundColor = '#1F3463';
+    e.target.style.transform = 'scale(1)';
+  };
+
+  // Fallback mouse handlers for non-touch devices
+  const handleMouseDown = (e) => {
+    e.target.style.backgroundColor = '#1A2E56';
+    e.target.style.transform = 'scale(0.95)';
+  };
+
+  const handleMouseUp = (e) => {
+    e.target.style.backgroundColor = '#1F3463';
+    e.target.style.transform = 'scale(1)';
   };
 
   const handleMouseLeave = (e) => {
     e.target.style.backgroundColor = '#1F3463';
+    e.target.style.transform = 'scale(1)';
   };
 
   const handleItemClick = (item, index) => {
@@ -161,7 +180,10 @@ const ResponsiveGrid = ({
           onClick={() => handleItemClick(item, index)}
           className={`${defaultButtonClass} ${buttonClassName}`}
           style={buttonStyle}
-          onMouseEnter={handleMouseEnter}
+          onTouchStart={handleTouchStart}
+          onTouchEnd={handleTouchEnd}
+          onMouseDown={handleMouseDown}
+          onMouseUp={handleMouseUp}
           onMouseLeave={handleMouseLeave}
           {...props}
         >
@@ -188,22 +210,22 @@ const ResponsiveGrid = ({
   // Define navigation button styles based on page type and disabled state
   const getNavButtonStyles = (disabled = false) => {
     if (isDirectoryPage) {
-      // Inverted colors for Directory page with disabled state support (no hover animations)
+      // Inverted colors for Directory page with disabled state support (touch press animations)
       return {
-        className: `flex items-center justify-center w-16 h-16 rounded-full focus:outline-none ${
+        className: `flex items-center justify-center w-16 h-16 rounded-full focus:outline-none transition-all duration-150 ${
           disabled
             ? 'bg-gray-200 text-gray-400 cursor-not-allowed shadow-md'
-            : 'bg-white text-[#1F3463] shadow-lg focus:ring-4 focus:ring-blue-200 cursor-pointer'
+            : 'bg-white text-[#1F3463] shadow-lg active:scale-95 active:shadow-md focus:ring-4 focus:ring-blue-200 cursor-pointer'
         }`,
         style: {}
       };
     } else {
-      // Standard colors for other pages with disabled state support
+      // Standard colors for other pages with disabled state support (touch press animations)
       return {
-        className: `flex items-center justify-center w-16 h-16 rounded-full text-white transition-all duration-200 focus:outline-none ${
+        className: `flex items-center justify-center w-16 h-16 rounded-full text-white transition-all duration-150 focus:outline-none ${
           disabled
             ? 'cursor-not-allowed shadow-md opacity-50'
-            : 'shadow-lg hover:shadow-xl focus:ring-4 focus:ring-blue-200 cursor-pointer'
+            : 'shadow-lg active:scale-95 active:shadow-md focus:ring-4 focus:ring-blue-200 cursor-pointer'
         }`,
         style: { backgroundColor: disabled ? '#9CA3AF' : '#1F3463' }
       };
@@ -224,7 +246,10 @@ const ResponsiveGrid = ({
             disabled={isPrevDisabled}
             className={`absolute left-4 top-1/2 transform -translate-y-1/2 z-10 ${getButtonStyles(isPrevDisabled).className}`}
             style={getButtonStyles(isPrevDisabled).style}
-            onMouseEnter={!isPrevDisabled ? handleMouseEnter : undefined}
+            onTouchStart={!isPrevDisabled ? handleTouchStart : undefined}
+            onTouchEnd={!isPrevDisabled ? handleTouchEnd : undefined}
+            onMouseDown={!isPrevDisabled ? handleMouseDown : undefined}
+            onMouseUp={!isPrevDisabled ? handleMouseUp : undefined}
             onMouseLeave={!isPrevDisabled ? handleMouseLeave : undefined}
             aria-label="Previous page"
           >
@@ -244,7 +269,10 @@ const ResponsiveGrid = ({
             disabled={isNextDisabled}
             className={`absolute right-4 top-1/2 transform -translate-y-1/2 z-10 ${getButtonStyles(isNextDisabled).className}`}
             style={getButtonStyles(isNextDisabled).style}
-            onMouseEnter={!isNextDisabled ? handleMouseEnter : undefined}
+            onTouchStart={!isNextDisabled ? handleTouchStart : undefined}
+            onTouchEnd={!isNextDisabled ? handleTouchEnd : undefined}
+            onMouseDown={!isNextDisabled ? handleMouseDown : undefined}
+            onMouseUp={!isNextDisabled ? handleMouseUp : undefined}
             onMouseLeave={!isNextDisabled ? handleMouseLeave : undefined}
             aria-label="Next page"
           >

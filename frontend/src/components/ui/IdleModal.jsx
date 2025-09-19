@@ -40,9 +40,12 @@ const IdleModal = ({ isOpen, countdown, onStayActive }) => {
             console.log('✅ YES button clicked in IdleModal');
             onStayActive();
           }}
-          className="w-24 h-24 text-[#1F3463] font-bold text-xl border-2 border-white rounded-full shadow-lg hover:shadow-xl drop-shadow-lg hover:drop-shadow-xl transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-blue-200 touch-target-lg"
+          className="w-24 h-24 text-[#1F3463] font-bold text-xl border-2 border-white rounded-full shadow-lg active:shadow-md drop-shadow-lg active:drop-shadow-sm active:scale-95 transition-all duration-150 focus:outline-none focus:ring-4 focus:ring-blue-200 touch-target-lg"
           style={{ backgroundColor: '#FFE251' }}
-          onMouseEnter={(e) => e.target.style.backgroundColor = '#E6CB49'}
+          onTouchStart={(e) => e.target.style.backgroundColor = '#E6CB49'}
+          onTouchEnd={(e) => e.target.style.backgroundColor = '#FFE251'}
+          onMouseDown={(e) => e.target.style.backgroundColor = '#E6CB49'}
+          onMouseUp={(e) => e.target.style.backgroundColor = '#FFE251'}
           onMouseLeave={(e) => e.target.style.backgroundColor = '#FFE251'}
         >
           YES
@@ -54,9 +57,12 @@ const IdleModal = ({ isOpen, countdown, onStayActive }) => {
             console.log('🏠 HOME button clicked in IdleModal');
             navigate('/');
           }}
-          className="w-24 h-24 text-white font-bold text-xl border-2 border-white rounded-full shadow-lg hover:shadow-xl drop-shadow-lg hover:drop-shadow-xl transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-blue-200 touch-target-lg"
+          className="w-24 h-24 text-white font-bold text-xl border-2 border-white rounded-full shadow-lg active:shadow-md drop-shadow-lg active:drop-shadow-sm active:scale-95 transition-all duration-150 focus:outline-none focus:ring-4 focus:ring-blue-200 touch-target-lg"
           style={{ backgroundColor: '#1F3463' }}
-          onMouseEnter={(e) => e.target.style.backgroundColor = '#1A2E56'}
+          onTouchStart={(e) => e.target.style.backgroundColor = '#1A2E56'}
+          onTouchEnd={(e) => e.target.style.backgroundColor = '#1F3463'}
+          onMouseDown={(e) => e.target.style.backgroundColor = '#1A2E56'}
+          onMouseUp={(e) => e.target.style.backgroundColor = '#1F3463'}
           onMouseLeave={(e) => e.target.style.backgroundColor = '#1F3463'}
         >
           HOME

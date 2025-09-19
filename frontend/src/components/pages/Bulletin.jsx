@@ -43,10 +43,10 @@ const Bulletin = () => {
   // Button styling helper
   const getButtonStyles = (isDisabled) => {
     return {
-      className: `w-16 h-16 rounded-full flex items-center justify-center transition-all duration-200 ${
+      className: `w-16 h-16 rounded-full flex items-center justify-center transition-all duration-150 ${
         isDisabled
           ? 'bg-gray-300 text-gray-500 cursor-not-allowed shadow-md'
-          : 'bg-white text-[#1F3463] hover:bg-[#1F3463] hover:text-white shadow-lg hover:shadow-xl drop-shadow-md hover:drop-shadow-lg'
+          : 'bg-white text-[#1F3463] active:bg-[#1F3463] active:text-white active:scale-95 shadow-lg active:shadow-md drop-shadow-md'
       }`,
       style: isDisabled ? {} : {}
     };
@@ -102,10 +102,10 @@ const Bulletin = () => {
               <button
                 key={index}
                 onClick={() => goToPage(index)}
-                className={`w-4 h-4 rounded-full transition-all duration-200 ${
+                className={`w-4 h-4 rounded-full transition-all duration-150 ${
                   index === currentPage
                     ? 'bg-blue-600'
-                    : 'bg-gray-300 hover:bg-gray-400'
+                    : 'bg-gray-300 active:bg-gray-400 active:scale-95'
                 }`}
                 style={index === currentPage ? { backgroundColor: '#1F3463' } : {}}
                 aria-label={`Go to page ${index + 1}`}

@@ -58,9 +58,9 @@ const DataPrivacyModal = ({ isOpen, onNext, onPrevious, consent, setConsent }) =
           <button
             onClick={onNext}
             disabled={!consent}
-            className={`w-24 h-24 rounded-full border-2 border-white font-bold text-sm transition-all duration-200 shadow-lg ${
+            className={`w-24 h-24 rounded-full border-2 border-white font-bold text-sm transition-all duration-150 shadow-lg ${
               consent
-                ? 'bg-[#FFE251] text-[#1A2E56] hover:shadow-xl transform hover:scale-105'
+                ? 'bg-[#FFE251] text-[#1A2E56] active:shadow-md active:scale-95'
                 : 'bg-gray-300 text-gray-500 cursor-not-allowed'
             }`}
           >
@@ -70,7 +70,7 @@ const DataPrivacyModal = ({ isOpen, onNext, onPrevious, consent, setConsent }) =
           {/* Previous Button (bottom) */}
           <button
             onClick={onPrevious}
-            className="w-24 h-24 rounded-full border-2 border-white bg-[#1F3463] text-white font-bold text-sm hover:bg-[#1A2E56] transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
+            className="w-24 h-24 rounded-full border-2 border-white bg-[#1F3463] text-white font-bold text-sm active:bg-[#1A2E56] transition-all duration-150 shadow-lg active:shadow-md active:scale-95"
           >
             PREVIOUS
           </button>
@@ -104,7 +104,7 @@ const ConfirmationModal = ({ isOpen, onYes, onNo }) => {
           {/* Yes Button */}
           <button
             onClick={onYes}
-            className="w-24 h-24 rounded-full border-2 border-white bg-[#1F3463] text-white font-bold text-sm hover:bg-[#1A2E56] transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
+            className="w-24 h-24 rounded-full border-2 border-white bg-[#1F3463] text-white font-bold text-sm active:bg-[#1A2E56] transition-all duration-150 shadow-lg active:shadow-md active:scale-95"
           >
             YES
           </button>
@@ -112,9 +112,67 @@ const ConfirmationModal = ({ isOpen, onYes, onNo }) => {
           {/* No Button */}
           <button
             onClick={onNo}
-            className="w-24 h-24 rounded-full border-2 border-white bg-[#1F3463] text-white font-bold text-sm hover:bg-gray-600 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
+            className="w-24 h-24 rounded-full border-2 border-white bg-[#1F3463] text-white font-bold text-sm active:bg-gray-600 transition-all duration-150 shadow-lg active:shadow-md active:scale-95"
           >
             NO
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Office Mismatch Modal Component
+const OfficeMismatchModal = ({ isOpen, onConfirm, onClose, currentOffice, suggestedOffice }) => {
+  if (!isOpen || !suggestedOffice) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[10000]">
+      <div className="bg-white rounded-3xl shadow-2xl p-8 max-w-2xl mx-4 text-center">
+        {/* Header */}
+        <h2 className="text-3xl font-semibold mb-4" style={{ color: '#1F3463' }}>
+          You Selected {currentOffice}'s Office
+        </h2>
+
+        {/* Subtext */}
+        <p className="text-xl text-gray-600 mb-8">
+          Please switch to
+        </p>
+
+        {/* Suggested Office Button */}
+        <button
+          onClick={onConfirm}
+          className="w-80 text-white rounded-3xl shadow-lg drop-shadow-md p-6 active:shadow-md active:scale-95 transition-all duration-150 border-2 border-transparent focus:outline-none focus:ring-4 focus:ring-blue-200 mb-6"
+          style={{ backgroundColor: '#1F3463' }}
+          onTouchStart={(e) => e.target.style.backgroundColor = '#1A2E56'}
+          onTouchEnd={(e) => e.target.style.backgroundColor = '#1F3463'}
+          onMouseDown={(e) => e.target.style.backgroundColor = '#1A2E56'}
+          onMouseUp={(e) => e.target.style.backgroundColor = '#1F3463'}
+          onMouseLeave={(e) => e.target.style.backgroundColor = '#1F3463'}
+        >
+          <div className="text-center flex flex-col items-center">
+            {/* Office Image */}
+            <div className="mb-4">
+              <img
+                src={`/queue/${suggestedOffice.key}.png`}
+                alt={`${suggestedOffice.name} Icon`}
+                className="w-34 h-34 object-contain rounded-xl mx-auto"
+              />
+            </div>
+            {/* Office Name */}
+            <h3 className="text-xl font-semibold text-white">
+              {suggestedOffice.name}
+            </h3>
+          </div>
+        </button>
+
+        {/* Close button (optional - user can also click suggested office) */}
+        <div>
+          <button
+            onClick={onClose}
+            className="text-gray-500 active:text-gray-700 text-sm underline transition-colors duration-150"
+          >
+            Continue with current selection
           </button>
         </div>
       </div>
@@ -132,6 +190,8 @@ const Queue = () => {
   const [selectedRole, setSelectedRole] = useState(null);
   const [priorityStatus, setPriorityStatus] = useState(null);
   const [studentStatus, setStudentStatus] = useState(null);
+  const [showOfficeMismatchModal, setShowOfficeMismatchModal] = useState(false);
+  const [suggestedOffice, setSuggestedOffice] = useState(null);
   const [showForm, setShowForm] = useState(false);
   const [showKeyboard, setShowKeyboard] = useState(true);
   const [activeField, setActiveField] = useState('name');
@@ -206,7 +266,7 @@ const Queue = () => {
   const serviceOptions = [
     'Request a document',
     'Enroll',
-    'Inquire',
+    'Inquiry',
     'Claim'
   ];
 
@@ -315,6 +375,25 @@ const Queue = () => {
   // Student status selection handlers
   const handleStudentStatusSelect = (status) => {
     setStudentStatus(status);
+
+    // Check for office mismatch scenarios
+    const currentOfficeKey = selectedDepartment?.name === "Registrar's Office" ? 'registrar' : 'admissions';
+
+    // Scenario 1: Registrar's Office + Enroll + YES (new student) -> should use Admissions
+    if (currentOfficeKey === 'registrar' && selectedService === 'Enroll' && status === 'yes') {
+      setSuggestedOffice({ key: 'admissions', name: 'Admissions Office' });
+      setShowOfficeMismatchModal(true);
+      return;
+    }
+
+    // Scenario 2: Admissions Office + Enroll + NO (not new student) -> should use Registrar's
+    if (currentOfficeKey === 'admissions' && selectedService === 'Enroll' && status === 'no') {
+      setSuggestedOffice({ key: 'registrar', name: "Registrar's Office" });
+      setShowOfficeMismatchModal(true);
+      return;
+    }
+
+    // No mismatch - proceed normally
     // For enrollment, jump directly to QR code result step
     // Skip role selection, priority status, and form steps
     setCurrentStep('result');
@@ -484,6 +563,28 @@ const Queue = () => {
     setShowKeyboard(true);
   };
 
+  // Office mismatch modal handlers
+  const handleOfficeMismatchConfirm = () => {
+    if (suggestedOffice) {
+      // Switch to the suggested office and proceed directly to result
+      setSelectedDepartment(departmentData[suggestedOffice.key]);
+      setShowOfficeMismatchModal(false);
+      setSuggestedOffice(null);
+      // Skip service selection and student status check - go directly to QR result
+      // Keep selectedService as "Enroll" and preserve studentStatus
+      setCurrentStep('result');
+      // Reset only the steps that come after result
+      setSelectedRole(null);
+      setPriorityStatus(null);
+      setShowForm(false);
+    }
+  };
+
+  const handleOfficeMismatchClose = () => {
+    setShowOfficeMismatchModal(false);
+    setSuggestedOffice(null);
+  };
+
   // Check if form steps are valid
   const isFormStep1Valid = formData.name.trim() && formData.contactNumber.trim();
   const isFormStep2Valid = formData.email.trim(); // Email is required, address is optional
@@ -557,9 +658,9 @@ const Queue = () => {
                 <button
                   onClick={handleIdVerificationNext}
                   disabled={!idNumber.trim()}
-                  className={`w-24 h-24 rounded-full border-2 border-white font-bold text-sm transition-all duration-200 shadow-lg ${
+                  className={`w-24 h-24 rounded-full border-2 border-white font-bold text-sm transition-all duration-150 shadow-lg ${
                     idNumber.trim()
-                      ? 'bg-[#1F3463] text-white hover:bg-[#1A2E56] hover:shadow-xl transform hover:scale-105'
+                      ? 'bg-[#1F3463] text-white active:bg-[#1A2E56] active:shadow-md active:scale-95'
                       : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                   }`}
                 >
@@ -569,7 +670,7 @@ const Queue = () => {
                 {/* Previous Button */}
                 <button
                   onClick={handleIdVerificationPrevious}
-                  className="w-24 h-24 rounded-full border-2 border-white bg-[#1F3463] text-white font-bold text-sm hover:bg-[#1A2E56] transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
+                  className="w-24 h-24 rounded-full border-2 border-white bg-[#1F3463] text-white font-bold text-sm active:bg-[#1A2E56] transition-all duration-150 shadow-lg active:shadow-md active:scale-95"
                 >
                   PREVIOUS
                 </button>
@@ -662,9 +763,9 @@ const Queue = () => {
                 <button
                   onClick={handleFormStep1Next}
                   disabled={!isFormStep1Valid}
-                  className={`w-24 h-24 rounded-full border-2 border-white font-bold text-sm transition-all duration-200 shadow-lg ${
+                  className={`w-24 h-24 rounded-full border-2 border-white font-bold text-sm transition-all duration-150 shadow-lg ${
                     isFormStep1Valid
-                      ? 'bg-[#1F3463] text-white hover:bg-[#1A2E56] hover:shadow-xl transform hover:scale-105'
+                      ? 'bg-[#1F3463] text-white active:bg-[#1A2E56] active:shadow-md active:scale-95'
                       : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                   }`}
                 >
@@ -674,7 +775,7 @@ const Queue = () => {
                 {/* Previous Button */}
                 <button
                   onClick={handleFormStep1Previous}
-                  className="w-24 h-24 rounded-full border-2 border-white bg-[#1F3463] text-white font-bold text-sm hover:bg-[#1A2E56] transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
+                  className="w-24 h-24 rounded-full border-2 border-white bg-[#1F3463] text-white font-bold text-sm active:bg-[#1A2E56] transition-all duration-150 shadow-lg active:shadow-md active:scale-95"
                 >
                   PREVIOUS
                 </button>
@@ -786,9 +887,9 @@ const Queue = () => {
                 <button
                   onClick={handleFormStep2Next}
                   disabled={!isFormStep2Valid}
-                  className={`w-24 h-24 rounded-full border-2 border-white font-bold text-sm transition-all duration-200 shadow-lg ${
+                  className={`w-24 h-24 rounded-full border-2 border-white font-bold text-sm transition-all duration-150 shadow-lg ${
                     isFormStep2Valid
-                      ? 'bg-[#1F3463] text-white hover:bg-[#1A2E56] hover:shadow-xl transform hover:scale-105'
+                      ? 'bg-[#1F3463] text-white active:bg-[#1A2E56] active:shadow-md active:scale-95'
                       : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                   }`}
                 >
@@ -798,7 +899,7 @@ const Queue = () => {
                 {/* Previous Button */}
                 <button
                   onClick={handleFormStep2Previous}
-                  className="w-24 h-24 rounded-full border-2 border-white bg-[#1F3463] text-white font-bold text-sm hover:bg-[#1A2E56] transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
+                  className="w-24 h-24 rounded-full border-2 border-white bg-[#1F3463] text-white font-bold text-sm active:bg-[#1A2E56] transition-all duration-150 shadow-lg active:shadow-md active:scale-95"
                 >
                   PREVIOUS
                 </button>
@@ -858,6 +959,17 @@ const Queue = () => {
       { number: queueNumber + 1 <= 99 ? queueNumber + 1 : 1, isActive: false }
     ];
 
+    // Format current date for validity notice
+    const formatCurrentDate = () => {
+      const today = new Date();
+      const options = {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      };
+      return today.toLocaleDateString('en-US', options);
+    };
+
     return (
       <QueueLayout>
         <div className="h-full flex flex-col">
@@ -905,10 +1017,17 @@ const Queue = () => {
                 <span className="text-3xl text-gray-700">Window {windowNumber}</span>
               </div>
 
+              {/* Validity Notice */}
+              <div className="mb-4 text-center">
+                <p className="text-lg font-semibold text-[#1F3463]">
+                  This ticket is only valid on {formatCurrentDate()}
+                </p>
+              </div>
+
               {/* Print Button */}
               <button
                 onClick={handlePrintClick}
-                className="px-20 py-4 bg-[#FFE251] text-black rounded-full font-bold text-xl hover:bg-[#1A2E56] transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
+                className="px-20 py-4 bg-[#FFE251] text-black rounded-full font-bold text-xl active:bg-[#1A2E56] transition-all duration-150 shadow-lg active:shadow-md active:scale-95"
               >
                 PRINT
               </button>
@@ -919,7 +1038,7 @@ const Queue = () => {
         {/* Done Button (replaces Back Button) */}
         <button
           onClick={handlePrintClick}
-          className="fixed bottom-6 left-6 w-20 h-20 bg-[#FFE251] text-black border-2 border-white rounded-full shadow-lg hover:bg-[#1A2E56] transition-all duration-200 flex items-center justify-center z-50 focus:outline-none focus:ring-4 focus:ring-blue-200"
+          className="fixed bottom-6 left-6 w-20 h-20 bg-[#FFE251] text-black border-2 border-white rounded-full shadow-lg active:bg-[#1A2E56] transition-all duration-150 flex items-center justify-center z-50 focus:outline-none focus:ring-4 focus:ring-blue-200 active:scale-95"
           aria-label="Done - Go to feedback"
         >
           <span className="text-sm font-bold">DONE</span>
@@ -953,7 +1072,7 @@ const Queue = () => {
                   <button
                     key={star}
                     onClick={() => setStarRating(star)}
-                    className="text-6xl transition-all duration-200 hover:scale-110 focus:outline-none focus:ring-4 focus:ring-yellow-200 rounded-lg p-2"
+                    className="text-6xl transition-all duration-150 active:scale-95 focus:outline-none focus:ring-4 focus:ring-yellow-200 rounded-lg p-2"
                     aria-label={`Rate ${star} star${star > 1 ? 's' : ''}`}
                   >
                     {star <= starRating ? (
@@ -978,9 +1097,9 @@ const Queue = () => {
             <button
               onClick={() => setCurrentStep('thankYou')}
               disabled={starRating === 0}
-              className={`px-8 py-4 rounded-full font-bold text-xl transition-all duration-200 shadow-lg ${
+              className={`px-8 py-4 rounded-full font-bold text-xl transition-all duration-150 shadow-lg ${
                 starRating > 0
-                  ? 'bg-[#FFE251] text-[#1A2E56] hover:bg-[#FFE251] hover:shadow-xl transform hover:scale-105'
+                  ? 'bg-[#FFE251] text-[#1A2E56] active:bg-[#FFE251] active:shadow-md active:scale-95'
                   : 'bg-gray-300 text-gray-500 cursor-not-allowed'
               }`}
             >
@@ -1029,9 +1148,13 @@ const Queue = () => {
             <div className="flex flex-col items-center w-full px-20">
               {/* Fixed Header - Absolute positioning to prevent movement */}
               <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 -mt-32">
-                <h2 className="text-4xl font-semibold text-center drop-shadow-lg whitespace-nowrap mb-6" style={{ color: '#1F3463' }}>
+                <h2 className="text-4xl font-semibold text-center drop-shadow-lg whitespace-nowrap mb-2" style={{ color: '#1F3463' }}>
                   SELECT OFFICE
                 </h2>
+                {/* Subheader */}
+                <p className="text-2xl font-bold text-center drop-shadow-lg mb-8" style={{ color: '#1F3463' }}>
+                  CUT OFF TIME: 5:00 PM
+                </p>
               </div>
 
               {/* Responsive Grid Container - Fixed positioning below header */}
@@ -1175,43 +1298,54 @@ const Queue = () => {
     ];
 
     return (
-      <QueueLayout>
-        <div className="h-full flex flex-col">
-          <div className="flex-1 flex items-center justify-center">
-            {/* Centered Header-Grid Unit with Fixed Positioning */}
-            <div className="flex flex-col items-center w-full relative">
-              {/* Fixed Header - Absolute positioning to prevent movement */}
-              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 -mt-40">
-                <h2 className="text-4xl font-semibold text-center drop-shadow-lg whitespace-nowrap mb-4" style={{ color: '#1F3463' }}>
-                  ARE YOU AN INCOMING NEW STUDENT?
-                </h2>
-                {/* Subheader */}
-                <p className="text-2xl font-light text-center drop-shadow-lg" style={{ color: '#1F3463' }}>
-                  *A MINOR OF AGE ISN'T ALLOWED TO PROCESS ENROLLMENT
-                </p>
-              </div>
+      <>
+        <QueueLayout>
+          <div className="h-full flex flex-col">
+            <div className="flex-1 flex items-center justify-center">
+              {/* Centered Header-Grid Unit with Fixed Positioning */}
+              <div className="flex flex-col items-center w-full relative">
+                {/* Fixed Header - Absolute positioning to prevent movement */}
+                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 -mt-40">
+                  <h2 className="text-4xl font-semibold text-center drop-shadow-lg whitespace-nowrap mb-4" style={{ color: '#1F3463' }}>
+                    ARE YOU AN INCOMING NEW STUDENT?
+                  </h2>
+                  {/* Subheader */}
+                  <p className="text-2xl font-light text-center drop-shadow-lg" style={{ color: '#1F3463' }}>
+                    *A MINOR OF AGE ISN'T ALLOWED TO PROCESS ENROLLMENT
+                  </p>
+                </div>
 
-              {/* Responsive Grid Container - Fixed positioning below header */}
-              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 mt-8">
-                <ResponsiveGrid
-                  items={studentStatusOptions}
-                  onItemClick={(option) => handleStudentStatusSelect(option.key)}
-                  renderItem={(option) => (
-                    <div className="text-center">
-                      <h3 className="text-xl font-semibold text-white">
-                        {option.label}
-                      </h3>
-                    </div>
-                  )}
-                  showPagination={studentStatusOptions.length > 6}
-                />
+                {/* Responsive Grid Container - Fixed positioning below header */}
+                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 mt-8">
+                  <ResponsiveGrid
+                    items={studentStatusOptions}
+                    onItemClick={(option) => handleStudentStatusSelect(option.key)}
+                    renderItem={(option) => (
+                      <div className="text-center">
+                        <h3 className="text-xl font-semibold text-white">
+                          {option.label}
+                        </h3>
+                      </div>
+                    )}
+                    showPagination={studentStatusOptions.length > 6}
+                  />
+                </div>
               </div>
             </div>
           </div>
-        </div>
 
-        <BackButton />
-      </QueueLayout>
+          <BackButton />
+        </QueueLayout>
+
+        {/* Office Mismatch Modal */}
+        <OfficeMismatchModal
+          isOpen={showOfficeMismatchModal}
+          onConfirm={handleOfficeMismatchConfirm}
+          onClose={handleOfficeMismatchClose}
+          currentOffice={selectedDepartment?.name === "Registrar's Office" ? "Registrar" : "Admissions"}
+          suggestedOffice={suggestedOffice}
+        />
+      </>
     );
   }
 
@@ -1309,7 +1443,7 @@ const Queue = () => {
         </h2>
         <button
           onClick={handleBackToOffices}
-          className="px-6 py-3 bg-[#1F3463] text-white rounded-lg hover:bg-[#1A2E56] transition-colors"
+          className="px-6 py-3 bg-[#1F3463] text-white rounded-lg active:bg-[#1A2E56] active:scale-95 transition-all duration-150"
         >
           Back to Department Selection
         </button>

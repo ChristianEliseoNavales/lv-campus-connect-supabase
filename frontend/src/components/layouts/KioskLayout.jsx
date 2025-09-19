@@ -69,10 +69,10 @@ const KioskLayout = ({ children, customFooter = null }) => {
                 <NavLink
                   to="/"
                   className={({ isActive }) =>
-                    `w-36 h-24 flex flex-col items-center justify-center px-6 py-4 rounded-full transition-all duration-200 ${
+                    `w-36 h-24 flex flex-col items-center justify-center px-6 py-4 rounded-full transition-all duration-150 ${
                       isActive
                         ? 'font-bold shadow-md'
-                        : 'hover:bg-white hover:bg-opacity-20'
+                        : 'active:bg-white active:bg-opacity-20 active:scale-95'
                     }`
                   }
                   style={({ isActive }) => ({
@@ -87,10 +87,10 @@ const KioskLayout = ({ children, customFooter = null }) => {
                 <NavLink
                   to="/bulletin"
                   className={({ isActive }) =>
-                    `w-36 h-24 flex flex-col items-center justify-center px-6 py-4 rounded-full transition-all duration-200 ${
+                    `w-36 h-24 flex flex-col items-center justify-center px-6 py-4 rounded-full transition-all duration-150 ${
                       isActive
                         ? 'font-bold shadow-md'
-                        : 'hover:bg-white hover:bg-opacity-20'
+                        : 'active:bg-white active:bg-opacity-20 active:scale-95'
                     }`
                   }
                   style={({ isActive }) => ({
@@ -105,10 +105,10 @@ const KioskLayout = ({ children, customFooter = null }) => {
                 <NavLink
                   to="/map"
                   className={({ isActive }) =>
-                    `w-36 h-24 flex flex-col items-center justify-center px-6 py-4 rounded-full transition-all duration-200 ${
+                    `w-36 h-24 flex flex-col items-center justify-center px-6 py-4 rounded-full transition-all duration-150 ${
                       isActive
                         ? 'font-bold shadow-md'
-                        : 'hover:bg-white hover:bg-opacity-20'
+                        : 'active:bg-white active:bg-opacity-20 active:scale-95'
                     }`
                   }
                   style={({ isActive }) => ({
@@ -123,10 +123,10 @@ const KioskLayout = ({ children, customFooter = null }) => {
                 <NavLink
                   to="/directory"
                   className={({ isActive }) =>
-                    `w-36 h-24 flex flex-col items-center justify-center px-6 py-4 rounded-full transition-all duration-200 ${
+                    `w-36 h-24 flex flex-col items-center justify-center px-6 py-4 rounded-full transition-all duration-150 ${
                       isActive
                         ? 'font-bold shadow-md'
-                        : 'hover:bg-white hover:bg-opacity-20'
+                        : 'active:bg-white active:bg-opacity-20 active:scale-95'
                     }`
                   }
                   style={({ isActive }) => ({
@@ -141,10 +141,10 @@ const KioskLayout = ({ children, customFooter = null }) => {
                 <NavLink
                   to="/queue"
                   className={({ isActive }) =>
-                    `w-36 h-24 flex flex-col items-center justify-center px-6 py-4 rounded-full transition-all duration-200 ${
+                    `w-36 h-24 flex flex-col items-center justify-center px-6 py-4 rounded-full transition-all duration-150 ${
                       isActive
                         ? 'font-bold shadow-md'
-                        : 'hover:bg-white hover:bg-opacity-20'
+                        : 'active:bg-white active:bg-opacity-20 active:scale-95'
                     }`
                   }
                   style={({ isActive }) => ({
@@ -159,10 +159,10 @@ const KioskLayout = ({ children, customFooter = null }) => {
                 <NavLink
                   to="/faq"
                   className={({ isActive }) =>
-                    `w-36 h-24 flex flex-col items-center justify-center px-6 py-4 rounded-full transition-all duration-200 ${
+                    `w-36 h-24 flex flex-col items-center justify-center px-6 py-4 rounded-full transition-all duration-150 ${
                       isActive
                         ? 'font-bold shadow-md'
-                        : 'hover:bg-white hover:bg-opacity-20'
+                        : 'active:bg-white active:bg-opacity-20 active:scale-95'
                     }`
                   }
                   style={({ isActive }) => ({
