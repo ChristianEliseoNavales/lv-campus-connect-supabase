@@ -1,94 +1,9 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState } from 'react';
 import { KioskLayout } from '../layouts';
 import { FaSearch, FaWheelchair, FaPlus, FaMinus, FaExpand, FaSearchPlus, FaSearchMinus } from 'react-icons/fa';
+import HolographicKeyboard from '../ui/HolographicKeyboard';
 
-// On-screen QWERTY Keyboard Component - Optimized for Kiosk Touchscreen
-const OnScreenKeyboard = ({ onKeyPress, onBackspace, onSpace, onEnter, isVisible }) => {
-  const [isAnimating, setIsAnimating] = useState(false);
-  const keyboardRef = useRef(null);
 
-  useEffect(() => {
-    if (isVisible) {
-      setIsAnimating(true);
-      if (keyboardRef.current) {
-        keyboardRef.current.classList.remove('kiosk-keyboard-exit');
-        keyboardRef.current.classList.add('kiosk-keyboard-enter');
-      }
-    } else {
-      if (keyboardRef.current) {
-        keyboardRef.current.classList.remove('kiosk-keyboard-enter');
-        keyboardRef.current.classList.add('kiosk-keyboard-exit');
-        setTimeout(() => setIsAnimating(false), 300);
-      }
-    }
-  }, [isVisible]);
-
-  const numberRow = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'];
-  const keyboardRows = [
-    ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P'],
-    ['A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L'],
-    ['Z', 'X', 'C', 'V', 'B', 'N', 'M']
-  ];
-
-  if (!isVisible && !isAnimating) return null;
-
-  return (
-    <div
-      ref={keyboardRef}
-      className="bg-white border-2 border-gray-300 rounded-xl p-6 shadow-xl max-w-5xl mx-auto"
-    >
-      {/* Number Row */}
-      <div className="flex justify-center gap-3 mb-4">
-        {numberRow.map((key) => (
-          <button
-            key={key}
-            onClick={() => onKeyPress(key)}
-            className="w-20 h-16 bg-white border-2 border-gray-400 rounded-lg text-2xl font-bold kiosk-touch-feedback select-none"
-          >
-            {key}
-          </button>
-        ))}
-      </div>
-
-      {/* Letter Rows */}
-      {keyboardRows.map((row, rowIndex) => (
-        <div key={rowIndex} className="flex justify-center gap-3 mb-4">
-          {row.map((key) => (
-            <button
-              key={key}
-              onClick={() => onKeyPress(key)}
-              className="w-20 h-16 bg-white border-2 border-gray-400 rounded-lg text-2xl font-bold kiosk-touch-feedback select-none"
-            >
-              {key}
-            </button>
-          ))}
-        </div>
-      ))}
-
-      {/* Action Buttons Row */}
-      <div className="flex justify-center gap-3">
-        <button
-          onClick={onSpace}
-          className="w-40 h-16 bg-white border-2 border-gray-400 rounded-lg text-xl font-bold kiosk-touch-feedback select-none"
-        >
-          SPACE
-        </button>
-        <button
-          onClick={onBackspace}
-          className="w-32 h-16 bg-white border-2 border-gray-400 rounded-lg text-xl font-bold kiosk-touch-feedback select-none"
-        >
-          ⌫
-        </button>
-        <button
-          onClick={onEnter}
-          className="w-32 h-16 bg-white border-2 border-gray-400 rounded-lg text-xl font-bold kiosk-touch-feedback select-none"
-        >
-          ENTER
-        </button>
-      </div>
-    </div>
-  );
-};
 
 const Map = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -107,7 +22,7 @@ const Map = () => {
 
   // Department options for the dropdown
   const departmentOptions = [
-    { value: '', label: 'All Departments' },
+    { value: '', label: 'Select Department' },
     { value: 'registrar', label: 'Registrar Office' },
     { value: 'admissions', label: 'Admissions Office' },
     { value: 'cashier', label: 'Cashier Office' },
@@ -163,8 +78,9 @@ const Map = () => {
     setIsSearchFocused(false);
   };
 
-  const toggleKeyboard = () => {
-    setShowKeyboard(!showKeyboard);
+  const hideKeyboard = () => {
+    setShowKeyboard(false);
+    setIsSearchFocused(false);
   };
 
   // Keyboard handling functions
@@ -180,18 +96,12 @@ const Map = () => {
     setSearchTerm(prev => prev + ' ');
   };
 
-  const handleEnter = () => {
-    // Could trigger search functionality here
-    setShowKeyboard(false);
-    setIsSearchFocused(false);
-  };
-
   return (
     <KioskLayout>
       <div className="h-full flex flex-col">
         {/* Search Bar at Top */}
-        <div className="rounded-3xl p-4 mb-4">
-          <div className="flex gap-4 items-center">
+        <div className="rounded-3xl mb-4 flex justify-center">
+          <div className="w-3/5 flex gap-4 items-center">
             <div className="flex-grow">
               <input
                 type="text"
@@ -200,66 +110,48 @@ const Map = () => {
                 onFocus={handleSearchFocus}
                 onBlur={handleSearchBlur}
                 placeholder="Search for rooms, departments, or facilities..."
-                className={`w-full px-4 py-3 border-2 rounded-3xl text-lg focus:outline-none transition-colors ${
+                className={`w-full px-4 py-3 border-2 rounded-3xl text-lg focus:outline-none transition-colors shadow-lg focus:shadow-xl ${
                   isSearchFocused
                     ? 'border-[#1F3463] bg-blue-50'
                     : 'border-gray-300 hover:border-gray-400'
                 }`}
-                readOnly={showKeyboard}
+                readOnly
               />
             </div>
             <button
               onClick={handleSearch}
-              className="bg-[#1F3463] text-white px-6 py-3 rounded-3xl hover:bg-[#1A2E56] transition-colors focus:outline-none focus:ring-4 focus:ring-blue-200 flex items-center gap-2"
+              className="bg-[#FFE251] text-[#1A2E56] px-6 py-3 rounded-3xl transition-colors focus:outline-none focus:ring-4 focus:ring-blue-200 flex items-center gap-2 shadow-lg hover:shadow-xl drop-shadow-md hover:drop-shadow-lg"
             >
               <FaSearch className="w-5 h-5" />
               <span className="font-semibold">Search</span>
             </button>
 
-            {/* Keyboard Toggle Button - Only show when search is focused or keyboard is visible */}
-            {(isSearchFocused || showKeyboard) && (
-              <button
-                onClick={toggleKeyboard}
-                className={`w-12 h-12 flex items-center justify-center rounded-lg transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-blue-200 ${
-                  showKeyboard
-                    ? 'bg-yellow-300 text-blue-900 font-bold shadow-md'
-                    : 'bg-[#1F3463] text-white hover:bg-[#1A2E56]'
-                }`}
-                aria-label="Toggle virtual keyboard"
-              >
-                <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M3 5a2 2 0 012-2h10a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V5zm5.293 1.293a1 1 0 011.414 0l3 3a1 1 0 010 1.414l-3 3a1 1 0 01-1.414-1.414L10.586 10 8.293 7.707a1 1 0 010-1.414z" clipRule="evenodd" />
-                </svg>
-              </button>
-            )}
+
           </div>
         </div>
 
         {/* Map Display */}
-        <div className={`flex-grow bg-white rounded-lg shadow-md p-6 mb-4 ${showKeyboard ? 'mb-2' : ''}`}>
+        <div className="flex-grow bg-white rounded-lg shadow-xl drop-shadow-lg p-6 mb-2">
           <div className="w-full h-full flex items-center justify-center">
             <img
-              src="/1F.jpg"
+              src="/map/1F.jpg"
               alt="1st Floor Map"
               className="max-w-full max-h-full object-contain rounded-lg shadow-sm"
             />
           </div>
         </div>
 
-        {/* 3-Column Control Panel */}
-        <div className={`rounded-lg shadow-md p-6 ${showKeyboard ? 'mb-4' : ''}`}>
-          <div className="grid grid-cols-3 gap-6">
+        {/* Control Panel */}
+        <div className="rounded-lg p-4">
+          <div className="grid grid-cols-3 gap-4 items-end">
             {/* Column 1 - Department Selector */}
-            <div className="bg-gray-50 rounded-lg p-4">
-              <label htmlFor="department" className="block text-sm font-semibold text-gray-700 mb-3">
-                Department
-              </label>
-              <div className="flex gap-3">
+            <div>
+              <div className="relative">
                 <select
                   id="department"
                   value={selectedDepartment}
                   onChange={handleDepartmentChange}
-                  className="flex-grow px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1F3463] focus:border-[#1F3463] outline-none bg-white text-lg"
+                  className="w-full px-4 py-4 pr-12 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-[#1F3463] focus:border-[#1F3463] outline-none bg-white text-lg h-14 appearance-none cursor-pointer shadow-lg focus:shadow-xl"
                 >
                   {departmentOptions.map((option) => (
                     <option key={option.value} value={option.value}>
@@ -267,83 +159,89 @@ const Map = () => {
                     </option>
                   ))}
                 </select>
+                {/* Custom Dropdown Arrow */}
+                <div className="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
+                  <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </div>
+              </div>
+            </div>
+
+            {/* Column 2 - Floor Level Selector */}
+            <div>
+              <div className="relative">
+                <select
+                  id="floor"
+                  value={selectedFloor}
+                  onChange={handleFloorChange}
+                  className="w-full px-4 py-4 pr-12 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-[#1F3463] focus:border-[#1F3463] outline-none bg-white text-lg h-14 appearance-none cursor-pointer shadow-lg focus:shadow-xl"
+                >
+                  {floorOptions.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+                {/* Custom Dropdown Arrow */}
+                <div className="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
+                  <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </div>
+              </div>
+            </div>
+
+            {/* Column 3 - Map Controls */}
+            <div>
+              <div className="flex h-14 shadow-lg drop-shadow-md rounded-2xl overflow-hidden">
                 <button
                   onClick={handleAccessibility}
-                  className="bg-[#1F3463] text-white px-4 py-3 rounded-lg hover:bg-[#1A2E56] transition-colors focus:outline-none focus:ring-4 focus:ring-blue-200 flex items-center justify-center"
+                  className="flex-1 bg-[#1F3463] text-white px-3 py-4 hover:bg-[#1A2E56] transition-colors focus:outline-none focus:ring-4 focus:ring-blue-200 flex items-center justify-center gap-2 border-r border-[#1A2E56]"
                   title="Accessibility Features"
                   aria-label="Toggle accessibility features"
                 >
                   <FaWheelchair className="w-6 h-6" />
                 </button>
-              </div>
-            </div>
-
-            {/* Column 2 - Floor Level Selector */}
-            <div className="bg-gray-50 rounded-lg p-4">
-              <label htmlFor="floor" className="block text-sm font-semibold text-gray-700 mb-3">
-                Floor Level
-              </label>
-              <select
-                id="floor"
-                value={selectedFloor}
-                onChange={handleFloorChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1F3463] focus:border-[#1F3463] outline-none bg-white text-lg"
-              >
-                {floorOptions.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {/* Column 3 - Map Controls */}
-            <div className="bg-gray-50 rounded-lg p-4">
-              <label className="block text-sm font-semibold text-gray-700 mb-3">
-                Map Controls
-              </label>
-              <div className="flex gap-2">
                 <button
                   onClick={handleZoomIn}
-                  className="flex-1 bg-[#1F3463] text-white px-3 py-3 rounded-lg hover:bg-[#1A2E56] transition-colors focus:outline-none focus:ring-4 focus:ring-blue-200 flex items-center justify-center gap-2"
+                  className="flex-1 bg-[#1F3463] text-white px-3 py-4 hover:bg-[#1A2E56] transition-colors focus:outline-none focus:ring-4 focus:ring-blue-200 flex items-center justify-center gap-2 border-r border-[#1A2E56]"
                   title="Zoom In"
                 >
-                  <FaPlus className="w-4 h-4" />
-                  <FaSearchPlus className="w-4 h-4" />
+                  <FaSearchPlus className="w-6 h-6" />
                 </button>
                 <button
                   onClick={handleZoomOut}
-                  className="flex-1 bg-[#1F3463] text-white px-3 py-3 rounded-lg hover:bg-[#1A2E56] transition-colors focus:outline-none focus:ring-4 focus:ring-blue-200 flex items-center justify-center gap-2"
+                  className="flex-1 bg-[#1F3463] text-white px-3 py-4 hover:bg-[#1A2E56] transition-colors focus:outline-none focus:ring-4 focus:ring-blue-200 flex items-center justify-center gap-2 border-r border-[#1A2E56]"
                   title="Zoom Out"
                 >
-                  <FaMinus className="w-4 h-4" />
-                  <FaSearchMinus className="w-4 h-4" />
+                  <FaSearchMinus className="w-6 h-6" />
                 </button>
                 <button
                   onClick={handleFullscreen}
-                  className="flex-1 bg-[#1F3463] text-white px-3 py-3 rounded-lg hover:bg-[#1A2E56] transition-colors focus:outline-none focus:ring-4 focus:ring-blue-200 flex items-center justify-center"
+                  className="flex-1 bg-[#1F3463] text-white px-3 py-4 hover:bg-[#1A2E56] transition-colors focus:outline-none focus:ring-4 focus:ring-blue-200 flex items-center justify-center"
                   title="Fullscreen"
                 >
-                  <FaExpand className="w-5 h-5" />
+                  <FaExpand className="w-6 h-6" />
                 </button>
               </div>
             </div>
           </div>
         </div>
 
-        {/* On-Screen Keyboard */}
-        {(showKeyboard || isSearchFocused) && (
-          <div className="flex justify-center w-full mb-4">
-            <OnScreenKeyboard
-              onKeyPress={handleKeyPress}
-              onBackspace={handleBackspace}
-              onSpace={handleSpace}
-              onEnter={handleEnter}
-              isVisible={showKeyboard}
-            />
-          </div>
-        )}
       </div>
+
+      {/* Holographic Keyboard Overlay */}
+      <HolographicKeyboard
+        onKeyPress={handleKeyPress}
+        onBackspace={handleBackspace}
+        onSpace={handleSpace}
+        onHide={hideKeyboard}
+        isVisible={showKeyboard}
+        activeInputValue={searchTerm}
+        activeInputLabel="SEARCH"
+        activeInputPlaceholder="Search for rooms, departments, or facilities..."
+      />
     </KioskLayout>
   );
 };

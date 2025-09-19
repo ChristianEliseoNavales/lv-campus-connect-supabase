@@ -1,10 +1,10 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 
-const useIdleDetection = (idleTimeout = 30000) => { // 30 seconds for production
+const useIdleDetection = (idleTimeout = 60000) => { // 60 seconds (1 minute) for production
   const [isIdle, setIsIdle] = useState(false);
   const [showIdleModal, setShowIdleModal] = useState(false);
-  const [countdown, setCountdown] = useState(5);
+  const [countdown, setCountdown] = useState(20);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -31,7 +31,7 @@ const useIdleDetection = (idleTimeout = 30000) => { // 30 seconds for production
     idleTimerRef.current = setTimeout(() => {
       console.log('⚠️ Idle timeout reached, showing modal');
       setShowIdleModal(true);
-      setCountdown(5);
+      setCountdown(20);
     }, idleTimeout);
   }, [idleTimeout, location.pathname]); // Removed showIdleModal dependency
 
@@ -69,7 +69,7 @@ const useIdleDetection = (idleTimeout = 30000) => { // 30 seconds for production
   const handleStayActive = useCallback(() => {
     console.log('✅ User chose to stay active');
     setShowIdleModal(false);
-    setCountdown(5);
+    setCountdown(20);
     // Restart the idle timer immediately
     resetIdleTimer();
   }, [resetIdleTimer]);
@@ -142,7 +142,7 @@ const useIdleDetection = (idleTimeout = 30000) => { // 30 seconds for production
       console.log('🔄 Resetting idle state for new page');
       setIsIdle(false);
       setShowIdleModal(false);
-      setCountdown(5);
+      setCountdown(20);
       resetIdleTimer();
     }
   }, [location.pathname, resetIdleTimer]);

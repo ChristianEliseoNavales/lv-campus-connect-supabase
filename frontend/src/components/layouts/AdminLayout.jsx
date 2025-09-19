@@ -96,7 +96,7 @@ const AdminLayout = ({ children }) => {
   );
 
   return (
-    <div className="min-h-screen bg-gray-50 flex">
+    <div className="min-h-screen bg-gray-50 flex admin-layout">
       {/* Sidebar - positioned above header in z-index */}
       <div
         className={`shadow-lg transition-all duration-300 ease-in-out ${isSidebarCollapsed ? 'w-16' : 'w-64'} flex flex-col relative z-20 overflow-hidden`}

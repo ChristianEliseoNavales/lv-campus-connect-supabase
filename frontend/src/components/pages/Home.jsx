@@ -8,7 +8,6 @@ const Home = () => {
     admissions: { currentNumber: 0, nextNumber: 0, queue: [] }
   });
   const [loading, setLoading] = useState(true);
-  const [currentTime, setCurrentTime] = useState(new Date());
 
   // Fetch queue data from API
   useEffect(() => {
@@ -65,9 +64,9 @@ const Home = () => {
     const data = queueData[department];
 
     return (
-      <div className="h-full bg-white rounded-lg shadow-lg flex flex-col">
-        {/* Office Name Header */}
-        <div className="bg-[#1F3463] text-white text-center py-4 rounded-t-lg">
+      <div className="h-full flex flex-col">
+        {/* Office Name Header - Added rounded corners to all four corners */}
+        <div className="bg-[#1F3463] text-white text-center py-4 rounded-lg">
           <h3 className="text-xl font-bold">{title}</h3>
         </div>
 
@@ -76,13 +75,13 @@ const Home = () => {
           <p className="text-lg font-bold" style={{ color: '#1F3463' }}>NOW SERVING</p>
         </div>
 
-        {/* Labels positioned OUTSIDE and ABOVE the grid */}
+        {/* Labels positioned OUTSIDE and ABOVE the grid - Updated for 50/50 split */}
         <div className="mx-4 mb-2">
-          <div className="grid grid-cols-3 gap-2">
+          <div className="grid grid-cols-2 gap-2">
             <div className="text-center">
               <span className="font-semibold text-gray-700 text-sm">WINDOW</span>
             </div>
-            <div className="col-span-2 text-center">
+            <div className="text-center">
               <span className="font-semibold text-gray-700 text-sm">QUEUE NO.</span>
             </div>
           </div>
@@ -90,15 +89,15 @@ const Home = () => {
 
         {/* Queue Grid Container */}
         <div className="flex-grow mx-4 mb-4">
-          <div className="h-full bg-white p-2">
-            {/* Grid Layout: 4 rows with unified row borders */}
+          <div className="h-full p-2">
+            {/* Grid Layout: 4 rows with separate containers for window and queue numbers */}
             <div className="flex flex-col gap-2 h-full">
               {/* Row 1 */}
-              <div className="flex-1 border border-gray-300 rounded flex">
-                <div className="flex items-center justify-center bg-white rounded-l flex-1">
+              <div className="flex-1 flex gap-2">
+                <div className="flex items-center justify-center bg-gray-100 rounded-lg flex-1">
                   <span className="text-lg font-bold text-gray-800">1</span>
                 </div>
-                <div className="flex items-center justify-center bg-gray-100 rounded-r flex-[2]">
+                <div className="flex items-center justify-center bg-gray-100 rounded-lg flex-1">
                   <span className="text-lg font-bold" style={{ color: '#1F3463' }}>
                     {loading ? '--' : String(data.currentNumber).padStart(2, '0')}
                   </span>
@@ -106,11 +105,11 @@ const Home = () => {
               </div>
 
               {/* Row 2 */}
-              <div className="flex-1 border border-gray-300 rounded flex">
-                <div className="flex items-center justify-center bg-white rounded-l flex-1">
+              <div className="flex-1 flex gap-2">
+                <div className="flex items-center justify-center bg-gray-100 rounded-lg flex-1">
                   <span className="text-lg font-bold text-gray-800">2</span>
                 </div>
-                <div className="flex items-center justify-center bg-gray-100 rounded-r flex-[2]">
+                <div className="flex items-center justify-center bg-gray-100 rounded-lg flex-1">
                   <span className="text-lg font-bold text-gray-600">
                     {loading ? '--' : String(data.nextNumber).padStart(2, '0')}
                   </span>
@@ -118,21 +117,21 @@ const Home = () => {
               </div>
 
               {/* Row 3 */}
-              <div className="flex-1 border border-gray-300 rounded flex">
-                <div className="flex items-center justify-center bg-white rounded-l flex-1">
+              <div className="flex-1 flex gap-2">
+                <div className="flex items-center justify-center bg-gray-100 rounded-lg flex-1">
                   <span className="text-lg font-bold text-gray-800">3</span>
                 </div>
-                <div className="flex items-center justify-center bg-gray-100 rounded-r flex-[2]">
+                <div className="flex items-center justify-center bg-gray-100 rounded-lg flex-1">
                   <span className="text-lg font-bold text-gray-400">--</span>
                 </div>
               </div>
 
               {/* Row 4 */}
-              <div className="flex-1 border border-gray-300 rounded flex">
-                <div className="flex items-center justify-center bg-white rounded-l flex-1">
+              <div className="flex-1 flex gap-2">
+                <div className="flex items-center justify-center bg-gray-100 rounded-lg flex-1">
                   <span className="text-lg font-bold text-gray-800">Priority</span>
                 </div>
-                <div className="flex items-center justify-center bg-gray-100 rounded-r flex-[2]">
+                <div className="flex items-center justify-center bg-gray-100 rounded-lg flex-1">
                   <span className="text-lg font-bold text-gray-400">--</span>
                 </div>
               </div>
@@ -143,102 +142,107 @@ const Home = () => {
     );
   };
 
-  // Digital Clock Component
-  const DigitalClock = () => {
-    const formatTime = (date) => {
-      return date.toLocaleTimeString('en-US', {
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: false
-      });
-    };
 
-    const formatDay = (date) => {
-      return date.toLocaleDateString('en-US', { weekday: 'long' });
-    };
-
-    const formatDate = (date) => {
-      const day = date.getDate();
-      const month = date.toLocaleDateString('en-US', { month: 'long' });
-      return { day, month };
-    };
-
-    const time = formatTime(currentTime);
-    const dayName = formatDay(currentTime);
-    const { day, month } = formatDate(currentTime);
-
-    return (
-      <div className="w-full h-full bg-[#1F3463] rounded-lg shadow-lg p-4 flex flex-col items-center justify-center text-white">
-        <div className="text-center">
-          <div className="text-2xl text-black font-bold mb-2 bg-white rounded-xl p-2 px-20">{time}</div>
-          <div className="text-sm font-medium mb-1">{dayName}</div>
-          <div className="text-3xl font-bold">{day}</div>
-          <div className="text-sm font-medium">{month}</div>
-        </div>
-      </div>
-    );
-  };
 
   return (
     <div className="h-full flex flex-col">
 
-      {/* 4-Column, 3-Row Grid Layout */}
-      <div className="flex-grow grid grid-cols-[1fr_1fr_1fr_0.5fr] grid-rows-3 gap-6 h-full">
-        {/* Column 1 (Left sidebar) - Row 1: MAP */}
-        <div className="col-span-1 row-span-1 col-start-1 row-start-1">
-          <button
-            onClick={() => navigate('/map')}
-            className="w-full h-full bg-[#1F3463] rounded-lg shadow-lg p-4 flex items-center justify-center hover:bg-[#2a4a7a] transition-colors duration-200 focus:outline-none focus:ring-4 focus:ring-blue-200"
-          >
-            <div className="text-center">
-              <h3 className="text-lg font-bold text-white">MAP</h3>
+      {/* 3-Column Grid Layout */}
+      <div className="flex-grow grid grid-cols-3 gap-0 h-full">
+        {/* Columns 1-2 Combined (Registrar's and Admissions Office) - Single parent container */}
+        <div className="col-span-2 px-4">
+          {/* White background container wrapping both office sections */}
+          <div className="h-full bg-white rounded-lg shadow-xl drop-shadow-lg p-6">
+            {/* Grid container for both office sections */}
+            <div className="h-full grid grid-cols-2 gap-6">
+              {/* Column 1 - Registrar's Office */}
+              <div className="h-full">
+                <EnhancedQueueDisplay
+                  department="registrar"
+                  title="Registrar's Office"
+                />
+              </div>
+
+              {/* Column 2 - Admissions Office */}
+              <div className="h-full">
+                <EnhancedQueueDisplay
+                  department="admissions"
+                  title="Admissions Office"
+                />
+              </div>
             </div>
-          </button>
+          </div>
         </div>
 
-        {/* Column 2 (Main content area 1) - Registrar's Office - Spans all 3 rows */}
-        <div className="col-span-1 row-span-3 col-start-2 row-start-1">
-          <EnhancedQueueDisplay
-            department="registrar"
-            title="Registrar's Office"
-          />
-        </div>
-
-        {/* Column 3 (Main content area 2) - Admissions Office - Spans all 3 rows */}
-        <div className="col-span-1 row-span-3 col-start-3 row-start-1">
-          <EnhancedQueueDisplay
-            department="admissions"
-            title="Admissions Office"
-          />
-        </div>
-
-        {/* Column 4 (Right sidebar) - Digital Clock - Row 1 only */}
-        <div className="col-span-1 row-span-1 col-start-4 row-start-1">
-          <DigitalClock />
-        </div>
-
-        {/* Column 1 (Left sidebar) - Row 2: DIRECTORY */}
-        <div className="col-span-1 row-span-1 col-start-1 row-start-2">
-          <button
-            onClick={() => navigate('/directory')}
-            className="w-full h-full bg-[#1F3463] rounded-lg shadow-lg p-4 flex items-center justify-center hover:bg-[#2a4a7a] transition-colors duration-200 focus:outline-none focus:ring-4 focus:ring-blue-200"
-          >
-            <div className="text-center">
-              <h3 className="text-lg font-bold text-white">DIRECTORY</h3>
+        {/* Column 3 - New Queue/Directory Section */}
+        <div className="col-span-1 flex flex-col gap-6 pl-6">
+          {/* Row 1 - FIND OFFICE LOCATIONS */}
+          <div className="flex-1 bg-[#FFE251] rounded-2xl shadow-xl drop-shadow-lg hover:shadow-2xl hover:drop-shadow-xl transition-all duration-200 p-6 cursor-pointer relative overflow-hidden">
+            {/* Button text positioned at top-left */}
+            <div className="absolute top-6 left-6">
+              <h3 className="text-2xl font-bold text-[#1F3463] leading-tight">FIND OFFICE LOCATIONS</h3>
             </div>
-          </button>
-        </div>
 
-        {/* Column 1 (Left sidebar) - Row 3: HIGHLIGHTS */}
-        <div className="col-span-1 row-span-1 col-start-1 row-start-3">
-          <button
-            onClick={() => navigate('/highlights')}
-            className="w-full h-full bg-[#1F3463] rounded-lg shadow-lg p-4 flex items-center justify-center hover:bg-[#2a4a7a] transition-colors duration-200 focus:outline-none focus:ring-4 focus:ring-blue-200"
-          >
-            <div className="text-center">
-              <h3 className="text-lg font-bold text-white">HIGHLIGHTS</h3>
+            {/* Decorative images */}
+            <img
+              src="/home/1a.png"
+              alt=""
+              className="absolute bottom-6 left-6 w-auto h-auto max-w-24 max-h-24"
+              onError={(e) => {
+                e.target.style.display = 'none';
+              }}
+            />
+            <img
+              src="/home/2a.png"
+              alt=""
+              className="absolute bottom-6 right-6 w-auto h-auto max-w-24 max-h-24"
+              onError={(e) => {
+                e.target.style.display = 'none';
+              }}
+            />
+            <img
+              src="/home/3a.png"
+              alt=""
+              className="absolute top-6 right-6 w-auto h-auto max-w-24 max-h-24"
+              onError={(e) => {
+                e.target.style.display = 'none';
+              }}
+            />
+          </div>
+
+          {/* Row 2 - GET A QUEUE NUMBER */}
+          <div className="flex-1 bg-[#FFE251] rounded-2xl shadow-xl drop-shadow-lg hover:shadow-2xl hover:drop-shadow-xl transition-all duration-200 p-6 cursor-pointer relative overflow-hidden">
+            {/* Button text positioned at top-left */}
+            <div className="absolute top-6 left-6">
+              <h3 className="text-2xl font-bold text-[#1F3463] leading-tight">GET A QUEUE NUMBER</h3>
             </div>
-          </button>
+
+            {/* Decorative images */}
+            <img
+              src="/home/1b.png"
+              alt=""
+              className="absolute bottom-6 left-6 w-auto h-auto max-w-24 max-h-24"
+              onError={(e) => {
+                e.target.style.display = 'none';
+              }}
+            />
+            <img
+              src="/home/2b.png"
+              alt=""
+              className="absolute bottom-6 right-6 w-auto h-auto max-w-24 max-h-24"
+              onError={(e) => {
+                e.target.style.display = 'none';
+              }}
+            />
+            <img
+              src="/home/3b.png"
+              alt=""
+              className="absolute top-6 right-6 w-auto h-auto max-w-24 max-h-24"
+              onError={(e) => {
+                e.target.style.display = 'none';
+              }}
+            />
+          </div>
         </div>
       </div>
     </div>

@@ -1,0 +1,374 @@
+# University Kiosk System - Queue Management Logic & Architecture
+
+## Table of Contents
+1. [System Overview](#system-overview)
+2. [Queue Numbering System](#queue-numbering-system)
+3. [Multi-Window Management](#multi-window-management)
+4. [Real-Time Queue Display](#real-time-queue-display)
+5. [User Flow](#user-flow)
+6. [Role-Based Access Control](#role-based-access-control)
+7. [System Architecture](#system-architecture)
+8. [Data Storage](#data-storage)
+9. [Real-Time Updates](#real-time-updates)
+10. [Technical Implementation](#technical-implementation)
+
+---
+
+## System Overview
+
+The University Kiosk System is a comprehensive queue management solution designed to streamline student and visitor services across multiple university departments. The system operates on a dual-interface architecture:
+
+- **Public Kiosk Interface**: Accessible at `/` or `/kiosk` with no authentication required
+- **Admin Management Interface**: Accessible at `/admin/*` with Google SSO authentication and role-based access control
+
+The system serves two primary departments:
+- **Registrar's Office**: Student records, transcripts, enrollment verification
+- **Admissions Office**: New student applications, admission requirements
+
+---
+
+## Queue Numbering System
+
+### Global Sequential Numbering (01-99)
+The system implements a **global queue numbering system** that ensures no duplicate numbers across all departments:
+
+- **Range**: Numbers 01 through 99 (zero-padded for display)
+- **Sequential Assignment**: Numbers are assigned in order (01, 02, 03, etc.)
+- **No Duplicates**: Each number can only be active once across the entire system
+- **Automatic Cycling**: When reaching 99, the system cycles back to 01
+- **Cross-Department**: Numbers are shared between Registrar and Admissions offices
+
+### Example Queue Assignment:
+```
+Student A (Registrar) → Queue #01
+Student B (Admissions) → Queue #02  
+Student C (Registrar) → Queue #03
+Student D (Admissions) → Queue #04
+```
+
+This ensures clear identification and prevents confusion when students see their numbers on displays throughout the campus.
+
+---
+
+## Multi-Window Management
+
+### Registrar Department Windows
+The Registrar's Office operates with **multiple service windows** (typically 3 windows), each capable of handling specific services:
+
+#### Window Configuration:
+- **Window 1**: Transcript requests, grade reports, enrollment verification
+- **Window 2**: Student record updates, transfer credit evaluation
+- **Window 3**: General inquiries, document processing
+
+#### Window-Specific Service Filtering:
+Each window can be configured to handle specific services, allowing for:
+- **Specialized Service Delivery**: Windows can focus on particular types of requests
+- **Load Distribution**: Services are distributed across available windows
+- **Efficient Processing**: Staff expertise can be matched to service types
+
+#### Window States:
+- **Available**: Ready to serve the next customer
+- **Serving**: Currently helping a customer (displays current queue number)
+- **Closed**: Window is not operational
+
+### Admissions Department
+The Admissions Office typically operates with a single service point but can be expanded to multiple windows using the same architecture.
+
+---
+
+## Real-Time Queue Display
+
+### "NOW SERVING" Information
+The system provides real-time queue status displays showing:
+
+#### Main Display Elements:
+- **Current Number Being Served**: Large, prominent display of the active queue number
+- **Window Assignment**: Which specific window is serving the current number
+- **Next Numbers**: Preview of upcoming queue numbers
+- **Department Identification**: Clear indication of Registrar vs. Admissions queues
+
+#### Display Layout (4-row, 2-column grid):
+```
+┌─────────────────┬─────────────────┐
+│ NOW SERVING     │ WINDOW 1        │
+│     #23         │                 │
+├─────────────────┼─────────────────┤
+│ NEXT: #24       │ WINDOW 2        │
+│                 │     #25         │
+├─────────────────┼─────────────────┤
+│ UPCOMING: #26   │ WINDOW 3        │
+│                 │   CLOSED        │
+├─────────────────┼─────────────────┤
+│ QUEUE LENGTH: 8 │ EST. WAIT: 15min│
+└─────────────────┴─────────────────┘
+```
+
+### Digital Clock Integration
+All queue displays include real-time digital clocks showing:
+- Current time (12-hour format with AM/PM)
+- Current date (Month DD, YYYY format)
+- Automatic updates every second using JavaScript Date object
+
+---
+
+## User Flow
+
+### Complete Queue Request Process:
+
+#### 1. Department Selection
+- User selects either Registrar's Office or Admissions Office
+- System displays department-specific information and current queue status
+
+#### 2. Privacy Consent
+- User reviews and accepts privacy policy for data collection
+- Required before proceeding to service selection
+
+#### 3. Service Selection
+- User chooses from department-specific services:
+  - **Registrar**: Transcript Request, Enrollment Verification, Grade Change Request, etc.
+  - **Admissions**: Application Assistance, Admission Requirements, Transfer Services, etc.
+
+#### 4. Role Identification
+- User identifies as: Visitor, Student, Teacher, or Alumni
+- Helps staff prepare appropriate service level
+
+#### 5. Priority Status
+- User indicates if they have priority status (Yes/No)
+- Priority customers may receive expedited service
+
+#### 6. Information Form (Two-Step Process)
+- **Step 1**: Name and contact number (required)
+- **Step 2**: Email and address (address is optional)
+- Form includes virtual keyboard for touch screen input
+
+#### 7. Confirmation
+- User reviews all entered information
+- Option to modify details before final submission
+
+#### 8. Queue Number Assignment
+- System assigns next available global queue number
+- Displays queue ticket with number, department, and window assignment
+
+#### 9. Service Completion
+- User proceeds to assigned window
+- Staff processes request and marks service as complete
+
+---
+
+## Role-Based Access Control
+
+### Authentication System
+The admin interface uses **Google SSO (Single Sign-On)** with fallback to email/password authentication:
+
+#### Google SSO Integration:
+- University Google accounts for seamless authentication
+- Automatic role assignment based on email domain/configuration
+- Secure token-based session management
+
+#### Fallback Authentication:
+- Email and password login for testing and backup access
+- JWT token generation and validation
+- Session persistence with localStorage
+
+### User Roles and Permissions:
+
+#### 1. MIS Super Admin (`super_admin`)
+- **Full System Access**: Can access all admin modules
+- **User Management**: Create, modify, and delete user accounts
+- **System Configuration**: Modify queue settings, window configurations
+- **Access Routes**: `/admin/*` (all admin routes)
+
+#### 2. Registrar Admin (`registrar_admin`)
+- **Registrar Queue Management**: Control Registrar department queues
+- **Window Operations**: Call next number, complete services, manage window status
+- **Service Configuration**: Modify Registrar services and window assignments
+- **Access Routes**: `/admin/registrar/*` only
+
+#### 3. Admissions Admin (`admissions_admin`)
+- **Admissions Queue Management**: Control Admissions department queues
+- **Application Processing**: Manage application status and requirements
+- **Service Configuration**: Modify Admissions services
+- **Access Routes**: `/admin/admissions/*` only
+
+### Route Protection:
+```javascript
+// Example route access control
+'/admin/mis/*'        → super_admin only
+'/admin/registrar/*'  → super_admin, registrar_admin
+'/admin/admissions/*' → super_admin, admissions_admin
+```
+
+---
+
+## System Architecture
+
+### MERN Stack Implementation:
+
+#### Frontend (React + Vite)
+- **Port**: 5173 (strictly enforced, no fallback ports)
+- **Framework**: React 18 with Vite build tool
+- **Styling**: Tailwind CSS utility-first approach
+- **State Management**: React Context API for authentication
+- **Routing**: React Router with protected routes
+
+#### Backend (Node.js + Express)
+- **Port**: 3001 (API server)
+- **Framework**: Express.js for REST API endpoints
+- **Authentication**: JWT tokens with Google OAuth integration
+- **Middleware**: CORS, rate limiting, input validation
+
+#### Key API Endpoints:
+```
+Public Endpoints (No Authentication):
+GET  /api/public/queue/registrar          - Get Registrar queue status
+GET  /api/public/queue/admissions         - Get Admissions queue status
+GET  /api/public/queue/registrar-windows/window1  - Window-specific queue
+POST /api/queue/submit                    - Submit new queue request
+
+Admin Endpoints (Authentication Required):
+GET  /api/auth/verify                     - Verify JWT token
+POST /api/auth/google                     - Google SSO authentication
+POST /api/auth/login                      - Email/password login
+POST /api/admin/queue/call-next           - Call next number
+POST /api/admin/queue/complete            - Complete service
+```
+
+---
+
+## Data Storage
+
+### Local JSON Files (Pre-MongoDB Migration)
+The system currently uses local JSON files for data persistence before migrating to MongoDB Atlas:
+
+#### File Structure:
+```
+backend/data/
+├── queue.json          - Active queue entries
+├── services.json       - Service configurations
+├── windows.json        - Window assignments and status
+├── users.json          - User accounts and roles
+└── settings.json       - System configuration
+```
+
+#### Queue Entry Data Model:
+```json
+{
+  "id": "unique-identifier",
+  "queueNumber": 23,
+  "department": "registrar",
+  "service": "Transcript Request",
+  "window": "window1",
+  "fullName": "John Doe",
+  "contactNumber": "09123456789",
+  "email": "john.doe@email.com",
+  "address": "123 Main St (optional)",
+  "role": "student",
+  "priority": "normal",
+  "status": "waiting",
+  "timestamp": "2024-01-15T10:30:00.000Z",
+  "estimatedWait": "15-20 minutes"
+}
+```
+
+#### Window Configuration Model:
+```json
+{
+  "registrar": {
+    "windows": {
+      "window1": {
+        "name": "Window 1",
+        "services": ["Transcript Request", "Grade Report"],
+        "isActive": true,
+        "currentNumber": 23,
+        "operator": "Alice Brown",
+        "status": "serving"
+      }
+    }
+  }
+}
+```
+
+### Future MongoDB Atlas Migration:
+- **Collections**: queues, users, services, windows, settings
+- **Indexing**: Queue numbers, timestamps, department filters
+- **Replication**: Multi-region setup for reliability
+- **Backup**: Automated daily backups with point-in-time recovery
+
+---
+
+## Real-Time Updates
+
+### WebSocket Implementation:
+The system uses WebSocket connections for real-time updates across all interfaces:
+
+#### WebSocket Events:
+- `queue-updated`: Broadcast when queue status changes
+- `number-called`: Notify when a number is called
+- `service-completed`: Update when service is finished
+- `window-status-changed`: Notify window availability changes
+
+#### Update Flow:
+1. **Admin Action**: Registrar admin calls next number
+2. **Backend Processing**: Update queue data and window status
+3. **WebSocket Broadcast**: Send updates to all connected clients
+4. **Frontend Update**: Public displays and admin interfaces refresh automatically
+
+#### Connection Management:
+- **Automatic Reconnection**: Clients reconnect if connection is lost
+- **Heartbeat Monitoring**: Regular ping/pong to maintain connections
+- **Error Handling**: Graceful degradation if WebSocket fails
+
+### Polling Fallback:
+If WebSocket connections fail, the system falls back to HTTP polling:
+- **Interval**: Every 5 seconds for queue status
+- **Endpoints**: Same public API endpoints used for initial data loading
+- **Error Recovery**: Automatic retry with exponential backoff
+
+---
+
+## Technical Implementation
+
+### Frontend Components:
+
+#### Public Kiosk Interface:
+- **KioskLayout**: Main layout with navigation and idle detection
+- **Queue Component**: Multi-step queue request process
+- **Home Component**: Real-time queue displays for both departments
+- **IdleDetection**: Automatic return to home after inactivity
+
+#### Admin Interface:
+- **AdminLayout**: Sidebar navigation with role-based menu filtering
+- **RegistrarAdminDashboard**: Queue management and window controls
+- **AdmissionsAdminDashboard**: Admissions-specific queue management
+- **ProtectedRoute**: Authentication and authorization wrapper
+
+### Key Features:
+
+#### 16:9 Landscape Optimization:
+- All interfaces optimized for kiosk displays (1920x1080 minimum)
+- Touch-friendly button sizes and spacing
+- Large fonts for room visibility
+
+#### Accessibility:
+- **WCAG Compliance**: Text contrast ratios meet accessibility standards
+- **Keyboard Navigation**: Full keyboard support for all interactions
+- **Screen Reader Support**: Proper ARIA labels and semantic HTML
+
+#### Error Handling:
+- **Network Failures**: Graceful degradation with user-friendly messages
+- **Data Validation**: Client and server-side input validation
+- **Rate Limiting**: Protection against abuse and excessive requests
+
+### Performance Optimization:
+- **Code Splitting**: Lazy loading of admin components
+- **Caching**: Browser caching for static assets
+- **Compression**: Gzip compression for API responses
+- **Minification**: Optimized production builds
+
+---
+
+## Conclusion
+
+The University Kiosk System provides a robust, scalable solution for queue management with clear separation between public and administrative functions. The global numbering system ensures consistency across departments, while the multi-window architecture allows for efficient service delivery. The role-based access control system maintains security while providing appropriate access levels for different administrative users.
+
+The system is designed for future expansion, with the current local JSON storage serving as a foundation for eventual migration to MongoDB Atlas and potential integration with other university systems.

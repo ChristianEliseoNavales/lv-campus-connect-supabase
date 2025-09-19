@@ -20,8 +20,8 @@ const Button = ({
     success: 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg hover:shadow-xl hover:-translate-y-1 focus:ring-emerald-200',
     danger: 'bg-red-600 hover:bg-red-700 text-white shadow-lg hover:shadow-xl hover:-translate-y-1 focus:ring-red-200',
     warning: 'bg-amber-600 hover:bg-amber-700 text-white shadow-lg hover:shadow-xl hover:-translate-y-1 focus:ring-amber-200',
-    outline: 'border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white focus:ring-blue-200',
-    ghost: 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 focus:ring-gray-200',
+    outline: 'border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white shadow-md hover:shadow-lg focus:ring-blue-200',
+    ghost: 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 shadow-sm hover:shadow-md focus:ring-gray-200',
     kiosk: 'bg-white/20 border-2 border-white/30 text-white hover:bg-white/30 hover:border-white/50 backdrop-blur-md shadow-lg hover:shadow-xl hover:-translate-y-1 focus:ring-white/20'
   };
 

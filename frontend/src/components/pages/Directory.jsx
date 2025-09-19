@@ -1,9 +1,14 @@
 import React, { useState } from 'react';
+import { ResponsiveGrid } from '../ui';
+import DirectoryLayout from '../layouts/DirectoryLayout';
+import { KioskLayout } from '../layouts';
+import { FaLocationDot } from 'react-icons/fa6';
 
 const Directory = () => {
   const [selectedDepartment, setSelectedDepartment] = useState(null);
+  // Fixed layout structure
 
-  // Organizational chart data for each department
+  // Organizational chart data for each office
   const organizationalData = {
     admissions: {
       name: "Admissions Office",
@@ -42,7 +47,7 @@ const Directory = () => {
       ]
     },
     registrar: {
-      name: "Registrar Office",
+      name: "Registrar's Office",
       description: "Manages student records, transcripts, enrollment verification, and academic scheduling",
       email: "registrar@lv.edu.ph",
       head: {
@@ -280,18 +285,105 @@ const Directory = () => {
           reports_to: 2
         }
       ]
+    },
+    data_privacy: {
+      name: "Data Privacy Office",
+      description: "Ensures compliance with data protection laws and manages privacy policies",
+      email: "privacy@lv.edu.ph",
+      head: {
+        id: 1,
+        name: "Ms. Elena Rodriguez",
+        title: "Data Protection Officer"
+      },
+      staff: [
+        {
+          id: 2,
+          name: "Carlos Mendoza",
+          title: "Privacy Compliance Specialist",
+          reports_to: 1
+        },
+        {
+          id: 3,
+          name: "Maria Santos",
+          title: "Data Security Analyst",
+          reports_to: 1
+        }
+      ]
+    },
+    basic_ed: {
+      name: "Basic Ed Office",
+      description: "Manages elementary and secondary education programs and student affairs",
+      email: "basiced@lv.edu.ph",
+      head: {
+        id: 1,
+        name: "Dr. Carmen Dela Cruz",
+        title: "Basic Education Director"
+      },
+      staff: [
+        {
+          id: 2,
+          name: "Ms. Rosa Fernandez",
+          title: "Elementary Coordinator",
+          reports_to: 1
+        },
+        {
+          id: 3,
+          name: "Mr. Antonio Reyes",
+          title: "Secondary Coordinator",
+          reports_to: 1
+        },
+        {
+          id: 4,
+          name: "Ms. Grace Villanueva",
+          title: "Student Affairs Coordinator",
+          reports_to: 1
+        }
+      ]
+    },
+    higher_ed: {
+      name: "Higher Ed Office",
+      description: "Oversees undergraduate and graduate programs and academic affairs",
+      email: "highered@lv.edu.ph",
+      head: {
+        id: 1,
+        name: "Dr. Ricardo Morales",
+        title: "Higher Education Director"
+      },
+      staff: [
+        {
+          id: 2,
+          name: "Dr. Ana Gutierrez",
+          title: "Undergraduate Programs Coordinator",
+          reports_to: 1
+        },
+        {
+          id: 3,
+          name: "Dr. Miguel Torres",
+          title: "Graduate Programs Coordinator",
+          reports_to: 1
+        },
+        {
+          id: 4,
+          name: "Ms. Lucia Herrera",
+          title: "Academic Affairs Assistant",
+          reports_to: 1
+        }
+      ]
     }
   };
 
-  const departments = [
-    { key: 'registrar', name: "Registrar's Office" },
+  const offices = [
     { key: 'admissions', name: 'Admissions Office' },
-    { key: 'hr', name: 'Human Resource Office' },
     { key: 'communications', name: 'Communications Office' },
-    { key: 'it_mis', name: 'MIS Office' }
+    { key: 'data_privacy', name: 'Data Privacy Office' },
+    { key: 'hr', name: 'HR Office' },
+    { key: 'it_mis', name: 'MIS Office' },
+    { key: 'registrar', name: "Registrar's Office" },
+    { key: 'basic_ed', name: 'Basic Ed Office' },
+    { key: 'higher_ed', name: 'Higher Ed Office' }
   ];
 
-  const currentDepartment = organizationalData[selectedDepartment];
+  const currentOffice = organizationalData[selectedDepartment];
 
   // Component to render individual staff member in triangular org chart
   const StaffMember = ({ person, isHead = false }) => (
@@ -299,8 +391,8 @@ const Directory = () => {
       {/* Avatar Icon - Perfectly Centered with Enhanced Styling */}
       <div className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto ${
         isHead ? 'text-white' : 'text-white'
-      }`} style={{ backgroundColor: 'transparent', border: '2px solid #161F55' }}>
-        <svg className="w-8 h-8" viewBox="0 0 24 24" style={{ color: '#161F55' }}>
+      }`} style={{ backgroundColor: 'transparent', border: '2px solid #1F3463' }}>
+        <svg className="w-8 h-8" viewBox="0 0 24 24" style={{ color: '#1F3463' }}>
           {/* Person figure - solid fill with same color as text */}
           <g fill="currentColor">
             {/* Head */}
@@ -311,12 +403,12 @@ const Directory = () => {
         </svg>
       </div>
 
-      {/* Name and Title - Center Aligned with Consistent Purple-Blue Color */}
+      {/* Name and Title - Center Aligned with Consistent Navy Blue Color */}
       <div className="text-center w-full">
-        <h3 className="text-lg font-semibold text-center leading-tight whitespace-nowrap" style={{ color: '#161F55' }}>
+        <h3 className="text-lg font-semibold text-center leading-tight whitespace-nowrap" style={{ color: '#1F3463' }}>
           {person.name}
         </h3>
-        <p className="text-sm text-center mt-1 whitespace-nowrap" style={{ color: '#161F55' }}>
+        <p className="text-sm text-center mt-1 whitespace-nowrap" style={{ color: '#1F3463' }}>
           {person.title}
         </p>
       </div>
@@ -324,8 +416,8 @@ const Directory = () => {
   );
 
   // Function to organize staff into triangular pyramid structure
-  const organizeStaffInPyramid = (department) => {
-    const allStaff = [department.head, ...department.staff];
+  const organizeStaffInPyramid = (office) => {
+    const allStaff = [office.head, ...office.staff];
     const rows = [];
     let currentIndex = 0;
     let rowSize = 1;
@@ -343,130 +435,125 @@ const Directory = () => {
     return rows;
   };
 
-  return (
-    <div className="h-full flex flex-col">
+  // Office Selection: Use KioskLayout with navigation
+  if (!selectedDepartment) {
+    return (
+      <KioskLayout>
+        <div className="h-full flex flex-col">
+          {/* Office Selection Grid */}
+          <div className="flex-grow flex items-center justify-center h-full">
+            {/* Centered Header-Grid Unit with Flexible Positioning */}
+            <div className="flex flex-col items-center justify-center w-full px-20 h-full">
+              {/* Header - Positioned above grid with proper spacing */}
+              <div className="mb-8">
+                <h2 className="text-4xl font-semibold text-center drop-shadow-lg whitespace-nowrap" style={{ color: '#1F3463' }}>
+                  SELECT OFFICE
+                </h2>
+              </div>
 
-      {!selectedDepartment ? (
-        /* Department Selection Grid */
-        <div className="flex-grow flex flex-col">
-          {/* Fixed Header */}
-          <div className="pt-8 pb-6">
-            <h2 className="text-4xl font-semibold text-center drop-shadow-lg" style={{ color: '#161F55' }}>
-              Select a department
-            </h2>
-          </div>
-
-          {/* Centered Grid Container */}
-          <div className="flex-grow flex items-center justify-center">
-            {/* 5 Department Grid: 3 in first row, 2 in second row */}
-            <div className="grid grid-cols-3 gap-8 max-w-4xl mx-auto">
-              {/* First Row - 3 departments */}
-              {departments.slice(0, 3).map((department) => (
-                <button
-                  key={department.key}
-                  onClick={() => setSelectedDepartment(department.key)}
-                  className="text-white rounded-3xl shadow-lg drop-shadow-md p-6 hover:shadow-xl hover:drop-shadow-lg transition-all duration-200 border-2 border-transparent focus:outline-none focus:ring-4 focus:ring-blue-200"
-                  style={{ backgroundColor: '#1F3463' }}
-                  onMouseEnter={(e) => e.target.style.backgroundColor = '#1A2E56'}
-                  onMouseLeave={(e) => e.target.style.backgroundColor = '#1F3463'}
-                >
-                  <div className="text-center">
-                    <h3 className="text-xl font-semibold text-white">
-                      {department.name}
-                    </h3>
-                  </div>
-                </button>
-              ))}
-
-              {/* Second Row - 2 departments, centered */}
-              <div className="col-span-3 grid grid-cols-2 gap-8 max-w-xl mx-auto">
-                {departments.slice(3, 5).map((department) => (
-                  <button
-                    key={department.key}
-                    onClick={() => setSelectedDepartment(department.key)}
-                    className="text-white rounded-3xl shadow-lg drop-shadow-md p-6 hover:shadow-xl hover:drop-shadow-lg transition-all duration-200 border-2 border-transparent focus:outline-none focus:ring-4 focus:ring-blue-200"
-                    style={{ backgroundColor: '#1F3463' }}
-                    onMouseEnter={(e) => e.target.style.backgroundColor = '#1A2E56'}
-                    onMouseLeave={(e) => e.target.style.backgroundColor = '#1F3463'}
-                  >
+              {/* Responsive Grid Container - Natural flow positioning */}
+              <div className="flex-shrink-0">
+                <ResponsiveGrid
+                  items={offices}
+                  onItemClick={(office) => setSelectedDepartment(office.key)}
+                  renderItem={(office) => (
                     <div className="text-center">
                       <h3 className="text-xl font-semibold text-white">
-                        {department.name}
+                        {office.name}
                       </h3>
                     </div>
-                  </button>
-                ))}
+                  )}
+                  showPagination={offices.length > 6}
+                  isDirectoryPage={true}
+                />
               </div>
             </div>
           </div>
         </div>
-      ) : (
-        /* Department Details View - Fixed Header/Footer with Scrollable Content */
-        <div className="flex-grow flex flex-col bg-white bg-opacity-80 rounded-2xl shadow-sm overflow-hidden">
-          {currentDepartment && (
-            <>
-              {/* Fixed Header with Department Navigation - Light Background */}
-              <div className="bg-gray-200 px-8 py-6 flex-shrink-0 relative border-b border-gray-200">
-                {/* Left: Back Button - Positioned Absolutely */}
-                <button
-                  onClick={() => setSelectedDepartment(null)}
-                  className="absolute left-8 top-1/2 transform -translate-y-1/2 flex items-center transition-colors duration-200 font-semibold z-10 hover:opacity-80"
-                  style={{ color: '#161F55' }}
-                >
-                  <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clipRule="evenodd" />
-                  </svg>
-                  Back
-                </button>
+      </KioskLayout>
+    );
+  }
 
-                {/* Center: Department Name - Perfectly Centered Across Full Width */}
-                <div className="flex justify-center items-center w-full">
-                  <h1 className="text-3xl font-bold text-center" style={{ color: '#161F55' }}>
-                    {currentDepartment.name}
-                  </h1>
-                </div>
-
-                {/* Right: Find Location - Positioned Absolutely */}
-                <button className="absolute right-8 top-1/2 transform -translate-y-1/2 flex items-center transition-colors duration-200 font-semibold z-10 hover:opacity-80" style={{ color: '#161F55' }}>
-                  <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
-                  </svg>
-                  Find Location
-                </button>
-              </div>
-
-              {/* Scrollable Staff Content Area */}
-              <div className="flex-grow overflow-y-auto px-8 py-8">
-                <div className="flex flex-col items-center justify-center space-y-8 min-h-full w-full">
-                  {organizeStaffInPyramid(currentDepartment).map((row, rowIndex) => (
-                    <div key={rowIndex} className="flex justify-center items-center gap-16 w-full">
-                      <div className="flex justify-center items-center gap-16 flex-wrap">
-                        {row.map((person, personIndex) => (
-                          <StaffMember
-                            key={person.id}
-                            person={person}
-                            isHead={rowIndex === 0 && personIndex === 0}
-                          />
-                        ))}
+  // Office Details View: Use DirectoryLayout as root component
+  return (
+        /* Office Details View - Use DirectoryLayout */
+        <DirectoryLayout>
+          <div className="h-full flex flex-col">
+            {/* Main Content Area - Display office-specific directory images */}
+            <div className="flex-grow flex items-center justify-center">
+              <div className="w-full max-w-4xl mx-auto">
+                {/* Office Email Display - Positioned above office content */}
+                {currentOffice?.email && (
+                  <div className="mb-6 text-center">
+                    <div className="bg-white bg-opacity-95 rounded-lg shadow-lg drop-shadow-md px-6 py-4 inline-block">
+                      <div className="flex items-center justify-center space-x-3">
+                        <svg
+                          className="w-6 h-6"
+                          style={{ color: '#1F3463' }}
+                          fill="currentColor"
+                          viewBox="0 0 20 20"
+                        >
+                          <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
+                          <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
+                        </svg>
+                        <span
+                          className="text-xl font-semibold"
+                          style={{ color: '#1F3463' }}
+                        >
+                          {currentOffice.email}
+                        </span>
                       </div>
                     </div>
-                  ))}
-                </div>
-              </div>
+                  </div>
+                )}
 
-              {/* Fixed Footer with Department Email - Seamlessly Integrated */}
-              <div className="px-8 py-4 flex-shrink-0">
-                <div className="text-center">
-                  <p className="text-lg font-medium" style={{ color: '#161F55' }}>
-                    <span>Email:</span> <span>{currentDepartment.email}</span>
-                  </p>
-                </div>
+                {selectedDepartment === 'it_mis' ? (
+                  <img
+                    src="/directory/mis.png"
+                    alt="MIS Office Directory"
+                    className="w-full h-auto object-contain rounded-lg shadow-lg"
+                  />
+                ) : (
+                  /* Placeholder for other offices */
+                  <div className="bg-white bg-opacity-90 rounded-lg shadow-xl drop-shadow-lg p-12 text-center">
+                    <h2 className="text-4xl font-bold mb-6" style={{ color: '#1F3463' }}>
+                      {currentOffice?.name}
+                    </h2>
+                    <p className="text-xl text-gray-600 mb-8">
+                      Directory image coming soon
+                    </p>
+                    <div className="text-lg" style={{ color: '#1F3463' }}>
+                      <p>
+                        <strong>Description:</strong> {currentOffice?.description}
+                      </p>
+                    </div>
+                  </div>
+                )}
               </div>
-            </>
-          )}
-        </div>
-      )}
-    </div>
+            </div>
+
+            {/* Navigation Buttons - Positioned at bottom-left corner */}
+            <div className="fixed bottom-6 left-6 flex flex-col space-y-4 z-50">
+              {/* Location Button */}
+              <button
+                className="w-20 h-20 bg-[#FFE251] text-[#1A2E56] border-2 border-white rounded-full shadow-lg hover:shadow-xl drop-shadow-md hover:drop-shadow-lg hover:bg-[#1A2E56] transition-all duration-200 flex flex-col items-center justify-center focus:outline-none focus:ring-4 focus:ring-blue-200"
+                aria-label="Find office location"
+              >
+                <FaLocationDot className="w-6 h-6 mb-1" />
+                <span className="text-md font-semibold">Location</span>
+              </button>
+
+              {/* Back Button */}
+              <button
+                onClick={() => setSelectedDepartment(null)}
+                className="w-20 h-20 bg-[#FFE251] text-[#1A2E56] border-2 border-white rounded-full shadow-lg hover:shadow-xl drop-shadow-md hover:drop-shadow-lg hover:bg-[#1A2E56] transition-all duration-200 flex flex-col items-center justify-center focus:outline-none focus:ring-4 focus:ring-blue-200"
+                aria-label="Go back to directory listing"
+              >
+                <span className="text-md font-semibold">BACK</span>
+              </button>
+            </div>
+          </div>
+    </DirectoryLayout>
   );
 };
 

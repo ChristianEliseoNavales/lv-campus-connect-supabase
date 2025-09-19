@@ -73,63 +73,66 @@ const FAQ = () => {
   return (
     <div className="h-full flex flex-col">
       {/* Main Content Area */}
-      <div className="flex-grow flex flex-col">
-        {/* Fixed Header */}
-        <div className="pt-8 pb-6">
-          <h1 className="text-4xl font-semibold text-center drop-shadow-lg" style={{ color: '#161F55' }}>
-            FREQUENTLY ASKED QUESTIONS
-          </h1>
-        </div>
+      <div className="flex-grow flex items-center justify-center p-8">
+        {/* White Background Container with Fixed Height and Scrollable Content */}
+        <div className="bg-white rounded-xl shadow-xl drop-shadow-lg w-full max-w-3xl h-[60vh] flex flex-col overflow-hidden">
+          {/* Header inside white container */}
+          <div className="pt-8 pb-6 px-8 flex-shrink-0">
+            <h1 className="text-4xl font-semibold text-center drop-shadow-lg" style={{ color: '#161F55' }}>
+              FREQUENTLY ASKED QUESTIONS
+            </h1>
+          </div>
 
-        {/* FAQ Accordion List */}
-        <div className="flex-grow overflow-auto px-8">
-          <div className="space-y-3 max-w-4xl mx-auto">
-            {faqData.map((faq) => (
-              <div
-                key={faq.id}
-                className="bg-white rounded-lg shadow-md border border-gray-200 overflow-hidden"
-              >
-                <button
-                  onClick={() => toggleFAQ(faq.id)}
-                  className="w-full px-6 py-4 text-left hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition-colors duration-200"
+          {/* Scrollable FAQ Content */}
+          <div className="flex-grow overflow-y-auto px-8 pb-8">
+            <div className="space-y-3 max-w-4xl mx-auto">
+              {faqData.map((faq) => (
+                <div
+                  key={faq.id}
+                  className="bg-gray-50 rounded-lg shadow-lg drop-shadow-sm border border-gray-200 overflow-hidden"
                 >
-                  <div className="flex items-center justify-between">
-                    <h3 className="text-lg font-semibold text-gray-800 pr-4">
-                      {faq.question}
-                    </h3>
-                    <div className="flex-shrink-0">
-                      {openFAQ === faq.id ? (
-                        <svg
-                          className="w-6 h-6 transition-transform duration-200"
-                          style={{ color: '#1F3463' }}
-                          fill="currentColor"
-                          viewBox="0 0 20 20"
-                        >
-                          <path fillRule="evenodd" d="M5 10a1 1 0 011-1h8a1 1 0 110 2H6a1 1 0 01-1-1z" clipRule="evenodd" />
-                        </svg>
-                      ) : (
-                        <svg
-                          className="w-6 h-6 transition-transform duration-200"
-                          style={{ color: '#1F3463' }}
-                          fill="currentColor"
-                          viewBox="0 0 20 20"
-                        >
-                          <path fillRule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clipRule="evenodd" />
-                        </svg>
-                      )}
+                  <button
+                    onClick={() => toggleFAQ(faq.id)}
+                    className="w-full px-6 py-4 text-left hover:bg-gray-100 focus:outline-none focus:bg-gray-100 transition-colors duration-200"
+                  >
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-lg font-semibold text-gray-800 pr-4">
+                        {faq.question}
+                      </h3>
+                      <div className="flex-shrink-0">
+                        {openFAQ === faq.id ? (
+                          <svg
+                            className="w-6 h-6 transition-transform duration-200"
+                            style={{ color: '#1F3463' }}
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                          >
+                            <path fillRule="evenodd" d="M5 10a1 1 0 011-1h8a1 1 0 110 2H6a1 1 0 01-1-1z" clipRule="evenodd" />
+                          </svg>
+                        ) : (
+                          <svg
+                            className="w-6 h-6 transition-transform duration-200"
+                            style={{ color: '#1F3463' }}
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                          >
+                            <path fillRule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clipRule="evenodd" />
+                          </svg>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                </button>
+                  </button>
 
-                {openFAQ === faq.id && (
-                  <div className="px-6 pb-4 border-t border-gray-100 animate-fadeIn">
-                    <p className="text-gray-700 leading-relaxed pt-4">
-                      {faq.answer}
-                    </p>
-                  </div>
-                )}
-              </div>
-            ))}
+                  {openFAQ === faq.id && (
+                    <div className="px-6 pb-4 border-t border-gray-100 animate-fadeIn bg-white">
+                      <p className="text-gray-700 leading-relaxed pt-4">
+                        {faq.answer}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>

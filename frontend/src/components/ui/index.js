@@ -4,6 +4,9 @@ export { default as Card, KioskCard, AdminCard, StatCard } from './Card';
 export { default as Input, TextArea, Select } from './Input';
 export { default as LoadingSpinner, KioskLoadingSpinner, AdminLoadingSpinner } from './LoadingSpinner';
 export { default as IdleModal } from './IdleModal';
+export { default as ResponsiveGrid } from './ResponsiveGrid';
+export { default as DigitalClock } from './DigitalClock';
+export { default as HolographicKeyboard } from './HolographicKeyboard';
 
 // Admin-specific UI Components
 export { default as DataTable } from './DataTable';

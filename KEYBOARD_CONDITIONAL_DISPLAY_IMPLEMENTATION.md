@@ -87,7 +87,7 @@ return (
 The following pages do **NOT** show the keyboard button as they contain no form inputs:
 
 - **Home** (`/`): Navigation page only
-- **Highlights** (`/highlights`): Content display only  
+- **Bulletin** (`/bulletin`): Content display only
 - **Directory** (`/directory`): Navigation and information display
 - **FAQ** (`/faq`): Accordion content display
 - **Admin modules**: Use separate admin layouts

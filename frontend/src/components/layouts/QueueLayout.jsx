@@ -10,7 +10,7 @@ const QueueLayout = ({ children, customFooter = null, showKeyboard = false, onTo
 
   return (
     <div
-      className="flex flex-col w-screen h-screen overflow-hidden kiosk-container bg-cover bg-center bg-no-repeat"
+      className="flex flex-col w-screen h-screen overflow-hidden kiosk-container kiosk-layout font-kiosk-public bg-cover bg-center bg-no-repeat"
       style={{
         backgroundImage: 'url(/main-bg.jpg)',
         backgroundSize: 'cover',

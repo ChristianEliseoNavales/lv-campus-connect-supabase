@@ -11,12 +11,13 @@ import {
 } from './components/pages/admin';
 import {
   Home,
-  Highlights,
+  Bulletin,
   Map,
   Directory,
   Queue,
   FAQ,
-  IdlePage
+  IdlePage,
+  GridDemo
 } from './components/pages';
 
 function App() {
@@ -30,24 +31,21 @@ function App() {
               <Home />
             </KioskLayout>
           } />
-          <Route path="/highlights" element={
+          <Route path="/bulletin" element={
             <KioskLayout>
-              <Highlights />
+              <Bulletin />
             </KioskLayout>
           } />
 
           <Route path="/map" element={<Map />} />
-          <Route path="/directory" element={
-            <KioskLayout>
-              <Directory />
-            </KioskLayout>
-          } />
+          <Route path="/directory" element={<Directory />} />
           <Route path="/queue" element={<Queue />} />
           <Route path="/faq" element={
             <KioskLayout>
               <FAQ />
             </KioskLayout>
           } />
+          <Route path="/grid-demo" element={<GridDemo />} />
 
           {/* Idle Page - No Layout Wrapper */}
           <Route path="/idle" element={<IdlePage />} />

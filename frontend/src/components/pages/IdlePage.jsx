@@ -10,23 +10,23 @@ const IdlePage = () => {
   // University images for carousel - using actual image files
   const carouselImages = [
     {
-      src: '/image1.png',
+      src: '/idle/image1.png',
       alt: 'University Campus View 1'
     },
     {
-      src: '/image2.png',
+      src: '/idle/image2.png',
       alt: 'University Campus View 2'
     },
     {
-      src: '/image3.png',
+      src: '/idle/image3.png',
       alt: 'University Campus View 3'
     },
     {
-      src: '/image4.png',
+      src: '/idle/image4.png',
       alt: 'University Campus View 4'
     },
     {
-      src: '/image5.png',
+      src: '/idle/image5.png',
       alt: 'University Campus View 5'
     }
   ];
@@ -46,7 +46,7 @@ const IdlePage = () => {
       setCurrentImageIndex((prev) => 
         prev === carouselImages.length - 1 ? 0 : prev + 1
       );
-    }, 5000);
+    }, 30000);
 
     return () => clearInterval(interval);
   }, [carouselImages.length]);
@@ -89,7 +89,7 @@ const IdlePage = () => {
 
   return (
     <div
-      className="w-screen h-screen overflow-hidden grid grid-cols-4 bg-cover bg-center bg-no-repeat cursor-pointer"
+      className="w-screen h-screen overflow-hidden grid grid-cols-4 bg-cover bg-center bg-no-repeat cursor-pointer kiosk-layout font-kiosk-public"
       onClick={handleReturnFromIdle}
       style={{
         backgroundImage: 'url(/main-bg.jpg)',

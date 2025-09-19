@@ -37,7 +37,7 @@ const Card = ({
     md: 'shadow-lg',
     lg: 'shadow-xl',
     xl: 'shadow-2xl',
-    kiosk: 'shadow-2xl hover:shadow-3xl'
+    kiosk: 'shadow-2xl hover:shadow-3xl drop-shadow-lg'
   };
 
   const roundeds = {

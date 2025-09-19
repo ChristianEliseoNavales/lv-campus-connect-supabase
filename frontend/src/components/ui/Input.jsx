@@ -13,13 +13,13 @@ const Input = ({
 }) => {
   const inputId = id || `input-${Math.random().toString(36).substr(2, 9)}`;
 
-  const baseClasses = 'w-full border rounded-md transition-all duration-300 focus:outline-none focus:ring-4';
-  
+  const baseClasses = 'w-full border rounded-md transition-all duration-300 focus:outline-none focus:ring-4 shadow-sm focus:shadow-md';
+
   const variants = {
     default: 'border-gray-300 focus:border-blue-500 focus:ring-blue-200',
-    error: 'border-red-500 bg-red-50 focus:border-red-500 focus:ring-red-200',
-    success: 'border-emerald-500 bg-emerald-50 focus:border-emerald-500 focus:ring-emerald-200',
-    kiosk: 'border-gray-300 focus:border-blue-500 focus:ring-blue-200 text-lg'
+    error: 'border-red-500 bg-red-50 focus:border-red-500 focus:ring-red-200 shadow-md',
+    success: 'border-emerald-500 bg-emerald-50 focus:border-emerald-500 focus:ring-emerald-200 shadow-md',
+    kiosk: 'border-gray-300 focus:border-blue-500 focus:ring-blue-200 text-lg shadow-lg focus:shadow-xl'
   };
 
   const sizes = {
@@ -82,13 +82,13 @@ export const TextArea = ({
 }) => {
   const inputId = id || `textarea-${Math.random().toString(36).substr(2, 9)}`;
 
-  const baseClasses = 'w-full border rounded-md transition-all duration-300 focus:outline-none focus:ring-4 resize-vertical';
-  
+  const baseClasses = 'w-full border rounded-md transition-all duration-300 focus:outline-none focus:ring-4 resize-vertical shadow-sm focus:shadow-md';
+
   const variants = {
     default: 'border-gray-300 focus:border-blue-500 focus:ring-blue-200',
-    error: 'border-red-500 bg-red-50 focus:border-red-500 focus:ring-red-200',
-    success: 'border-emerald-500 bg-emerald-50 focus:border-emerald-500 focus:ring-emerald-200',
-    kiosk: 'border-gray-300 focus:border-blue-500 focus:ring-blue-200 text-lg'
+    error: 'border-red-500 bg-red-50 focus:border-red-500 focus:ring-red-200 shadow-md',
+    success: 'border-emerald-500 bg-emerald-50 focus:border-emerald-500 focus:ring-emerald-200 shadow-md',
+    kiosk: 'border-gray-300 focus:border-blue-500 focus:ring-blue-200 text-lg shadow-lg focus:shadow-xl'
   };
 
   const sizes = {
@@ -152,13 +152,13 @@ export const Select = ({
 }) => {
   const inputId = id || `select-${Math.random().toString(36).substr(2, 9)}`;
 
-  const baseClasses = 'w-full border rounded-md transition-all duration-300 focus:outline-none focus:ring-4 bg-white';
-  
+  const baseClasses = 'w-full border rounded-md transition-all duration-300 focus:outline-none focus:ring-4 bg-white shadow-sm focus:shadow-md';
+
   const variants = {
     default: 'border-gray-300 focus:border-blue-500 focus:ring-blue-200',
-    error: 'border-red-500 bg-red-50 focus:border-red-500 focus:ring-red-200',
-    success: 'border-emerald-500 bg-emerald-50 focus:border-emerald-500 focus:ring-emerald-200',
-    kiosk: 'border-gray-300 focus:border-blue-500 focus:ring-blue-200 text-lg'
+    error: 'border-red-500 bg-red-50 focus:border-red-500 focus:ring-red-200 shadow-md',
+    success: 'border-emerald-500 bg-emerald-50 focus:border-emerald-500 focus:ring-emerald-200 shadow-md',
+    kiosk: 'border-gray-300 focus:border-blue-500 focus:ring-blue-200 text-lg shadow-lg focus:shadow-xl'
   };
 
   const sizes = {
