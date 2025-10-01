@@ -1,0 +1,8 @@
+# Ignore everything at the root level
+/*
+
+# Exception: Allow the frontend folder to be tracked
+!/frontend
+
+# Exception: Allow .gitignore itself to be tracked
+!/.gitignore
