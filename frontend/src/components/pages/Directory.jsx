@@ -405,10 +405,10 @@ const Directory = () => {
 
       {/* Name and Title - Center Aligned with Consistent Navy Blue Color */}
       <div className="text-center w-full">
-        <h3 className="text-lg font-semibold text-center leading-tight whitespace-nowrap" style={{ color: '#1F3463' }}>
+        <h3 className="text-xl font-semibold text-center leading-tight whitespace-nowrap" style={{ color: '#1F3463' }}>
           {person.name}
         </h3>
-        <p className="text-sm text-center mt-1 whitespace-nowrap" style={{ color: '#1F3463' }}>
+        <p className="text-lg text-center mt-1 whitespace-nowrap" style={{ color: '#1F3463' }}>
           {person.title}
         </p>
       </div>
@@ -446,7 +446,7 @@ const Directory = () => {
             <div className="flex flex-col items-center justify-center w-full px-20 h-full">
               {/* Header - Positioned above grid with proper spacing */}
               <div className="mb-8">
-                <h2 className="text-4xl font-semibold text-center drop-shadow-lg whitespace-nowrap" style={{ color: '#1F3463' }}>
+                <h2 className="text-5xl font-semibold text-center drop-shadow-lg whitespace-nowrap" style={{ color: '#1F3463' }}>
                   SELECT OFFICE
                 </h2>
               </div>
@@ -458,7 +458,7 @@ const Directory = () => {
                   onItemClick={(office) => setSelectedDepartment(office.key)}
                   renderItem={(office) => (
                     <div className="text-center">
-                      <h3 className="text-xl font-semibold text-white">
+                      <h3 className="text-2xl font-semibold text-white">
                         {office.name}
                       </h3>
                     </div>
@@ -497,7 +497,7 @@ const Directory = () => {
                           <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
                         </svg>
                         <span
-                          className="text-xl font-semibold"
+                          className="text-2xl font-semibold"
                           style={{ color: '#1F3463' }}
                         >
                           {currentOffice.email}
@@ -516,13 +516,13 @@ const Directory = () => {
                 ) : (
                   /* Placeholder for other offices */
                   <div className="bg-white bg-opacity-90 rounded-lg shadow-xl drop-shadow-lg p-12 text-center">
-                    <h2 className="text-4xl font-bold mb-6" style={{ color: '#1F3463' }}>
+                    <h2 className="text-5xl font-bold mb-6" style={{ color: '#1F3463' }}>
                       {currentOffice?.name}
                     </h2>
-                    <p className="text-xl text-gray-600 mb-8">
+                    <p className="text-2xl text-gray-600 mb-8">
                       Directory image coming soon
                     </p>
-                    <div className="text-lg" style={{ color: '#1F3463' }}>
+                    <div className="text-xl" style={{ color: '#1F3463' }}>
                       <p>
                         <strong>Description:</strong> {currentOffice?.description}
                       </p>
@@ -540,7 +540,7 @@ const Directory = () => {
                 aria-label="Find office location"
               >
                 <FaLocationDot className="w-6 h-6 mb-1" />
-                <span className="text-md font-semibold">Location</span>
+                <span className="text-lg font-semibold">Location</span>
               </button>
 
               {/* Back Button */}
@@ -549,7 +549,7 @@ const Directory = () => {
                 className="w-20 h-20 bg-[#FFE251] text-[#1A2E56] border-2 border-white rounded-full shadow-lg active:shadow-md drop-shadow-md active:drop-shadow-sm active:bg-[#1A2E56] active:scale-95 transition-all duration-150 flex flex-col items-center justify-center focus:outline-none focus:ring-4 focus:ring-blue-200"
                 aria-label="Go back to directory listing"
               >
-                <span className="text-md font-semibold">BACK</span>
+                <span className="text-lg font-semibold">BACK</span>
               </button>
             </div>
           </div>

@@ -119,23 +119,43 @@ export const FormHelp = ({ children, className = '' }) => {
 };
 
 // Form Checkbox
-export const FormCheckbox = ({ 
-  label, 
-  error = false, 
-  className = '', 
-  ...props 
+export const FormCheckbox = ({
+  label,
+  error = false,
+  variant = 'default', // 'default', 'kiosk'
+  className = '',
+  ...props
 }) => {
+  const checkboxClasses = variant === 'kiosk'
+    ? `h-16 w-16 rounded-lg border-4 border-gray-400 text-[#1F3463] focus:ring-[#1F3463] focus:ring-4 focus:border-[#1F3463] transition-all duration-200 touch-target-lg shadow-lg hover:shadow-xl active:scale-95 cursor-pointer ${
+        error ? 'border-red-400' : ''
+      }`
+    : `h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 ${
+        error ? 'border-red-300' : ''
+      }`;
+
+  const labelClasses = variant === 'kiosk'
+    ? 'ml-6 block text-xl text-gray-700 flex-1 pt-2'
+    : 'ml-2 block text-sm text-gray-700';
+
+  const containerClasses = variant === 'kiosk'
+    ? `flex items-start space-x-6 cursor-pointer group ${className}`
+    : `flex items-center ${className}`;
+
+  const checkboxStyle = variant === 'kiosk'
+    ? { accentColor: '#1F3463' }
+    : {};
+
   return (
-    <div className={`flex items-center ${className}`}>
+    <div className={containerClasses}>
       <input
         type="checkbox"
-        className={`h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 ${
-          error ? 'border-red-300' : ''
-        }`}
+        className={checkboxClasses}
+        style={checkboxStyle}
         {...props}
       />
       {label && (
-        <label htmlFor={props.id} className="ml-2 block text-sm text-gray-700">
+        <label htmlFor={props.id} className={labelClasses}>
           {label}
         </label>
       )}

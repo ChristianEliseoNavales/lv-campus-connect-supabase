@@ -38,15 +38,37 @@ export default {
         sans: ['Segoe UI', 'Tahoma', 'Geneva', 'Verdana', 'sans-serif'],
         'sf-pro-rounded': ['SF Pro Rounded', 'SF Pro Display', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'],
         'kiosk-public': ['SF Pro Rounded', 'SF Pro Display', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'],
+        'days-one': ['Days One', 'cursive'],
+        'tolkien': ['Tolkien', 'serif'],
       },
       animation: {
         'slide-up': 'slideUp 0.5s ease-out',
         'spin': 'spin 1s linear infinite',
+        'tap-attention': 'tapAttention 2s ease-in-out infinite',
+        'glow-pulse': 'glowPulse 2s ease-in-out infinite',
       },
       keyframes: {
         slideUp: {
           '0%': { opacity: '0', transform: 'translateY(30px)' },
           '100%': { opacity: '1', transform: 'translateY(0)' },
+        },
+        tapAttention: {
+          '0%, 100%': {
+            transform: 'scale(1)',
+            opacity: '0.9'
+          },
+          '50%': {
+            transform: 'scale(1.05)',
+            opacity: '1'
+          },
+        },
+        glowPulse: {
+          '0%, 100%': {
+            filter: 'drop-shadow(0 0 8px rgba(255, 226, 81, 0.4))',
+          },
+          '50%': {
+            filter: 'drop-shadow(0 0 20px rgba(255, 226, 81, 0.8))',
+          },
         }
       }
     },

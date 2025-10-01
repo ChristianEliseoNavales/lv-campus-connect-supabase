@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { HiHome } from "react-icons/hi2";
 import { BiSolidNotepad } from "react-icons/bi";
@@ -8,13 +8,26 @@ import { MdQueue } from "react-icons/md";
 import { TbMessage2Question } from "react-icons/tb";
 import useIdleDetection from '../../hooks/useIdleDetection';
 import IdleModal from '../ui/IdleModal';
-import { DigitalClock } from '../ui';
+import { DigitalClock, CircularHelpButton, InstructionModeOverlay } from '../ui';
 
 const KioskLayout = ({ children, customFooter = null }) => {
   // Idle detection hook
   const { showIdleModal, countdown, handleStayActive } = useIdleDetection();
 
+  // Instruction mode state
+  const [showInstructionMode, setShowInstructionMode] = useState(false);
+
   console.log('🏗️ KioskLayout render - showIdleModal:', showIdleModal, 'countdown:', countdown);
+
+  // Handle help button click to activate instruction mode
+  const handleHelpButtonClick = () => {
+    setShowInstructionMode(true);
+  };
+
+  // Handle instruction mode close
+  const handleInstructionModeClose = () => {
+    setShowInstructionMode(false);
+  };
 
 
 
@@ -46,6 +59,9 @@ const KioskLayout = ({ children, customFooter = null }) => {
       <main className="flex-grow px-6 py-6 overflow-auto w-full">
         {children}
       </main>
+
+      {/* Circular Help Button - Fixed position overlay */}
+      <CircularHelpButton onClick={handleHelpButtonClick} />
 
       {/* Bottom Navigation - Fixed positioning with rectangular container */}
       <footer className="relative w-full">
@@ -80,8 +96,8 @@ const KioskLayout = ({ children, customFooter = null }) => {
                     color: isActive ? '#1F3463' : 'white'
                   })}
                 >
-                  <HiHome className="w-10 h-10" />
-                  <span className="mt-1 font-bold text-base">HOME</span>
+                  <HiHome className="w-12 h-12" />
+                  <span className="mt-1 font-bold text-xl">HOME</span>
                 </NavLink>
 
                 <NavLink
@@ -98,8 +114,8 @@ const KioskLayout = ({ children, customFooter = null }) => {
                     color: isActive ? '#1F3463' : 'white'
                   })}
                 >
-                  <BiSolidNotepad className="w-10 h-10" />
-                  <span className="mt-1 font-bold text-sm text-center leading-tight">BULLETIN</span>
+                  <BiSolidNotepad className="w-12 h-12" />
+                  <span className="mt-1 font-bold text-lg text-center leading-tight">BULLETIN</span>
                 </NavLink>
 
                 <NavLink
@@ -116,8 +132,8 @@ const KioskLayout = ({ children, customFooter = null }) => {
                     color: isActive ? '#1F3463' : 'white'
                   })}
                 >
-                  <FaLocationDot className="w-10 h-10" />
-                  <span className="mt-1 font-bold text-base">MAP</span>
+                  <FaLocationDot className="w-12 h-12" />
+                  <span className="mt-1 font-bold text-xl">MAP</span>
                 </NavLink>
 
                 <NavLink
@@ -134,8 +150,8 @@ const KioskLayout = ({ children, customFooter = null }) => {
                     color: isActive ? '#1F3463' : 'white'
                   })}
                 >
-                  <FaUserFriends className="w-10 h-10" />
-                  <span className="mt-1 font-bold text-base">DIRECTORY</span>
+                  <FaUserFriends className="w-12 h-12" />
+                  <span className="mt-1 font-bold text-xl">DIRECTORY</span>
                 </NavLink>
 
                 <NavLink
@@ -152,8 +168,8 @@ const KioskLayout = ({ children, customFooter = null }) => {
                     color: isActive ? '#1F3463' : 'white'
                   })}
                 >
-                  <MdQueue className="w-10 h-10" />
-                  <span className="mt-1 font-bold text-base">QUEUE</span>
+                  <MdQueue className="w-12 h-12" />
+                  <span className="mt-1 font-bold text-xl">QUEUE</span>
                 </NavLink>
 
                 <NavLink
@@ -170,8 +186,8 @@ const KioskLayout = ({ children, customFooter = null }) => {
                     color: isActive ? '#1F3463' : 'white'
                   })}
                 >
-                  <TbMessage2Question className="w-10 h-10" />
-                  <span className="mt-1 font-bold text-base">FAQ</span>
+                  <TbMessage2Question className="w-12 h-12" />
+                  <span className="mt-1 font-bold text-xl">FAQ</span>
                 </NavLink>
               </nav>
             </div>
@@ -184,6 +200,12 @@ const KioskLayout = ({ children, customFooter = null }) => {
         isOpen={showIdleModal}
         countdown={countdown}
         onStayActive={handleStayActive}
+      />
+
+      {/* Instruction Mode Overlay */}
+      <InstructionModeOverlay
+        isVisible={showInstructionMode}
+        onClose={handleInstructionModeClose}
       />
     </div>
   );

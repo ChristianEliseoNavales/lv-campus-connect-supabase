@@ -18,7 +18,8 @@ import {
   FAQ,
   IdlePage,
   GridDemo,
-  PortalQueue
+  PortalQueue,
+  SampleIdlePage
 } from './components/pages';
 
 function App() {
@@ -51,6 +52,9 @@ function App() {
 
           {/* Idle Page - No Layout Wrapper */}
           <Route path="/idle" element={<IdlePage />} />
+
+          {/* Sample Idle Page - Experimental Design */}
+          <Route path="/sample" element={<SampleIdlePage />} />
 
           {/* Authentication Routes */}
           <Route path="/login" element={<Login />} />

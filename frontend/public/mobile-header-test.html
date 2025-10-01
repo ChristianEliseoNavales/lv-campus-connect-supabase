@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mobile Header Alignment Test - LVCampusConnect</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Days+One&display=swap" rel="stylesheet">
+    <style>
+        .font-days-one { font-family: 'Days One', cursive; }
+        .test-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1rem;
+            padding: 1rem;
+        }
+        .test-device {
+            border: 2px solid #1F3463;
+            border-radius: 8px;
+            overflow: hidden;
+            background: white;
+        }
+        .device-label {
+            background: #1F3463;
+            color: white;
+            padding: 0.5rem;
+            text-align: center;
+            font-weight: bold;
+        }
+        .device-viewport {
+            position: relative;
+            overflow: hidden;
+        }
+        /* Device-specific viewport sizes */
+        .iphone-se { width: 320px; height: 200px; }
+        .iphone-12 { width: 375px; height: 200px; }
+        .iphone-12-pro-max { width: 414px; height: 200px; }
+        .ipad-mini { width: 768px; height: 200px; }
+        .ipad-pro { width: 1024px; height: 200px; }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <div class="container mx-auto py-8">
+        <h1 class="text-3xl font-bold text-center mb-8 text-gray-800">
+            PortalQueue Header Vertical Centering Test
+        </h1>
+        
+        <div class="test-grid">
+            <!-- iPhone SE (320px) -->
+            <div class="test-device">
+                <div class="device-label">iPhone SE (320px)</div>
+                <div class="device-viewport iphone-se">
+                    <header class="w-full h-24 relative bg-cover bg-center bg-no-repeat" 
+                            style="background-image: url('/mobile/headerBg.png'); background-color: #f0f9ff;">
+                        <div class="absolute inset-0 bg-white opacity-20"></div>
+                        <div class="absolute inset-0 flex items-center justify-center px-2">
+                            <div class="flex items-center justify-center gap-2 max-w-[98%] overflow-hidden">
+                                <div class="flex-shrink-0 flex items-center">
+                                    <div class="h-10 w-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold">L</div>
+                                </div>
+                                <div class="flex-shrink min-w-0 flex items-center justify-center">
+                                    <h1 class="font-days-one text-xl font-normal text-center leading-tight whitespace-nowrap"
+                                        style="color: #1F3463; line-height: 0.9;">
+                                        LVCampusConnect
+                                    </h1>
+                                </div>
+                            </div>
+                        </div>
+                    </header>
+                </div>
+            </div>
+
+            <!-- iPhone 12 (375px) -->
+            <div class="test-device">
+                <div class="device-label">iPhone 12 (375px)</div>
+                <div class="device-viewport iphone-12">
+                    <header class="w-full h-28 relative bg-cover bg-center bg-no-repeat" 
+                            style="background-image: url('/mobile/headerBg.png'); background-color: #f0f9ff;">
+                        <div class="absolute inset-0 bg-white opacity-20"></div>
+                        <div class="absolute inset-0 flex items-center justify-center px-2">
+                            <div class="flex items-center justify-center gap-3 max-w-[95%] overflow-hidden">
+                                <div class="flex-shrink-0 flex items-center">
+                                    <div class="h-12 w-12 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold">L</div>
+                                </div>
+                                <div class="flex-shrink min-w-0 flex items-center justify-center">
+                                    <h1 class="font-days-one text-2xl font-normal text-center leading-tight whitespace-nowrap"
+                                        style="color: #1F3463; line-height: 0.9;">
+                                        LVCampusConnect
+                                    </h1>
+                                </div>
+                            </div>
+                        </div>
+                    </header>
+                </div>
+            </div>
+
+            <!-- iPhone 12 Pro Max (414px) -->
+            <div class="test-device">
+                <div class="device-label">iPhone 12 Pro Max (414px)</div>
+                <div class="device-viewport iphone-12-pro-max">
+                    <header class="w-full h-28 relative bg-cover bg-center bg-no-repeat" 
+                            style="background-image: url('/mobile/headerBg.png'); background-color: #f0f9ff;">
+                        <div class="absolute inset-0 bg-white opacity-20"></div>
+                        <div class="absolute inset-0 flex items-center justify-center px-2">
+                            <div class="flex items-center justify-center gap-3 max-w-[95%] overflow-hidden">
+                                <div class="flex-shrink-0 flex items-center">
+                                    <div class="h-12 w-12 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold">L</div>
+                                </div>
+                                <div class="flex-shrink min-w-0 flex items-center justify-center">
+                                    <h1 class="font-days-one text-2xl font-normal text-center leading-tight whitespace-nowrap"
+                                        style="color: #1F3463; line-height: 0.9;">
+                                        LVCampusConnect
+                                    </h1>
+                                </div>
+                            </div>
+                        </div>
+                    </header>
+                </div>
+            </div>
+
+            <!-- iPad Mini (768px) -->
+            <div class="test-device">
+                <div class="device-label">iPad Mini (768px)</div>
+                <div class="device-viewport ipad-mini">
+                    <header class="w-full h-32 relative bg-cover bg-center bg-no-repeat" 
+                            style="background-image: url('/mobile/headerBg.png'); background-color: #f0f9ff;">
+                        <div class="absolute inset-0 bg-white opacity-20"></div>
+                        <div class="absolute inset-0 flex items-center justify-center px-6">
+                            <div class="flex items-center justify-center gap-6 max-w-[85%] overflow-hidden">
+                                <div class="flex-shrink-0 flex items-center">
+                                    <div class="h-16 w-16 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-xl">L</div>
+                                </div>
+                                <div class="flex-shrink min-w-0 flex items-center justify-center">
+                                    <h1 class="font-days-one text-3xl font-normal text-center leading-tight whitespace-nowrap"
+                                        style="color: #1F3463; line-height: 0.9;">
+                                        LVCampusConnect
+                                    </h1>
+                                </div>
+                            </div>
+                        </div>
+                    </header>
+                </div>
+            </div>
+
+            <!-- iPad Pro (1024px) -->
+            <div class="test-device">
+                <div class="device-label">iPad Pro (1024px)</div>
+                <div class="device-viewport ipad-pro">
+                    <header class="w-full h-36 relative bg-cover bg-center bg-no-repeat" 
+                            style="background-image: url('/mobile/headerBg.png'); background-color: #f0f9ff;">
+                        <div class="absolute inset-0 bg-white opacity-20"></div>
+                        <div class="absolute inset-0 flex items-center justify-center px-8">
+                            <div class="flex items-center justify-center gap-8 overflow-hidden">
+                                <div class="flex-shrink-0 flex items-center">
+                                    <div class="h-20 w-20 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-2xl">L</div>
+                                </div>
+                                <div class="flex-shrink min-w-0 flex items-center justify-center">
+                                    <h1 class="font-days-one text-4xl font-normal text-center leading-tight whitespace-nowrap"
+                                        style="color: #1F3463; line-height: 0.9;">
+                                        LVCampusConnect
+                                    </h1>
+                                </div>
+                            </div>
+                        </div>
+                    </header>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-8 p-6 bg-white rounded-lg shadow-lg max-w-4xl mx-auto">
+            <h2 class="text-2xl font-bold mb-4 text-gray-800">Test Results Checklist</h2>
+            <div class="space-y-2">
+                <label class="flex items-center space-x-2">
+                    <input type="checkbox" class="form-checkbox">
+                    <span>Logo and text are perfectly centered vertically in all viewports</span>
+                </label>
+                <label class="flex items-center space-x-2">
+                    <input type="checkbox" class="form-checkbox">
+                    <span>Gap spacing between logo and text is consistent and proportional</span>
+                </label>
+                <label class="flex items-center space-x-2">
+                    <input type="checkbox" class="form-checkbox">
+                    <span>Text remains readable and properly sized on smallest screen (320px)</span>
+                </label>
+                <label class="flex items-center space-x-2">
+                    <input type="checkbox" class="form-checkbox">
+                    <span>No horizontal overflow or text wrapping occurs</span>
+                </label>
+                <label class="flex items-center space-x-2">
+                    <input type="checkbox" class="form-checkbox">
+                    <span>Header height scales appropriately with content</span>
+                </label>
+                <label class="flex items-center space-x-2">
+                    <input type="checkbox" class="form-checkbox">
+                    <span>Background image and overlay display correctly</span>
+                </label>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

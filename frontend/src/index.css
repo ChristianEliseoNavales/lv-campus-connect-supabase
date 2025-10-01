@@ -11,6 +11,15 @@
   font-display: swap; /* Ensures text remains visible during font swap */
 }
 
+/* Tolkien Font Face Declaration */
+@font-face {
+  font-family: 'Tolkien';
+  src: url('/fonts/Tolkien.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap; /* Ensures text remains visible during font swap */
+}
+
 @layer base {
   * {
     box-sizing: border-box;
@@ -166,6 +175,35 @@
     min-width: 60px;
   }
 
+  /* Kiosk-optimized checkbox styling for touchscreen interfaces */
+  .kiosk-checkbox {
+    width: 4rem;
+    height: 4rem;
+    border-width: 4px;
+    border-radius: 0.5rem;
+    accent-color: #1F3463;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  }
+
+  .kiosk-checkbox:hover {
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    transform: translateY(-1px);
+  }
+
+  .kiosk-checkbox:active {
+    transform: scale(0.95);
+  }
+
+  .kiosk-checkbox:focus {
+    outline: none;
+    ring: 4px;
+    ring-color: #1F3463;
+    ring-opacity: 0.5;
+    border-color: #1F3463;
+  }
+
   /* 16:9 Landscape optimization - Full screen utilization */
   .kiosk-container {
     width: 100vw;
@@ -200,6 +238,21 @@
   /* Smooth transitions for touch feedback */
   .touch-feedback {
     transition: all 0.15s ease-in-out;
+  }
+
+  /* Perfect vertical alignment for header elements */
+  .header-vertical-center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+  }
+
+  /* Baseline alignment for logo and text */
+  .header-baseline-align {
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
   }
 
   /* Enhanced sidebar animations */
@@ -355,6 +408,22 @@
       opacity: 0;
       backdrop-filter: blur(0px);
     }
+  }
+
+  /* Instruction Mode Animations */
+  @keyframes instructionPulse {
+    0%, 100% {
+      transform: scale(1);
+      box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.4);
+    }
+    50% {
+      transform: scale(1.02);
+      box-shadow: 0 0 0 8px rgba(255, 255, 255, 0.1);
+    }
+  }
+
+  .animate-instruction-pulse {
+    animation: instructionPulse 2s ease-in-out infinite;
   }
 
   /* Enhanced touch feedback for kiosk elements */

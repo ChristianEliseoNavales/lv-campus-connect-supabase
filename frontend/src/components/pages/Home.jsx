@@ -67,12 +67,12 @@ const Home = () => {
       <div className="h-full flex flex-col">
         {/* Office Name Header - Added rounded corners to all four corners */}
         <div className="bg-[#1F3463] text-white text-center py-4 rounded-lg">
-          <h3 className="text-xl font-bold">{title}</h3>
+          <h3 className="text-3xl font-bold">{title}</h3>
         </div>
 
         {/* NOW SERVING Section */}
         <div className="text-center py-4">
-          <p className="text-lg font-bold" style={{ color: '#1F3463' }}>NOW SERVING</p>
+          <p className="text-2xl font-bold" style={{ color: '#1F3463' }}>NOW SERVING</p>
         </div>
 
         {/* Labels positioned OUTSIDE and ABOVE the grid - Updated for 50/50 split */}
@@ -95,10 +95,10 @@ const Home = () => {
               {/* Row 1 */}
               <div className="flex-1 flex gap-2">
                 <div className="flex items-center justify-center bg-gray-100 rounded-lg flex-1">
-                  <span className="text-lg font-bold text-gray-800">1</span>
+                  <span className="text-2xl font-bold text-gray-800">1</span>
                 </div>
                 <div className="flex items-center justify-center bg-gray-100 rounded-lg flex-1">
-                  <span className="text-lg font-bold" style={{ color: '#1F3463' }}>
+                  <span className="text-2xl font-bold" style={{ color: '#1F3463' }}>
                     {loading ? '--' : String(data.currentNumber).padStart(2, '0')}
                   </span>
                 </div>
@@ -107,10 +107,10 @@ const Home = () => {
               {/* Row 2 */}
               <div className="flex-1 flex gap-2">
                 <div className="flex items-center justify-center bg-gray-100 rounded-lg flex-1">
-                  <span className="text-lg font-bold text-gray-800">2</span>
+                  <span className="text-2xl font-bold text-gray-800">2</span>
                 </div>
                 <div className="flex items-center justify-center bg-gray-100 rounded-lg flex-1">
-                  <span className="text-lg font-bold text-gray-600">
+                  <span className="text-2xl font-bold text-gray-600">
                     {loading ? '--' : String(data.nextNumber).padStart(2, '0')}
                   </span>
                 </div>
@@ -119,20 +119,20 @@ const Home = () => {
               {/* Row 3 */}
               <div className="flex-1 flex gap-2">
                 <div className="flex items-center justify-center bg-gray-100 rounded-lg flex-1">
-                  <span className="text-lg font-bold text-gray-800">3</span>
+                  <span className="text-2xl font-bold text-gray-800">3</span>
                 </div>
                 <div className="flex items-center justify-center bg-gray-100 rounded-lg flex-1">
-                  <span className="text-lg font-bold text-gray-400">--</span>
+                  <span className="text-2xl font-bold text-gray-400">--</span>
                 </div>
               </div>
 
               {/* Row 4 */}
               <div className="flex-1 flex gap-2">
                 <div className="flex items-center justify-center bg-gray-100 rounded-lg flex-1">
-                  <span className="text-lg font-bold text-gray-800">Priority</span>
+                  <span className="text-xl font-bold text-gray-800">Priority</span>
                 </div>
                 <div className="flex items-center justify-center bg-gray-100 rounded-lg flex-1">
-                  <span className="text-lg font-bold text-gray-400">--</span>
+                  <span className="text-2xl font-bold text-gray-400">--</span>
                 </div>
               </div>
             </div>
@@ -177,10 +177,13 @@ const Home = () => {
         {/* Column 3 - New Queue/Directory Section */}
         <div className="col-span-1 flex flex-col gap-6 pl-6">
           {/* Row 1 - FIND OFFICE LOCATIONS */}
-          <div className="flex-1 bg-[#FFE251] rounded-2xl shadow-xl drop-shadow-lg active:shadow-lg active:scale-95 transition-all duration-150 p-6 cursor-pointer relative overflow-hidden">
+          <div
+            className="flex-1 bg-[#FFE251] rounded-2xl shadow-xl drop-shadow-lg active:shadow-lg active:scale-95 transition-all duration-150 p-6 cursor-pointer relative overflow-hidden"
+            onClick={() => navigate('/map')}
+          >
             {/* Button text positioned at top-left */}
             <div className="absolute top-6 left-6">
-              <h3 className="text-2xl font-bold text-[#1F3463] leading-tight">FIND OFFICE LOCATIONS</h3>
+              <h3 className="text-3xl font-bold text-[#1F3463] leading-tight" style={{ textShadow: '1px 1px 2px rgba(255, 255, 255, 0.8)' }}>FIND OFFICE LOCATIONS</h3>
             </div>
 
             {/* Decorative images */}
@@ -211,10 +214,13 @@ const Home = () => {
           </div>
 
           {/* Row 2 - GET A QUEUE NUMBER */}
-          <div className="flex-1 bg-[#FFE251] rounded-2xl shadow-xl drop-shadow-lg active:shadow-lg active:scale-95 transition-all duration-150 p-6 cursor-pointer relative overflow-hidden">
+          <div
+            className="flex-1 bg-[#FFE251] rounded-2xl shadow-xl drop-shadow-lg active:shadow-lg active:scale-95 transition-all duration-150 p-6 cursor-pointer relative overflow-hidden"
+            onClick={() => navigate('/queue')}
+          >
             {/* Button text positioned at top-left */}
             <div className="absolute top-6 left-6">
-              <h3 className="text-2xl font-bold text-[#1F3463] leading-tight">GET A QUEUE NUMBER</h3>
+              <h3 className="text-3xl font-bold text-[#1F3463] leading-tight" style={{ textShadow: '1px 1px 2px rgba(255, 255, 255, 0.8)' }}>GET A QUEUE NUMBER</h3>
             </div>
 
             {/* Decorative images */}

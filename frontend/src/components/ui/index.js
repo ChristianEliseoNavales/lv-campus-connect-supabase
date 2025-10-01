@@ -7,6 +7,8 @@ export { default as IdleModal } from './IdleModal';
 export { default as ResponsiveGrid } from './ResponsiveGrid';
 export { default as DigitalClock } from './DigitalClock';
 export { default as HolographicKeyboard } from './HolographicKeyboard';
+export { default as CircularHelpButton } from './CircularHelpButton';
+export { default as InstructionModeOverlay } from './InstructionModeOverlay';
 
 // Admin-specific UI Components
 export { default as DataTable } from './DataTable';

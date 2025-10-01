@@ -78,7 +78,7 @@ const FAQ = () => {
         <div className="bg-white rounded-xl shadow-xl drop-shadow-lg w-full max-w-3xl h-[60vh] flex flex-col overflow-hidden">
           {/* Header inside white container */}
           <div className="pt-8 pb-6 px-8 flex-shrink-0">
-            <h1 className="text-4xl font-semibold text-center drop-shadow-lg" style={{ color: '#161F55' }}>
+            <h1 className="text-5xl font-semibold text-center drop-shadow-lg" style={{ color: '#161F55' }}>
               FREQUENTLY ASKED QUESTIONS
             </h1>
           </div>
@@ -96,7 +96,7 @@ const FAQ = () => {
                     className="w-full px-6 py-4 text-left active:bg-gray-100 focus:outline-none focus:bg-gray-100 active:scale-95 transition-all duration-150"
                   >
                     <div className="flex items-center justify-between">
-                      <h3 className="text-lg font-semibold text-gray-800 pr-4">
+                      <h3 className="text-xl font-semibold text-gray-800 pr-4">
                         {faq.question}
                       </h3>
                       <div className="flex-shrink-0">
@@ -125,7 +125,7 @@ const FAQ = () => {
 
                   {openFAQ === faq.id && (
                     <div className="px-6 pb-4 border-t border-gray-100 animate-fadeIn bg-white">
-                      <p className="text-gray-700 leading-relaxed pt-4">
+                      <p className="text-lg text-gray-700 leading-relaxed pt-4">
                         {faq.answer}
                       </p>
                     </div>

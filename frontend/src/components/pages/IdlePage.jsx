@@ -40,13 +40,13 @@ const IdlePage = () => {
     return () => clearInterval(timer);
   }, []);
 
-  // Auto-advance carousel every 5 seconds
+  // Auto-advance carousel every 2.5 seconds for more dynamic display
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentImageIndex((prev) => 
+      setCurrentImageIndex((prev) =>
         prev === carouselImages.length - 1 ? 0 : prev + 1
       );
-    }, 30000);
+    }, 2500);
 
     return () => clearInterval(interval);
   }, [carouselImages.length]);
@@ -89,74 +89,74 @@ const IdlePage = () => {
 
   return (
     <div
-      className="w-screen h-screen overflow-hidden grid grid-cols-4 bg-cover bg-center bg-no-repeat cursor-pointer kiosk-layout font-kiosk-public"
+      className="w-screen h-screen overflow-hidden grid grid-cols-4 bg-cover bg-center bg-no-repeat cursor-pointer kiosk-layout font-kiosk-public relative"
       onClick={handleReturnFromIdle}
       style={{
-        backgroundImage: 'url(/main-bg.jpg)',
+        backgroundImage: 'url(/idle/idleBG.png)',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat',
         backgroundAttachment: 'fixed'
       }}
     >
-      {/* Column 1 - Left sidebar with gradient background (25% width) */}
-      <div 
-        className="col-span-1 flex flex-col justify-center items-center p-8 text-center"
+      {/* Navy blue overlay with 70% opacity */}
+      <div
+        className="absolute inset-0 z-10"
         style={{
-          background: 'linear-gradient(to bottom, #1F3463 0%, #f8fafc 100%)'
+          backgroundColor: '#1F3463',
+          opacity: 0.7
         }}
-      >
+      />
+
+      {/* Column 1 - Left sidebar (25% width) */}
+      <div className="col-span-1 flex flex-col justify-center items-center p-8 pb-[250px] text-center relative z-20">
         {/* Logo and Branding */}
-        <div className="mb-8">
-          <div className="text-white text-3xl font-bold mb-2">
-            LVCampusConnect
+        <div className="mb-10 flex flex-col items-center">
+          <div className="flex items-center space-x-4 mb-8">
+            <img
+              src="/idle/logo.png"
+              alt="Logo"
+              className="w-16 h-16 object-contain drop-shadow-lg"
+            />
+            <div className="text-white text-3xl font-days-one">
+              LVCampusConnect
+            </div>
           </div>
-          <div className="text-white text-xl">
-            Welcome to La Verdad
+          <div className="text-white text-3xl">
+            WELCOME TO LA VERDAD
           </div>
         </div>
 
         {/* Time Display */}
-        <div className="mb-6">
-          <div className="text-white text-4xl font-bold mb-2">
+        <div className="mb-10">
+          <div className="text-white text-6xl font-bold mb-2">
             {formatTime(currentTime)}
           </div>
-          <div className="text-white text-xl font-semibold">
+          <div className="text-white text-3xl font-semibold">
             {formatDay(currentTime)}
           </div>
         </div>
 
         {/* Date Box */}
-        <div className="bg-white bg-opacity-90 rounded-2xl p-6 shadow-lg">
-          <div className="text-4xl font-bold mb-2" style={{ color: '#1F3463' }}>
+        <div className="text-white bg-white bg-opacity-30 rounded-2xl p-[50px] shadow-lg">
+          <div className="text-7xl font-bold mb-6" >
             {dateInfo.day}
           </div>
-          <div className="text-lg font-semibold mb-1" style={{ color: '#1F3463' }}>
+          <div className="text-5xl font-semibold mb-1" >
             {dateInfo.month}
           </div>
-          <div className="text-lg" style={{ color: '#1F3463' }}>
+          <div className="text-3xl">
             {dateInfo.year}
           </div>
         </div>
       </div>
 
       {/* Columns 2-4 - Right section with carousel (75% width) */}
-      <div className="col-span-3 relative flex flex-col">
+      <div className="col-span-3 relative flex flex-col z-20">
         {/* Main content area with carousel */}
-        <div className="flex-grow relative overflow-hidden px-4 py-8">
+        <div className="flex-grow relative overflow-hidden px-4 py-8 pb-[250px]">
           {/* Carousel Container with Flex Layout */}
           <div className="relative w-full h-full flex items-center">
-            {/* Left Navigation Arrow */}
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                goToPrevious();
-              }}
-              className="flex-shrink-0 z-10 bg-white bg-opacity-80 active:bg-opacity-100 active:scale-95 rounded-full p-4 shadow-lg transition-all duration-150 focus:outline-none focus:ring-4 focus:ring-blue-200 ml-4"
-            >
-              <FaChevronLeft className="w-8 h-8" style={{ color: '#1F3463' }} />
-            </button>
-
             {/* Image Carousel Container - Centered between arrows with controlled height */}
             <div className="flex-grow relative mx-8 flex flex-col">
               {/* Image Container with explicit height to ensure visibility */}
@@ -190,51 +190,29 @@ const IdlePage = () => {
                   </div>
                 ))}
               </div>
-
-              {/* Carousel Indicators - Positioned below image container with proper spacing */}
-              <div className="flex justify-center mt-6 mb-4">
-                <div className="flex space-x-3">
-                  {carouselImages.map((_, index) => (
-                    <button
-                      key={index}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setCurrentImageIndex(index);
-                      }}
-                      className={`w-4 h-4 rounded-full transition-all duration-200 shadow-lg ${
-                        index === currentImageIndex
-                          ? 'bg-white'
-                          : 'bg-white bg-opacity-60 hover:bg-opacity-80'
-                      }`}
-                    />
-                  ))}
-                </div>
-              </div>
             </div>
-
-            {/* Right Navigation Arrow */}
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                goToNext();
-              }}
-              className="flex-shrink-0 z-10 bg-white bg-opacity-80 active:bg-opacity-100 active:scale-95 rounded-full p-4 shadow-lg transition-all duration-150 focus:outline-none focus:ring-4 focus:ring-blue-200 mr-4"
-            >
-              <FaChevronRight className="w-8 h-8" style={{ color: '#1F3463' }} />
-            </button>
           </div>
         </div>
+      </div>
 
-        {/* Bottom section with gradient overlay and TAP TO START */}
-        <div 
-          className="relative h-32 flex items-center justify-center"
-          style={{
-            background: 'linear-gradient(to top, #1F3463 0%, rgba(255, 255, 255, 0) 100%)'
-          }}
-        >
-          <div className="text-white text-4xl font-bold tracking-wider text-shadow-lg">
-            TAP TO START
-          </div>
+      {/* Footer Image - Positioned at bottom spanning full width */}
+      <footer className="absolute bottom-0 left-0 right-0 z-20">
+        <img
+          src="/idle/footer.png"
+          alt="University Footer"
+          className="w-full h-auto object-cover object-center"
+        />
+      </footer>
+
+      {/* TAP TO START with Touch Icon - Bottom Right Corner */}
+      <div className="absolute bottom-6 right-[350px] z-30 flex items-center space-x-4 animate-tap-attention">
+        <img
+          src="/idle/touch.png"
+          alt="Touch Icon"
+          className="w-[100px] h-[100px] object-contain animate-glow-pulse"
+        />
+        <div className="text-white text-5xl font-bold tracking-wider animate-glow-pulse">
+          TAP TO START
         </div>
       </div>
     </div>

@@ -21,13 +21,13 @@ const DataPrivacyModal = ({ isOpen, onNext, onPrevious, consent, setConsent }) =
         {/* Modal Content - Perfectly centered */}
         <div className="bg-white rounded-2xl shadow-3xl drop-shadow-2xl p-10 mx-4 max-w-4xl w-full">
           {/* Modal Header */}
-          <h2 className="text-4xl font-bold text-gray-800 mb-8 text-center">
+          <h2 className="text-5xl font-bold text-gray-800 mb-8 text-center">
             PRIVACY NOTICE
           </h2>
 
           {/* Privacy Notice Text */}
           <div className="mb-8 text-gray-700 leading-relaxed">
-            <p className="mb-6 text-lg">
+            <p className="mb-6 text-xl">
               Please be informed that we are collecting your personal information for the purpose of
               recording and monitoring as we follow the Data Privacy Act of 2012. The storage, use,
               and disposal of your personal information will be governed by LVCC's Data Privacy Policies.
@@ -36,14 +36,17 @@ const DataPrivacyModal = ({ isOpen, onNext, onPrevious, consent, setConsent }) =
 
           {/* Consent Checkbox */}
           <div className="mb-10">
-            <label className="flex items-start space-x-4 cursor-pointer">
+            <label className="flex items-center space-x-6 cursor-pointer group">
               <input
                 type="checkbox"
                 checked={consent}
                 onChange={(e) => setConsent(e.target.checked)}
-                className="mt-2 h-8 w-8 text-blue-600 border-2 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+                className="mt-1 h-10 w-10 text-[#1F3463] border-4 border-gray-400 rounded-lg focus:ring-[#1F3463] focus:ring-4 focus:border-[#1F3463] transition-all duration-200 touch-target-lg shadow-lg hover:shadow-xl active:scale-95 cursor-pointer"
+                style={{
+                  accentColor: '#1F3463'
+                }}
               />
-              <span className="text-gray-700 leading-relaxed text-lg">
+              <span className="text-gray-700 leading-relaxed text-xl flex-1 pt-2">
                 I voluntarily give my consent to LVCC in collecting, processing, recording, using,
                 and retaining my personal information for the above-mentioned purpose in accordance
                 with this Privacy Notice.
@@ -94,7 +97,7 @@ const ConfirmationModal = ({ isOpen, onYes, onNo }) => {
         {/* Modal Content - Perfectly centered */}
         <div className="bg-white rounded-2xl shadow-3xl drop-shadow-2xl p-8 mx-4 max-w-lg w-full">
           {/* Modal Message */}
-          <h2 className="text-2xl font-bold text-gray-800 text-center">
+          <h2 className="text-3xl font-bold text-gray-800 text-center">
             Are you ready to submit your information?
           </h2>
         </div>
@@ -130,12 +133,12 @@ const OfficeMismatchModal = ({ isOpen, onConfirm, onClose, currentOffice, sugges
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[10000]">
       <div className="bg-white rounded-3xl shadow-2xl p-8 max-w-2xl mx-4 text-center">
         {/* Header */}
-        <h2 className="text-3xl font-semibold mb-4" style={{ color: '#1F3463' }}>
+        <h2 className="text-4xl font-semibold mb-4" style={{ color: '#1F3463' }}>
           You Selected {currentOffice}'s Office
         </h2>
 
         {/* Subtext */}
-        <p className="text-xl text-gray-600 mb-8">
+        <p className="text-2xl text-gray-600 mb-8">
           Please switch to
         </p>
 
@@ -160,7 +163,7 @@ const OfficeMismatchModal = ({ isOpen, onConfirm, onClose, currentOffice, sugges
               />
             </div>
             {/* Office Name */}
-            <h3 className="text-xl font-semibold text-white">
+            <h3 className="text-2xl font-semibold text-white">
               {suggestedOffice.name}
             </h3>
           </div>
@@ -620,19 +623,19 @@ const Queue = () => {
               {/* Form Section - Perfectly centered */}
               <div className="bg-white rounded-lg shadow-xl drop-shadow-lg p-8 w-[500px]">
                 {/* Header */}
-                <h2 className="text-3xl font-bold text-gray-800 mb-4 text-center">
+                <h2 className="text-4xl font-bold text-gray-800 mb-4 text-center">
                   Enter a valid ID number
                 </h2>
 
                 {/* Subheader */}
-                <p className="text-lg text-gray-600 mb-8 text-center">
+                <p className="text-xl text-gray-600 mb-8 text-center">
                   Please present your ID at the office for verification
                 </p>
 
                 <div className="space-y-4">
                   {/* ID Number Field */}
                   <div>
-                    <label htmlFor="idNumber" className="block text-lg font-semibold text-gray-700 mb-2">
+                    <label htmlFor="idNumber" className="block text-xl font-semibold text-gray-700 mb-2">
                       ID NUMBER <span className="text-red-500">*</span>
                     </label>
                     <input
@@ -641,7 +644,7 @@ const Queue = () => {
                       value={idNumber}
                       onFocus={() => handleFieldFocus('idNumber')}
                       readOnly
-                      className={`w-full px-3 py-3 border-2 rounded-lg text-lg focus:outline-none ${
+                      className={`w-full px-3 py-3 border-2 rounded-lg text-xl focus:outline-none ${
                         activeField === 'idNumber'
                           ? 'border-blue-500 bg-blue-50'
                           : 'border-gray-300 bg-gray-50'
@@ -717,7 +720,7 @@ const Queue = () => {
                 <div className="space-y-4">
                   {/* Name Field */}
                   <div>
-                    <label htmlFor="name" className="block text-lg font-semibold text-gray-700 mb-2">
+                    <label htmlFor="name" className="block text-xl font-semibold text-gray-700 mb-2">
                       NAME <span className="text-red-500">*</span>
                     </label>
                     <input
@@ -726,7 +729,7 @@ const Queue = () => {
                       value={formData.name}
                       onFocus={() => handleFieldFocus('name')}
                       readOnly
-                      className={`w-full px-3 py-3 border-2 rounded-lg text-lg focus:outline-none ${
+                      className={`w-full px-3 py-3 border-2 rounded-lg text-xl focus:outline-none ${
                         activeField === 'name'
                           ? 'border-blue-500 bg-blue-50'
                           : 'border-gray-300 bg-gray-50'
@@ -737,7 +740,7 @@ const Queue = () => {
 
                   {/* Contact Number Field */}
                   <div>
-                    <label htmlFor="contactNumber" className="block text-lg font-semibold text-gray-700 mb-2">
+                    <label htmlFor="contactNumber" className="block text-xl font-semibold text-gray-700 mb-2">
                       CONTACT NUMBER <span className="text-red-500">*</span>
                     </label>
                     <input
@@ -746,7 +749,7 @@ const Queue = () => {
                       value={formData.contactNumber}
                       onFocus={() => handleFieldFocus('contactNumber')}
                       readOnly
-                      className={`w-full px-3 py-3 border-2 rounded-lg text-lg focus:outline-none ${
+                      className={`w-full px-3 py-3 border-2 rounded-lg text-xl focus:outline-none ${
                         activeField === 'contactNumber'
                           ? 'border-blue-500 bg-blue-50'
                           : 'border-gray-300 bg-gray-50'
@@ -837,7 +840,7 @@ const Queue = () => {
                   {/* Email Field */}
                   <div className="relative">
                     <div className="flex justify-between items-center mb-2">
-                      <label htmlFor="email" className="block text-lg font-semibold text-gray-700">
+                      <label htmlFor="email" className="block text-xl font-semibold text-gray-700">
                         EMAIL <span className="text-red-500">*</span>
                       </label>
                     </div>
@@ -847,7 +850,7 @@ const Queue = () => {
                       value={formData.email}
                       onFocus={() => handleFieldFocus('email')}
                       readOnly
-                      className={`w-full px-3 py-3 border-2 rounded-lg text-lg focus:outline-none ${
+                      className={`w-full px-3 py-3 border-2 rounded-lg text-xl focus:outline-none ${
                         activeField === 'email'
                           ? 'border-blue-500 bg-blue-50'
                           : 'border-gray-300 bg-gray-50'
@@ -859,7 +862,7 @@ const Queue = () => {
                   {/* Address Field */}
                   <div className="relative">
                     <div className="flex justify-between items-center mb-2">
-                      <label htmlFor="address" className="block text-lg font-semibold text-gray-700">
+                      <label htmlFor="address" className="block text-xl font-semibold text-gray-700">
                         ADDRESS
                       </label>
                       <span className="text-sm text-gray-500 font-medium">Optional</span>
@@ -870,7 +873,7 @@ const Queue = () => {
                       value={formData.address}
                       onFocus={() => handleFieldFocus('address')}
                       readOnly
-                      className={`w-full px-3 py-3 border-2 rounded-lg text-lg focus:outline-none ${
+                      className={`w-full px-3 py-3 border-2 rounded-lg text-xl focus:outline-none ${
                         activeField === 'address'
                           ? 'border-blue-500 bg-blue-50'
                           : 'border-gray-300 bg-gray-50'
@@ -978,7 +981,7 @@ const Queue = () => {
             {/* First Div - QR Code Section */}
             <div className="bg-white rounded-3xl shadow-xl drop-shadow-lg p-8 flex flex-col items-center justify-center">
               {/* Top Text */}
-              <h2 className="text-3xl font-bold text-gray-800 mb-8 text-center">
+              <h2 className="text-4xl font-bold text-gray-800 mb-8 text-center">
                 Scan the QR Code for your Queue Number
               </h2>
 
@@ -1000,26 +1003,26 @@ const Queue = () => {
               {/* Large Queue Number with Circular Border */}
               <div className="flex items-center justify-center mb-6">
                 <div className="w-32 h-32 border-4 border-[#1F3463] rounded-full flex items-center justify-center">
-                  <span className="text-4xl font-bold text-[#1F3463]">
+                  <span className="text-5xl font-bold text-[#1F3463]">
                     {queueNumber.toString().padStart(2, '0')}
                   </span>
                 </div>
               </div>
 
               {/* Queue Number Label */}
-              <h3 className="text-2xl font-bold text-center text-gray-800 mb-4">
+              <h3 className="text-3xl font-bold text-center text-gray-800 mb-4">
                 Queue Number
               </h3>
 
               {/* Instruction Text */}
               <div className="mb-6 text-center">
-                <span className="text-lg text-gray-700">Please Proceed to <br /></span>
-                <span className="text-3xl text-gray-700">Window {windowNumber}</span>
+                <span className="text-xl text-gray-700">Please Proceed to <br /></span>
+                <span className="text-4xl text-gray-700">Window {windowNumber}</span>
               </div>
 
               {/* Validity Notice */}
               <div className="mb-4 text-center">
-                <p className="text-lg font-semibold text-[#1F3463]">
+                <p className="text-xl font-semibold text-[#1F3463]">
                   This ticket is only valid on {formatCurrentDate()}
                 </p>
               </div>
@@ -1055,12 +1058,12 @@ const Queue = () => {
           {/* Star Rating Container - White rounded container */}
           <div className="bg-white rounded-lg shadow-xl drop-shadow-lg p-12 max-w-2xl mx-auto text-center mb-8">
             {/* Main Heading */}
-            <h2 className="text-4xl font-bold text-gray-800 mb-4">
+            <h2 className="text-5xl font-bold text-gray-800 mb-4">
               How was your experience today?
             </h2>
 
             {/* Subheading */}
-            <p className="text-xl text-gray-600 mb-12">
+            <p className="text-2xl text-gray-600 mb-12">
               Please let us know how we did by leaving a star rating
             </p>
 
@@ -1085,7 +1088,7 @@ const Queue = () => {
               </div>
 
               {/* Rating Labels */}
-              <div className="flex justify-between text-lg text-gray-500 max-w-md mx-auto">
+              <div className="flex justify-between text-xl text-gray-500 max-w-md mx-auto">
                 <span>Poor</span>
                 <span>Excellent</span>
               </div>
@@ -1123,12 +1126,12 @@ const Queue = () => {
             </div>
 
             {/* Thank You Message */}
-            <h2 className="text-3xl font-bold text-[#1F3463] mb-4">
+            <h2 className="text-4xl font-bold text-[#1F3463] mb-4">
               Thank you!
             </h2>
 
             {/* Subtext */}
-            <p className="text-3xl text-[#1F3463]">
+            <p className="text-4xl text-[#1F3463]">
               Your feedback is much appreciated!
             </p>
           </div>
@@ -1148,11 +1151,11 @@ const Queue = () => {
             <div className="flex flex-col items-center w-full px-20">
               {/* Fixed Header - Absolute positioning to prevent movement */}
               <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 -mt-32">
-                <h2 className="text-4xl font-semibold text-center drop-shadow-lg whitespace-nowrap mb-2" style={{ color: '#1F3463' }}>
+                <h2 className="text-5xl font-semibold text-center drop-shadow-lg whitespace-nowrap mb-2" style={{ color: '#1F3463' }}>
                   SELECT OFFICE
                 </h2>
                 {/* Subheader */}
-                <p className="text-2xl font-bold text-center drop-shadow-lg mb-8" style={{ color: '#1F3463' }}>
+                <p className="text-3xl font-bold text-center drop-shadow-lg mb-16" style={{ color: '#1F3463' }}>
                   CUT OFF TIME: 5:00 PM
                 </p>
               </div>
@@ -1173,7 +1176,7 @@ const Queue = () => {
                         />
                       </div>
                       {/* Office Name */}
-                      <h3 className="text-xl font-semibold text-white">
+                      <h3 className="text-2xl font-semibold text-white">
                         {office.name}
                       </h3>
                     </div>
@@ -1200,7 +1203,7 @@ const Queue = () => {
               <div className="flex flex-col items-center w-full">
                 {/* Fixed Header */}
                 <div className="flex-shrink-0 pb-2">
-                  <h2 className="text-4xl font-semibold text-center drop-shadow-lg" style={{ color: '#1F3463' }}>
+                  <h2 className="text-5xl font-semibold text-center drop-shadow-lg" style={{ color: '#1F3463' }}>
                     SELECT OFFICE
                   </h2>
                 </div>
@@ -1226,7 +1229,7 @@ const Queue = () => {
                           />
                         </div>
                         {/* Office Name */}
-                        <h3 className="text-xl font-semibold text-white">
+                        <h3 className="text-2xl font-semibold text-white">
                           {office.name}
                         </h3>
                       </div>
@@ -1261,7 +1264,7 @@ const Queue = () => {
             <div className="flex flex-col items-center w-full relative">
               {/* Fixed Header - Absolute positioning to prevent movement */}
               <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 -mt-32">
-                <h2 className="text-4xl font-semibold text-center drop-shadow-lg whitespace-nowrap mb-6" style={{ color: '#1F3463' }}>
+                <h2 className="text-5xl font-semibold text-center drop-shadow-lg whitespace-nowrap mb-6" style={{ color: '#1F3463' }}>
                   WHAT WOULD YOU LIKE TO DO?
                 </h2>
               </div>
@@ -1273,20 +1276,20 @@ const Queue = () => {
                 onItemClick={(service) => handleServiceSelect(service)}
                 renderItem={(service) => (
                   <div className="text-center">
-                    <h3 className="text-xl font-semibold text-white">
-                      {service}
-                    </h3>
-                  </div>
-                )}
-                showPagination={serviceOptions.length > 6}
-              />
-              </div>
+                  <h3 className="text-2xl font-semibold text-white">
+                    {service}
+                  </h3>
+                </div>
+              )}
+              showPagination={serviceOptions.length > 6}
+            />
             </div>
           </div>
         </div>
+      </div>
 
-        <BackButton />
-      </QueueLayout>
+      <BackButton />
+    </QueueLayout>
     );
   }
 
@@ -1306,11 +1309,11 @@ const Queue = () => {
               <div className="flex flex-col items-center w-full relative">
                 {/* Fixed Header - Absolute positioning to prevent movement */}
                 <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 -mt-40">
-                  <h2 className="text-4xl font-semibold text-center drop-shadow-lg whitespace-nowrap mb-4" style={{ color: '#1F3463' }}>
+                  <h2 className="text-5xl font-semibold text-center drop-shadow-lg whitespace-nowrap mb-4" style={{ color: '#1F3463' }}>
                     ARE YOU AN INCOMING NEW STUDENT?
                   </h2>
                   {/* Subheader */}
-                  <p className="text-2xl font-light text-center drop-shadow-lg" style={{ color: '#1F3463' }}>
+                  <p className="text-3xl font-light text-center drop-shadow-lg" style={{ color: '#1F3463' }}>
                     *A MINOR OF AGE ISN'T ALLOWED TO PROCESS ENROLLMENT
                   </p>
                 </div>
@@ -1322,7 +1325,7 @@ const Queue = () => {
                     onItemClick={(option) => handleStudentStatusSelect(option.key)}
                     renderItem={(option) => (
                       <div className="text-center">
-                        <h3 className="text-xl font-semibold text-white">
+                        <h3 className="text-2xl font-semibold text-white">
                           {option.label}
                         </h3>
                       </div>
@@ -1371,22 +1374,22 @@ const Queue = () => {
                 onItemClick={(role) => handleRoleSelect(role)}
                 renderItem={(role) => (
                   <div className="text-center">
-                    <h3 className="text-xl font-semibold text-white">
-                      {role}
-                    </h3>
-                  </div>
-                )}
-                showPagination={roleOptions.length > 6}
-              />
-              </div>
+                  <h3 className="text-xl font-semibold text-white">
+                    {role}
+                  </h3>
+                </div>
+              )}
+              showPagination={roleOptions.length > 6}
+            />
             </div>
           </div>
         </div>
+      </div>
 
-        <BackButton />
-      </QueueLayout>
-    );
-  }
+      <BackButton />
+    </QueueLayout>
+  );
+}
 
   // Priority Status Step
   if (currentStep === 'priority') {
