@@ -6,6 +6,4 @@ export { default as Directory } from './Directory';
 export { default as Queue } from './Queue';
 export { default as FAQ } from './FAQ';
 export { default as IdlePage } from './IdlePage';
-export { default as GridDemo } from './GridDemo';
 export { default as PortalQueue } from './PortalQueue';
-export { default as SampleIdlePage } from './SampleIdlePage';
