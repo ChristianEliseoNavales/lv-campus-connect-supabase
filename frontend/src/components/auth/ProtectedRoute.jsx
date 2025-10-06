@@ -3,9 +3,23 @@ import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { LoadingSpinner } from '../ui';
 
+// ============================================================================
+// DEVELOPMENT BYPASS FLAG - TEMPORARILY DISABLE AUTHENTICATION
+// ============================================================================
+// Set to true to bypass all authentication checks during development
+// WARNING: Set back to false before deploying to production!
+const DEV_BYPASS_AUTH = true;
+// ============================================================================
+
 const ProtectedRoute = ({ children, requiredRoles = [], redirectTo = '/login' }) => {
   const { isAuthenticated, isLoading, user, canAccessRoute } = useAuth();
   const location = useLocation();
+
+  // DEVELOPMENT BYPASS: Skip all authentication checks if flag is enabled
+  if (DEV_BYPASS_AUTH) {
+    console.warn('⚠️ DEVELOPMENT MODE: Authentication checks are BYPASSED');
+    return children;
+  }
 
   // Show loading spinner while checking authentication
   if (isLoading) {

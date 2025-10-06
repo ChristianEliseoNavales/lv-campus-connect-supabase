@@ -1,6 +1,14 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import useGoogleAuth from '../hooks/useGoogleAuth';
 
+// ============================================================================
+// DEVELOPMENT BYPASS FLAG - TEMPORARILY DISABLE AUTHENTICATION
+// ============================================================================
+// Set to true to bypass authentication and auto-login as super admin
+// WARNING: Set back to false before deploying to production!
+const DEV_BYPASS_AUTH = true;
+// ============================================================================
+
 const AuthContext = createContext();
 
 export const useAuth = () => {
@@ -16,19 +24,36 @@ export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-  
+
   const { isGoogleLoaded, signInWithGoogle, signOut: googleSignOut } = useGoogleAuth();
 
   // Check for existing session on mount
   useEffect(() => {
     const checkExistingSession = async () => {
+      // DEVELOPMENT BYPASS: Auto-authenticate with mock super admin user
+      if (DEV_BYPASS_AUTH) {
+        console.warn('⚠️ DEVELOPMENT MODE: Auto-authenticated as Super Admin (authentication bypassed)');
+        const mockUser = {
+          id: 'dev-bypass-user',
+          email: 'dev@bypass.local',
+          name: 'Development Super Admin',
+          role: 'super_admin',
+          department: 'mis',
+          isActive: true
+        };
+        setUser(mockUser);
+        setIsAuthenticated(true);
+        setIsLoading(false);
+        return;
+      }
+
       try {
         const token = localStorage.getItem('authToken');
         const userData = localStorage.getItem('userData');
-        
+
         if (token && userData) {
           const parsedUser = JSON.parse(userData);
-          
+
           // Verify token with backend
           const response = await fetch('http://localhost:3001/api/auth/verify', {
             method: 'GET',
@@ -37,7 +62,7 @@ export const AuthProvider = ({ children }) => {
               'Content-Type': 'application/json'
             }
           });
-          
+
           if (response.ok) {
             const data = await response.json();
             setUser(data.user);
@@ -209,16 +234,22 @@ export const AuthProvider = ({ children }) => {
   };
 
   const canAccessRoute = (route) => {
+    // DEVELOPMENT BYPASS: Allow all routes when bypass is enabled
+    if (DEV_BYPASS_AUTH) {
+      return true;
+    }
+
     if (!isAuthenticated || !user) return false;
-    
+
     // MIS Super Admin has access to everything
     if (user.role === 'super_admin') return true;
-    
+
     // Role-specific route access
     if (route.startsWith('/admin/registrar') && user.role === 'registrar_admin') return true;
     if (route.startsWith('/admin/admissions') && user.role === 'admissions_admin') return true;
+    if (route.startsWith('/admin/hr') && user.role === 'hr_admin') return true;
     if (route.startsWith('/admin/mis') && user.role === 'super_admin') return true;
-    
+
     return false;
   };
 
