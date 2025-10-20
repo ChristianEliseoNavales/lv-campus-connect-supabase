@@ -17,8 +17,6 @@ const KioskLayout = ({ children, customFooter = null }) => {
   // Instruction mode state
   const [showInstructionMode, setShowInstructionMode] = useState(false);
 
-  console.log('🏗️ KioskLayout render - showIdleModal:', showIdleModal, 'countdown:', countdown);
-
   // Handle help button click to activate instruction mode
   const handleHelpButtonClick = () => {
     setShowInstructionMode(true);

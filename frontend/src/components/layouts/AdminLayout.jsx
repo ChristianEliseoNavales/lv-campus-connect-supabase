@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import {
@@ -13,9 +13,14 @@ import {
   MdHistory,
   MdNewspaper,
   MdStar,
-  MdBarChart
+  MdBarChart,
+  MdSwapHoriz,
+  MdStorage
 } from 'react-icons/md';
 import { BiSolidNotepad } from 'react-icons/bi';
+import { useSocket } from '../../contexts/SocketContext';
+import { useOptimizedFetch } from '../../hooks/useOptimizedFetch';
+import { ToastContainer, useToast } from '../ui/Toast';
 
 const AdminLayout = ({ children }) => {
   const { user, signOut } = useAuth();
@@ -25,18 +30,75 @@ const AdminLayout = ({ children }) => {
   const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
   const [isScrollable, setIsScrollable] = useState(false);
   const [isQueueExpanded, setIsQueueExpanded] = useState(false);
+
+  // Use centralized Socket context
+  const { joinRoom, leaveRoom, subscribe } = useSocket();
+
+  // Toast notifications
+  const { toasts, removeToast } = useToast();
   const dropdownRef = useRef(null);
   const mainContentRef = useRef(null);
 
   // Development mode detection - check if using URL-based role switching
   const isDevelopmentMode = user?.id === 'dev-bypass-user';
 
-  // Windows data for queue navigation (should match Settings configuration)
-  const windows = [
-    { id: 1, name: 'Window 1', serviceName: 'Enrollment' },
-    { id: 2, name: 'Window 2', serviceName: 'Transcript Request' },
-    { id: 3, name: 'Window 3', serviceName: 'Certificate Request' }
-  ];
+  // Determine department based on current admin context (URL path) - memoized
+  const department = useMemo(() => {
+    const currentPath = location.pathname;
+    if (currentPath.startsWith('/admin/registrar')) {
+      return 'registrar';
+    } else if (currentPath.startsWith('/admin/admissions')) {
+      return 'admissions';
+    } else {
+      // Fallback to role-based department for other paths
+      if (user?.role === 'registrar_admin') {
+        return 'registrar';
+      } else if (user?.role === 'admissions_admin') {
+        return 'admissions';
+      } else if (user?.role === 'super_admin') {
+        // For super_admin, default to registrar if no specific path context
+        return 'registrar';
+      }
+    }
+    return null;
+  }, [location.pathname, user?.role]);
+
+  // Use optimized fetch for windows data
+  const { data: windowsData, refetch: refetchWindows } = useOptimizedFetch(
+    department ? `http://localhost:5000/api/windows/${department}` : null,
+    {
+      dependencies: [department],
+      cacheKey: `windows-${department}`,
+      enableCache: true
+    }
+  );
+
+  // Ensure windows is always an array to prevent null/undefined errors
+  const windows = useMemo(() => {
+    return Array.isArray(windowsData) ? windowsData : [];
+  }, [windowsData]);
+
+  // Socket room management and real-time updates
+  useEffect(() => {
+    if (!department) return;
+
+    // Join appropriate room based on current admin context
+    const roomName = `admin-${department}`;
+    joinRoom(roomName);
+
+    // Listen for windows updates with cleanup
+    const unsubscribe = subscribe('windows-updated', (data) => {
+      if (data.department === department) {
+        console.log(`📡 Windows updated for ${department}:`, data);
+        refetchWindows(); // Use optimized refetch
+      }
+    });
+
+    return () => {
+      leaveRoom(roomName);
+      unsubscribe();
+    };
+  }, [department, joinRoom, leaveRoom, subscribe, refetchWindows]);
 
   // Check if queue menu should be expanded based on current route
   const isQueueRouteActive = () => {
@@ -45,10 +107,11 @@ const AdminLayout = ({ children }) => {
 
   // Update queue expanded state based on current route
   useEffect(() => {
-    if (isQueueRouteActive()) {
+    const isQueueRoute = isQueueRouteActive();
+    if (isQueueRoute && !isQueueExpanded) {
       setIsQueueExpanded(true);
     }
-  }, [location.pathname]);
+  }, [location.pathname, isQueueExpanded]);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -104,6 +167,59 @@ const AdminLayout = ({ children }) => {
     setIsUserDropdownOpen(false);
   };
 
+  // Office switching functionality
+  const canSwitchOffices = () => {
+    // Only super_admin users can switch between offices
+    // In development mode, also allow switching when DEV_BYPASS_AUTH is enabled
+    return user?.role === 'super_admin' || isDevelopmentMode;
+  };
+
+  const handleOfficeSwitch = (targetOffice) => {
+    const targetPaths = {
+      'registrar': '/admin/registrar',
+      'admissions': '/admin/admissions',
+      'mis': '/admin/mis'
+    };
+
+    navigate(targetPaths[targetOffice]);
+    setIsUserDropdownOpen(false);
+  };
+
+  const getOfficeSwitchButtons = () => {
+    const currentPath = location.pathname;
+    const buttons = [];
+
+    if (currentPath.startsWith('/admin/mis')) {
+      // When viewing MIS pages - show TWO buttons: Registrar and Admissions
+      buttons.push({
+        key: 'registrar',
+        text: 'Switch to Registrar\'s Office',
+        onClick: () => handleOfficeSwitch('registrar')
+      });
+      buttons.push({
+        key: 'admissions',
+        text: 'Switch to Admissions Office',
+        onClick: () => handleOfficeSwitch('admissions')
+      });
+    } else if (currentPath.startsWith('/admin/registrar')) {
+      // When viewing Registrar pages - show ONE button: MIS
+      buttons.push({
+        key: 'mis',
+        text: 'Switch to MIS Office',
+        onClick: () => handleOfficeSwitch('mis')
+      });
+    } else if (currentPath.startsWith('/admin/admissions')) {
+      // When viewing Admissions pages - show ONE button: MIS
+      buttons.push({
+        key: 'mis',
+        text: 'Switch to MIS Office',
+        onClick: () => handleOfficeSwitch('mis')
+      });
+    }
+
+    return buttons;
+  };
+
   // Determine effective role based on current URL path for development testing
   // This allows testing different role-based navigation while DEV_BYPASS_AUTH is enabled
   const getEffectiveRole = () => {
@@ -125,11 +241,12 @@ const AdminLayout = ({ children }) => {
   };
 
   // Role-based navigation items
-  const getNavigationItems = () => {
+  const getNavigationItems = useCallback(() => {
     const roleSpecificItems = {
       super_admin: [
         { name: 'Dashboard', path: '/admin/mis', icon: MdDashboard, end: true },
         { name: 'Users', path: '/admin/mis/users', icon: MdPeople },
+        { name: 'Database Manager', path: '/admin/mis/database-manager', icon: MdStorage },
         { name: 'Audit Trail', path: '/admin/mis/audit-trail', icon: MdHistory },
         { name: 'Bulletin', path: '/admin/mis/bulletin', icon: MdNewspaper },
         { name: 'Ratings', path: '/admin/mis/ratings', icon: MdStar }
@@ -140,11 +257,13 @@ const AdminLayout = ({ children }) => {
           name: 'Queue',
           icon: MdQueue,
           isExpandable: true,
-          children: windows.map(window => ({
-            name: window.name,
-            path: `/admin/registrar/queue/window-${window.id}`,
-            windowId: window.id
-          }))
+          children: windows
+            .filter(window => window && window.id && window.name)
+            .map(window => ({
+              name: window.name,
+              path: `/admin/registrar/queue/${window.id}`,
+              windowId: window.id
+            }))
         },
         { name: 'Transaction Logs', path: '/admin/registrar/transaction-logs', icon: BiSolidNotepad },
         { name: 'Audit Trail', path: '/admin/registrar/audit-trail', icon: MdHistory },
@@ -152,7 +271,18 @@ const AdminLayout = ({ children }) => {
       ],
       admissions_admin: [
         { name: 'Dashboard', path: '/admin/admissions', icon: MdDashboard, end: true },
-        { name: 'Queue', path: '/admin/admissions/queue', icon: MdQueue },
+        {
+          name: 'Queue',
+          icon: MdQueue,
+          isExpandable: true,
+          children: windows
+            .filter(window => window && window.id && window.name)
+            .map(window => ({
+              name: window.name,
+              path: `/admin/admissions/queue/${window.id}`,
+              windowId: window.id
+            }))
+        },
         { name: 'Transaction Logs', path: '/admin/admissions/transaction-logs', icon: BiSolidNotepad },
         { name: 'Audit Trail', path: '/admin/admissions/audit-trail', icon: MdHistory },
         { name: 'Settings', path: '/admin/admissions/settings', icon: MdSettings }
@@ -167,9 +297,17 @@ const AdminLayout = ({ children }) => {
     const effectiveRole = getEffectiveRole();
     const userRoleItems = roleSpecificItems[effectiveRole] || [];
     return userRoleItems;
-  };
+  }, [windows, user?.role, location.pathname]);
 
-  const navigationItems = getNavigationItems();
+  // Get navigation items with error handling
+  const navigationItems = useMemo(() => {
+    try {
+      return getNavigationItems();
+    } catch (error) {
+      console.error('Error getting navigation items:', error);
+      return [];
+    }
+  }, [getNavigationItems]);
 
   // Get display name based on effective role for development testing
   const getDisplayName = () => {
@@ -258,6 +396,7 @@ const AdminLayout = ({ children }) => {
               const isAnyChildActive = item.children?.some(child =>
                 location.pathname === child.path
               );
+              const isQueueRoute = location.pathname.includes('/queue');
 
               return (
                 <div key={item.name} className="space-y-1">
@@ -265,7 +404,7 @@ const AdminLayout = ({ children }) => {
                   <button
                     onClick={() => setIsQueueExpanded(!isQueueExpanded)}
                     className={`w-full flex items-center ${isSidebarCollapsed ? 'justify-center' : 'space-x-3'} px-3 py-3 rounded-2xl transition-all duration-300 ease-in-out ${
-                      isAnyChildActive || isExpanded
+                      isAnyChildActive || isExpanded || isQueueRoute
                         ? 'bg-white/40 text-white'
                         : 'text-white hover:bg-white/10'
                     }`}
@@ -402,6 +541,17 @@ const AdminLayout = ({ children }) => {
             {/* User Dropdown */}
             {isUserDropdownOpen && (
               <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50">
+                {/* Office Switch Buttons - only visible for users with multi-office access */}
+                {canSwitchOffices() && getOfficeSwitchButtons().map((button) => (
+                  <button
+                    key={button.key}
+                    onClick={button.onClick}
+                    className="w-full flex items-center space-x-2 px-4 py-2 text-left text-gray-700 hover:bg-gray-100 transition-colors"
+                  >
+                    <MdSwapHoriz className="w-5 h-5" />
+                    <span>{button.text}</span>
+                  </button>
+                ))}
                 <button
                   onClick={handleSignOut}
                   className="w-full flex items-center space-x-2 px-4 py-2 text-left text-gray-700 hover:bg-gray-100 transition-colors"
@@ -435,6 +585,9 @@ const AdminLayout = ({ children }) => {
           </div>
         </footer>
       </div>
+
+      {/* Toast Container */}
+      <ToastContainer toasts={toasts} onRemoveToast={removeToast} />
     </div>
   );
 };

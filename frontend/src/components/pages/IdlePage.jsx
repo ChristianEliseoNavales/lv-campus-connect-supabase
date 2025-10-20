@@ -180,7 +180,6 @@ const IdlePage = () => {
                       className="max-w-full max-h-full object-contain rounded-lg shadow-lg"
                       onError={(e) => {
                         // Fallback to a solid color if image fails to load
-                        console.error('Image failed to load:', image.src);
                         e.target.style.display = 'none';
                         e.target.parentElement.style.backgroundColor = '#1F3463';
                         e.target.parentElement.style.backgroundImage = 'linear-gradient(45deg, #1F3463, #2d4a7a)';

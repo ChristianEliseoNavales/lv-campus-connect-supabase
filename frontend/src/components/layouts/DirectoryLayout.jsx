@@ -6,8 +6,6 @@ const DirectoryLayout = ({ children, customFooter = null }) => {
   // Idle detection hook
   const { showIdleModal, countdown, handleStayActive } = useIdleDetection();
 
-  console.log('🏗️ DirectoryLayout render - showIdleModal:', showIdleModal, 'countdown:', countdown);
-
   return (
     <div
       className="flex flex-col w-screen h-screen overflow-hidden kiosk-container kiosk-layout font-kiosk-public bg-cover bg-center bg-no-repeat"

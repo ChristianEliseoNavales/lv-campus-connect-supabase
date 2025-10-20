@@ -99,6 +99,11 @@ const ResponsiveGrid = ({
   };
 
   // Fallback mouse handlers for non-touch devices
+  const handleMouseEnter = (e) => {
+    e.target.style.backgroundColor = '#2A4A7A';
+    e.target.style.transform = 'scale(1.02)';
+  };
+
   const handleMouseDown = (e) => {
     e.target.style.backgroundColor = '#1A2E56';
     e.target.style.transform = 'scale(0.95)';

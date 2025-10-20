@@ -231,7 +231,7 @@ const Map = () => {
                       ? 'border-[#1F3463] bg-blue-50'
                       : 'border-gray-300 active:border-gray-400'
                   }`}
-                  readOnly
+                  // TEMPORARY: readOnly removed for testing - restore for production
                 />
               </div>
               <button

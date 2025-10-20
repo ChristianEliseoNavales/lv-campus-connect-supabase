@@ -46,6 +46,15 @@ export default {
         'spin': 'spin 1s linear infinite',
         'tap-attention': 'tapAttention 2s ease-in-out infinite',
         'glow-pulse': 'glowPulse 2s ease-in-out infinite',
+        // Toast animations
+        'slide-in-right': 'slideInRight 0.3s ease-out',
+        'slide-out-right': 'slideOutRight 0.3s ease-in',
+        'slide-in-left': 'slideInLeft 0.3s ease-out',
+        'slide-out-left': 'slideOutLeft 0.3s ease-in',
+        'slide-in-down': 'slideInDown 0.3s ease-out',
+        'slide-out-up': 'slideOutUp 0.3s ease-in',
+        'slide-in-up': 'slideInUp 0.3s ease-out',
+        'slide-out-down': 'slideOutDown 0.3s ease-in',
       },
       keyframes: {
         slideUp: {
@@ -69,6 +78,39 @@ export default {
           '50%': {
             filter: 'drop-shadow(0 0 20px rgba(255, 226, 81, 0.8))',
           },
+        },
+        // Toast animation keyframes
+        slideInRight: {
+          '0%': { opacity: '0', transform: 'translateX(100%)' },
+          '100%': { opacity: '1', transform: 'translateX(0)' },
+        },
+        slideOutRight: {
+          '0%': { opacity: '1', transform: 'translateX(0)' },
+          '100%': { opacity: '0', transform: 'translateX(100%)' },
+        },
+        slideInLeft: {
+          '0%': { opacity: '0', transform: 'translateX(-100%)' },
+          '100%': { opacity: '1', transform: 'translateX(0)' },
+        },
+        slideOutLeft: {
+          '0%': { opacity: '1', transform: 'translateX(0)' },
+          '100%': { opacity: '0', transform: 'translateX(-100%)' },
+        },
+        slideInDown: {
+          '0%': { opacity: '0', transform: 'translateY(-100%)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
+        },
+        slideOutUp: {
+          '0%': { opacity: '1', transform: 'translateY(0)' },
+          '100%': { opacity: '0', transform: 'translateY(-100%)' },
+        },
+        slideInUp: {
+          '0%': { opacity: '0', transform: 'translateY(100%)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
+        },
+        slideOutDown: {
+          '0%': { opacity: '1', transform: 'translateY(0)' },
+          '100%': { opacity: '0', transform: 'translateY(100%)' },
         }
       }
     },

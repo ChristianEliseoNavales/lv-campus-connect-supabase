@@ -1,6 +1,7 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
+import SocketProvider from './contexts/SocketContext';
 import { KioskLayout, AdminLayout } from './components/layouts';
 import { ProtectedRoute, Login, Unauthorized } from './components/auth';
 import {
@@ -11,18 +12,21 @@ import {
 
 // MIS Admin Pages
 import MISUsers from './components/pages/admin/mis/Users';
+import DatabaseManager from './components/pages/admin/mis/DatabaseManager';
 import MISAuditTrail from './components/pages/admin/mis/AuditTrail';
 import MISBulletin from './components/pages/admin/mis/Bulletin';
 import MISRatings from './components/pages/admin/mis/Ratings';
 
 // Registrar Admin Pages
 import RegistrarQueue from './components/pages/admin/registrar/Queue';
+import RegistrarQueueRedirect from './components/pages/admin/registrar/QueueRedirect';
 import RegistrarTransactionLogs from './components/pages/admin/registrar/TransactionLogs';
 import RegistrarAuditTrail from './components/pages/admin/registrar/AuditTrail';
 import RegistrarSettings from './components/pages/admin/registrar/Settings';
 
 // Admissions Admin Pages
 import AdmissionsQueue from './components/pages/admin/admissions/Queue';
+import AdmissionsQueueRedirect from './components/pages/admin/admissions/QueueRedirect';
 import AdmissionsTransactionLogs from './components/pages/admin/admissions/TransactionLogs';
 import AdmissionsAuditTrail from './components/pages/admin/admissions/AuditTrail';
 import AdmissionsSettings from './components/pages/admin/admissions/Settings';
@@ -45,8 +49,9 @@ import {
 function App() {
   return (
     <AuthProvider>
-      <Router future={{ v7_relativeSplatPath: true }}>
-        <Routes>
+      <SocketProvider>
+        <Router future={{ v7_relativeSplatPath: true }}>
+          <Routes>
           {/* Public Kiosk Routes - No Authentication Required */}
           <Route path="/" element={
             <KioskLayout>
@@ -90,6 +95,13 @@ function App() {
               </AdminLayout>
             </ProtectedRoute>
           } />
+          <Route path="/admin/mis/database-manager" element={
+            <ProtectedRoute requiredRoles={['super_admin']}>
+              <AdminLayout>
+                <DatabaseManager />
+              </AdminLayout>
+            </ProtectedRoute>
+          } />
           <Route path="/admin/mis/audit-trail" element={
             <ProtectedRoute requiredRoles={['super_admin']}>
               <AdminLayout>
@@ -121,26 +133,16 @@ function App() {
             </ProtectedRoute>
           } />
           <Route path="/admin/registrar/queue" element={
-            <Navigate to="/admin/registrar/queue/window-1" replace />
-          } />
-          <Route path="/admin/registrar/queue/window-1" element={
             <ProtectedRoute requiredRoles={['super_admin', 'registrar_admin']}>
               <AdminLayout>
-                <RegistrarQueue windowId={1} />
+                <RegistrarQueueRedirect />
               </AdminLayout>
             </ProtectedRoute>
           } />
-          <Route path="/admin/registrar/queue/window-2" element={
+          <Route path="/admin/registrar/queue/:windowId" element={
             <ProtectedRoute requiredRoles={['super_admin', 'registrar_admin']}>
               <AdminLayout>
-                <RegistrarQueue windowId={2} />
-              </AdminLayout>
-            </ProtectedRoute>
-          } />
-          <Route path="/admin/registrar/queue/window-3" element={
-            <ProtectedRoute requiredRoles={['super_admin', 'registrar_admin']}>
-              <AdminLayout>
-                <RegistrarQueue windowId={3} />
+                <RegistrarQueue />
               </AdminLayout>
             </ProtectedRoute>
           } />
@@ -175,6 +177,13 @@ function App() {
             </ProtectedRoute>
           } />
           <Route path="/admin/admissions/queue" element={
+            <ProtectedRoute requiredRoles={['super_admin', 'admissions_admin']}>
+              <AdminLayout>
+                <AdmissionsQueueRedirect />
+              </AdminLayout>
+            </ProtectedRoute>
+          } />
+          <Route path="/admin/admissions/queue/:windowId" element={
             <ProtectedRoute requiredRoles={['super_admin', 'admissions_admin']}>
               <AdminLayout>
                 <AdmissionsQueue />
@@ -221,8 +230,9 @@ function App() {
 
           {/* Unauthorized Access */}
           <Route path="/admin/unauthorized" element={<Unauthorized />} />
-        </Routes>
-      </Router>
+          </Routes>
+        </Router>
+      </SocketProvider>
     </AuthProvider>
   );
 }

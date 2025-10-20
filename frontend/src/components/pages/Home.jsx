@@ -1,53 +1,115 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { io } from 'socket.io-client';
 
 const Home = () => {
   const navigate = useNavigate();
   const [queueData, setQueueData] = useState({
-    registrar: { currentNumber: 0, nextNumber: 0, queue: [] },
-    admissions: { currentNumber: 0, nextNumber: 0, queue: [] }
+    registrar: { currentNumber: 0, nextNumber: 0, queue: [], windows: [] },
+    admissions: { currentNumber: 0, nextNumber: 0, queue: [], windows: [] }
   });
   const [loading, setLoading] = useState(true);
+  const [sectionLoading, setSectionLoading] = useState({
+    registrar: false,
+    admissions: false
+  });
+  const [socket, setSocket] = useState(null);
+  const [currentTime, setCurrentTime] = useState(new Date());
+
+  // Initialize Socket.io connection
+  useEffect(() => {
+    const newSocket = io('http://localhost:5000');
+    setSocket(newSocket);
+
+    // Join kiosk room for real-time updates
+    newSocket.emit('join-room', 'kiosk');
+
+    // Listen for real-time updates
+    newSocket.on('windows-updated', (data) => {
+      if (data.department === 'registrar' || data.department === 'admissions') {
+        fetchQueueData(data.department);
+      }
+    });
+
+    newSocket.on('queue-updated', (data) => {
+      if (data.department === 'registrar' || data.department === 'admissions') {
+        fetchQueueData(data.department);
+      }
+    });
+
+    newSocket.on('settings-updated', (data) => {
+      if (data.department === 'registrar' || data.department === 'admissions') {
+        fetchQueueData(data.department);
+      }
+    });
+
+    return () => {
+      newSocket.disconnect();
+    };
+  }, []);
 
   // Fetch queue data from API
-  useEffect(() => {
-    const fetchQueueData = async () => {
-      try {
-        const [registrarResponse, admissionsResponse] = await Promise.all([
-          fetch('http://localhost:3001/api/public/queue/registrar'),
-          fetch('http://localhost:3001/api/public/queue/admissions')
-        ]);
+  const fetchQueueData = async (specificDepartment = null) => {
+    const departments = specificDepartment ? [specificDepartment] : ['registrar', 'admissions'];
 
-        const registrarData = await registrarResponse.json();
-        const admissionsData = await admissionsResponse.json();
+    try {
+      for (const department of departments) {
+        // Show section loading for specific department updates
+        if (specificDepartment) {
+          setSectionLoading(prev => ({ ...prev, [department]: true }));
+        }
 
-        setQueueData({
-          registrar: {
-            currentNumber: registrarData.currentNumber || 0,
-            nextNumber: registrarData.queue?.[0]?.queueNumber || 0,
-            queue: registrarData.queue || []
-          },
-          admissions: {
-            currentNumber: admissionsData.currentNumber || 0,
-            nextNumber: admissionsData.queue?.[0]?.queueNumber || 0,
-            queue: admissionsData.queue || []
+        const response = await fetch(`http://localhost:5000/api/public/queue/${department}`);
+        const data = await response.json();
+
+        // Ensure windows is always an array
+        const windows = Array.isArray(data.windows) ? data.windows : [];
+
+        console.log(`${department} queue data:`, {
+          windowsCount: windows.length,
+          windows: windows,
+          isEnabled: data.isEnabled
+        });
+
+        setQueueData(prev => ({
+          ...prev,
+          [department]: {
+            currentNumber: data.currentNumber || 0,
+            nextNumber: data.nextNumber || 0,
+            queue: data.queue || [],
+            windows: windows,
+            isEnabled: data.isEnabled
           }
-        });
-      } catch (error) {
-        console.error('Error fetching queue data:', error);
-        // Use fallback data if API is not available
+        }));
+
+        // Hide section loading after a brief delay for smooth transition
+        if (specificDepartment) {
+          setTimeout(() => {
+            setSectionLoading(prev => ({ ...prev, [department]: false }));
+          }, 500);
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching queue data:', error);
+      // Use fallback data if API is not available
+      if (!specificDepartment) {
         setQueueData({
-          registrar: { currentNumber: 5, nextNumber: 6, queue: [] },
-          admissions: { currentNumber: 3, nextNumber: 4, queue: [] }
+          registrar: { currentNumber: 5, nextNumber: 6, queue: [], windows: [], isEnabled: true },
+          admissions: { currentNumber: 3, nextNumber: 4, queue: [], windows: [], isEnabled: true }
         });
-      } finally {
+      }
+    } finally {
+      if (!specificDepartment) {
         setLoading(false);
       }
-    };
+    }
+  };
 
+  // Initial data fetch
+  useEffect(() => {
     fetchQueueData();
     // Refresh queue data every 30 seconds
-    const interval = setInterval(fetchQueueData, 30000);
+    const interval = setInterval(() => fetchQueueData(), 30000);
     return () => clearInterval(interval);
   }, []);
 
@@ -58,6 +120,27 @@ const Home = () => {
     }, 1000);
     return () => clearInterval(clockInterval);
   }, []);
+
+  // Skeleton Loading Component - Fixed 4-row layout
+  const QueueSkeleton = () => (
+    <div className="animate-pulse">
+      {/* Window Grid Skeleton - Always 4 rows */}
+      <div className="grid grid-cols-2 gap-2 h-full">
+        {[...Array(4)].map((_, rowIndex) => (
+          <React.Fragment key={rowIndex}>
+            {/* Window Name Skeleton */}
+            <div className="bg-gray-200 rounded-lg border border-gray-300 flex items-center justify-center">
+              <div className="bg-gray-300 h-6 w-20 rounded"></div>
+            </div>
+            {/* Queue Number Skeleton */}
+            <div className="bg-gray-200 rounded-lg border border-gray-300 flex items-center justify-center">
+              <div className="bg-gray-300 h-8 w-12 rounded"></div>
+            </div>
+          </React.Fragment>
+        ))}
+      </div>
+    </div>
+  );
 
   // Enhanced Queue Display Component
   const EnhancedQueueDisplay = ({ department, title }) => {
@@ -90,52 +173,61 @@ const Home = () => {
         {/* Queue Grid Container */}
         <div className="flex-grow mx-4 mb-4">
           <div className="h-full p-2">
-            {/* Grid Layout: 4 rows with separate containers for window and queue numbers */}
-            <div className="flex flex-col gap-2 h-full">
-              {/* Row 1 */}
-              <div className="flex-1 flex gap-2">
-                <div className="flex items-center justify-center bg-gray-100 rounded-lg flex-1">
-                  <span className="text-2xl font-bold text-gray-800">1</span>
-                </div>
-                <div className="flex items-center justify-center bg-gray-100 rounded-lg flex-1">
-                  <span className="text-2xl font-bold" style={{ color: '#1F3463' }}>
-                    {loading ? '--' : String(data.currentNumber).padStart(2, '0')}
-                  </span>
+            {/* Show skeleton loading when section is updating */}
+            {sectionLoading[department] ? (
+              <QueueSkeleton />
+            ) : data?.isEnabled === false ? (
+              /* Office Closed Message */
+              <div className="h-full flex items-center justify-center">
+                <div className="text-center">
+                  <p className="text-xl font-bold text-gray-600 mb-2">Office Closed</p>
+                  <p className="text-sm text-gray-500">Please try again later</p>
                 </div>
               </div>
+            ) : (
+              /* Fixed 4-Row Grid Layout - Always shows exactly 4 rows */
+              <div className="grid grid-cols-2 gap-2 h-full">
+                {[...Array(4)].map((_, rowIndex) => {
+                  const window = data?.windows?.[rowIndex];
+                  const isRealWindow = window && window.name;
+                  const isWindowOpen = window?.isOpen !== false; // Default to true if not specified
 
-              {/* Row 2 */}
-              <div className="flex-1 flex gap-2">
-                <div className="flex items-center justify-center bg-gray-100 rounded-lg flex-1">
-                  <span className="text-2xl font-bold text-gray-800">2</span>
-                </div>
-                <div className="flex items-center justify-center bg-gray-100 rounded-lg flex-1">
-                  <span className="text-2xl font-bold text-gray-600">
-                    {loading ? '--' : String(data.nextNumber).padStart(2, '0')}
-                  </span>
-                </div>
+                  return (
+                    <React.Fragment key={rowIndex}>
+                      {/* Window Name */}
+                      <div className={`flex items-center justify-center rounded-lg border ${
+                        isRealWindow && isWindowOpen
+                          ? 'bg-white border-gray-400'
+                          : 'bg-gray-100 border-gray-300'
+                      }`}>
+                        <span className={`text-lg font-bold ${
+                          isRealWindow && isWindowOpen
+                            ? 'text-gray-900'
+                            : 'text-gray-500'
+                        }`}>
+                          {isRealWindow ? window.name : '--'}
+                        </span>
+                      </div>
+                      {/* Queue Number */}
+                      <div className={`flex items-center justify-center rounded-lg border ${
+                        isRealWindow && isWindowOpen
+                          ? 'bg-white border-gray-400'
+                          : 'bg-gray-100 border-gray-300'
+                      }`}>
+                        <span className="text-xl font-bold" style={{
+                          color: isRealWindow && isWindowOpen ? '#1F3463' : '#9CA3AF'
+                        }}>
+                          {loading ? '--' :
+                           isRealWindow && isWindowOpen ?
+                           String(window.currentQueueNumber || 0).padStart(2, '0') :
+                           '--'}
+                        </span>
+                      </div>
+                    </React.Fragment>
+                  );
+                })}
               </div>
-
-              {/* Row 3 */}
-              <div className="flex-1 flex gap-2">
-                <div className="flex items-center justify-center bg-gray-100 rounded-lg flex-1">
-                  <span className="text-2xl font-bold text-gray-800">3</span>
-                </div>
-                <div className="flex items-center justify-center bg-gray-100 rounded-lg flex-1">
-                  <span className="text-2xl font-bold text-gray-400">--</span>
-                </div>
-              </div>
-
-              {/* Row 4 */}
-              <div className="flex-1 flex gap-2">
-                <div className="flex items-center justify-center bg-gray-100 rounded-lg flex-1">
-                  <span className="text-xl font-bold text-gray-800">Priority</span>
-                </div>
-                <div className="flex items-center justify-center bg-gray-100 rounded-lg flex-1">
-                  <span className="text-2xl font-bold text-gray-400">--</span>
-                </div>
-              </div>
-            </div>
+            )}
           </div>
         </div>
       </div>

@@ -4,7 +4,6 @@ import { AiOutlineExclamationCircle } from "react-icons/ai";
 
 const IdleModal = ({ isOpen, countdown, onStayActive }) => {
   const navigate = useNavigate();
-  console.log('🎭 IdleModal render - isOpen:', isOpen, 'countdown:', countdown);
 
   if (!isOpen) return null;
 
@@ -36,10 +35,7 @@ const IdleModal = ({ isOpen, countdown, onStayActive }) => {
       <div className="relative flex justify-center gap-4 mt-6">
         {/* YES Button */}
         <button
-          onClick={() => {
-            console.log('✅ YES button clicked in IdleModal');
-            onStayActive();
-          }}
+          onClick={onStayActive}
           className="w-24 h-24 text-[#1F3463] font-bold text-xl border-2 border-white rounded-full shadow-lg active:shadow-md drop-shadow-lg active:drop-shadow-sm active:scale-95 transition-all duration-150 focus:outline-none focus:ring-4 focus:ring-blue-200 touch-target-lg"
           style={{ backgroundColor: '#FFE251' }}
           onTouchStart={(e) => e.target.style.backgroundColor = '#E6CB49'}
@@ -53,10 +49,7 @@ const IdleModal = ({ isOpen, countdown, onStayActive }) => {
 
         {/* HOME Button */}
         <button
-          onClick={() => {
-            console.log('🏠 HOME button clicked in IdleModal');
-            navigate('/');
-          }}
+          onClick={() => navigate('/')}
           className="w-24 h-24 text-white font-bold text-xl border-2 border-white rounded-full shadow-lg active:shadow-md drop-shadow-lg active:drop-shadow-sm active:scale-95 transition-all duration-150 focus:outline-none focus:ring-4 focus:ring-blue-200 touch-target-lg"
           style={{ backgroundColor: '#1F3463' }}
           onTouchStart={(e) => e.target.style.backgroundColor = '#1A2E56'}

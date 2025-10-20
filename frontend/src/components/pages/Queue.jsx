@@ -1,9 +1,11 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import KioskLayout from '../layouts/KioskLayout';
 import QueueLayout from '../layouts/QueueLayout';
 import { ResponsiveGrid } from '../ui';
 import { HiSparkles } from "react-icons/hi2";
 import HolographicKeyboard from '../ui/HolographicKeyboard';
+import { useSocket } from '../../contexts/SocketContext';
+import { useOptimizedFetch } from '../../hooks/useOptimizedFetch';
 
 
 
@@ -200,8 +202,24 @@ const Queue = () => {
   const [activeField, setActiveField] = useState('name');
   const [formStep, setFormStep] = useState(1); // 1: Personal Info, 2: Additional Info
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
+  const [officeStatus, setOfficeStatus] = useState({
+    registrar: { isEnabled: true, loading: false },
+    admissions: { isEnabled: true, loading: false }
+  });
+  const [availableServices, setAvailableServices] = useState({
+    registrar: [],
+    admissions: []
+  });
+  const [departmentLocations, setDepartmentLocations] = useState({
+    registrar: '',
+    admissions: ''
+  });
+
+  // Use centralized Socket context
+  const { joinRoom, subscribe } = useSocket();
   const [starRating, setStarRating] = useState(0);
   const [idNumber, setIdNumber] = useState('');
+  const [queueResult, setQueueResult] = useState(null);
   const [formData, setFormData] = useState({
     name: '',
     contactNumber: '',
@@ -209,15 +227,95 @@ const Queue = () => {
     address: ''
   });
 
-  // Keyboard handling functions
+  // Form validation errors
+  const [formErrors, setFormErrors] = useState({
+    name: '',
+    contactNumber: '',
+    email: '',
+    address: ''
+  });
+
+  // Validation functions
+  const validateName = (name) => {
+    if (!name.trim()) {
+      return 'Name is required';
+    }
+    if (name.trim().length < 2) {
+      return 'Name must be at least 2 characters';
+    }
+    return '';
+  };
+
+  const validateContactNumber = (contactNumber) => {
+    if (!contactNumber.trim()) {
+      return 'Contact number is required';
+    }
+    // Philippine phone number validation: +63XXXXXXXXXX or 0XXXXXXXXXX
+    const phoneRegex = /^(\+63|0)[0-9]{10}$/;
+    if (!phoneRegex.test(contactNumber.trim())) {
+      return 'Enter a valid Philippine phone number (e.g., +639123456789 or 09123456789)';
+    }
+    return '';
+  };
+
+  const validateEmail = (email) => {
+    if (!email.trim()) {
+      return 'Email is required';
+    }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email.trim())) {
+      return 'Enter a valid email address (e.g., user@example.com)';
+    }
+    return '';
+  };
+
+  const validateAddress = (address) => {
+    // Address is optional, so only validate if provided
+    if (address && address.length > 500) {
+      return 'Address must be less than 500 characters';
+    }
+    return '';
+  };
+  // Service options for the queue process - now dynamic
+  const [serviceOptions, setServiceOptions] = useState([]);
+
+  // TEMPORARY TESTING FEATURE: Physical keyboard input handlers
+  // TODO: Remove before production deployment - for development/testing only
+  const handlePhysicalInputChange = (fieldName, value) => {
+    if (fieldName === 'idNumber') {
+      setIdNumber(value);
+    } else {
+      setFormData(prev => {
+        const updatedData = { ...prev, [fieldName]: value };
+
+        // Clear error for this field when user starts typing
+        setFormErrors(prevErrors => ({
+          ...prevErrors,
+          [fieldName]: ''
+        }));
+
+        return updatedData;
+      });
+    }
+  };
+
+  // Keyboard handling functions (for virtual keyboard)
   const handleKeyPress = (key) => {
     if (activeField === 'idNumber') {
       setIdNumber(prev => prev + key);
     } else {
-      setFormData(prev => ({
-        ...prev,
-        [activeField]: prev[activeField] + key
-      }));
+      setFormData(prev => {
+        const newValue = prev[activeField] + key;
+        const updatedData = { ...prev, [activeField]: newValue };
+
+        // Clear error for this field when user starts typing
+        setFormErrors(prevErrors => ({
+          ...prevErrors,
+          [activeField]: ''
+        }));
+
+        return updatedData;
+      });
     }
   };
 
@@ -259,19 +357,138 @@ const Queue = () => {
     setShowKeyboard(false);
   };
 
+  // Optimized check office availability status with caching
+  const checkOfficeStatus = useCallback(async (department) => {
+    try {
+      setOfficeStatus(prev => ({ ...prev, [department]: { ...prev[department], loading: true } }));
+
+      const response = await fetch(`http://localhost:5000/api/public/office-status/${department}`);
+      const data = await response.json();
+
+      setOfficeStatus(prev => ({
+        ...prev,
+        [department]: { isEnabled: data.isEnabled, loading: false }
+      }));
+
+      return data.isEnabled;
+    } catch (error) {
+      console.error(`Error checking ${department} office status:`, error);
+      setOfficeStatus(prev => ({
+        ...prev,
+        [department]: { isEnabled: true, loading: false } // Default to enabled on error
+      }));
+      return true;
+    }
+  }, []);
+
+  // Optimized fetch available services with caching
+  const fetchAvailableServices = useCallback(async (department) => {
+    try {
+      const response = await fetch(`http://localhost:5000/api/public/services/${department}`);
+      const data = await response.json();
+
+      setAvailableServices(prev => ({
+        ...prev,
+        [department]: data.services || []
+      }));
+
+      return data.services || [];
+    } catch (error) {
+      console.error(`Error fetching ${department} services:`, error);
+      return [];
+    }
+  }, []);
+
+  // Fetch department location
+  const fetchDepartmentLocation = useCallback(async (department) => {
+    try {
+      const response = await fetch(`http://localhost:5000/api/settings/location/${department}`);
+      const data = await response.json();
+
+      setDepartmentLocations(prev => ({
+        ...prev,
+        [department]: data.location || ''
+      }));
+
+      return data.location || '';
+    } catch (error) {
+      console.error(`Error fetching ${department} location:`, error);
+      return '';
+    }
+  }, []);
+
+  // Initialize Socket.io connection and check office status
+  useEffect(() => {
+    // Join kiosk room for real-time updates
+    joinRoom('kiosk');
+
+    // Listen for real-time updates with cleanup
+    const unsubscribeSettings = subscribe('settings-updated', (data) => {
+      if (data.department === 'registrar' || data.department === 'admissions') {
+        checkOfficeStatus(data.department);
+        // Also fetch location if it's a location update
+        if (data.type === 'location-updated') {
+          fetchDepartmentLocation(data.department);
+        }
+      }
+    });
+
+    const unsubscribeServices = subscribe('services-updated', (data) => {
+      if (data.department === 'registrar' || data.department === 'admissions') {
+        fetchAvailableServices(data.department);
+      }
+    });
+
+    // Initial status check for both offices
+    checkOfficeStatus('registrar');
+    checkOfficeStatus('admissions');
+    fetchAvailableServices('registrar');
+    fetchAvailableServices('admissions');
+
+    // Fetch initial location data for both departments
+    fetchDepartmentLocation('registrar');
+    fetchDepartmentLocation('admissions');
+
+    return () => {
+      unsubscribeSettings();
+      unsubscribeServices();
+    };
+  }, [joinRoom, subscribe]);
+
   // Offices following Directory.jsx structure
   const offices = [
     { key: 'registrar', name: "Registrar's Office" },
     { key: 'admissions', name: 'Admissions Office' }
   ];
 
-  // Service options for the queue process
-  const serviceOptions = [
-    'Request a document',
-    'Enroll',
-    'Inquiry',
-    'Claim'
-  ];
+  // Update service options when available services change
+  useEffect(() => {
+    if (selectedDepartment) {
+      // Determine the department key from selectedDepartment
+      const departmentKey = selectedDepartment.name === "Registrar's Office" ? 'registrar' : 'admissions';
+
+      const departmentServices = availableServices[departmentKey];
+      if (departmentServices && Array.isArray(departmentServices)) {
+        const services = departmentServices
+          .filter(service => service && service.name)
+          .map(service => service.name);
+        setServiceOptions(services);
+      } else {
+        setServiceOptions([]);
+      }
+    }
+  }, [selectedDepartment, availableServices]);
+
+  // Auto-redirect from thank you step after 3 seconds
+  useEffect(() => {
+    if (currentStep === 'thankYou') {
+      const timer = setTimeout(() => {
+        resetAllData();
+      }, 3000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [currentStep]);
 
   // Role options
   const roleOptions = [
@@ -319,7 +536,15 @@ const Queue = () => {
     }
   };
 
-  const handleOfficeSelect = (officeKey) => {
+  const handleOfficeSelect = async (officeKey) => {
+    // Check if office is available
+    const isAvailable = await checkOfficeStatus(officeKey);
+
+    if (!isAvailable) {
+      // Office is closed, don't proceed
+      return;
+    }
+
     setSelectedDepartment(departmentData[officeKey]);
     setShowPrivacyModal(true);
     setCurrentStep('privacy');
@@ -366,24 +591,33 @@ const Queue = () => {
 
   // Service selection handlers
   const handleServiceSelect = (service) => {
+    console.log('🎯 Service selected:', service, 'Type:', typeof service);
     setSelectedService(service);
     // If "Enroll" is selected, go to student status check, otherwise go to role
     if (service === 'Enroll') {
+      console.log('➡️ Going to studentStatus step');
       setCurrentStep('studentStatus');
     } else {
+      console.log('➡️ Going to role step');
       setCurrentStep('role');
     }
   };
 
   // Student status selection handlers
-  const handleStudentStatusSelect = (status) => {
+  const handleStudentStatusSelect = async (status) => {
+    console.log('🎓 [FRONTEND] Student status selected:', status);
+    console.log('🎓 [FRONTEND] Current service:', selectedService);
+    console.log('🎓 [FRONTEND] Current department:', selectedDepartment?.name);
+
     setStudentStatus(status);
 
     // Check for office mismatch scenarios
     const currentOfficeKey = selectedDepartment?.name === "Registrar's Office" ? 'registrar' : 'admissions';
+    console.log('🏢 [FRONTEND] Current office key:', currentOfficeKey);
 
     // Scenario 1: Registrar's Office + Enroll + YES (new student) -> should use Admissions
     if (currentOfficeKey === 'registrar' && selectedService === 'Enroll' && status === 'yes') {
+      console.log('🔄 [FRONTEND] Office mismatch detected: Registrar + Enroll + YES -> suggesting Admissions');
       setSuggestedOffice({ key: 'admissions', name: 'Admissions Office' });
       setShowOfficeMismatchModal(true);
       return;
@@ -391,33 +625,37 @@ const Queue = () => {
 
     // Scenario 2: Admissions Office + Enroll + NO (not new student) -> should use Registrar's
     if (currentOfficeKey === 'admissions' && selectedService === 'Enroll' && status === 'no') {
+      console.log('🔄 [FRONTEND] Office mismatch detected: Admissions + Enroll + NO -> suggesting Registrar');
       setSuggestedOffice({ key: 'registrar', name: "Registrar's Office" });
       setShowOfficeMismatchModal(true);
       return;
     }
 
     // No mismatch - proceed normally
-    // For enrollment, jump directly to QR code result step
-    // Skip role selection, priority status, and form steps
-    setCurrentStep('result');
+    console.log('✅ [FRONTEND] No office mismatch - proceeding with Enroll service submission');
+    console.log('🎓 [FRONTEND] Enroll service: Auto-setting required fields and submitting to backend');
+
+    // For Enroll service, automatically set role to "Student" since enrollment is for students only
+    console.log('🎓 [FRONTEND] Auto-setting role to "Student" for Enroll service');
+    setSelectedRole('Student');
+
+    // Set priority status to "no" by default for Enroll service (can be changed if needed)
+    console.log('🎓 [FRONTEND] Auto-setting priority status to "no" for Enroll service');
+    setPriorityStatus('no');
+
+    // For Enroll service, submit to backend immediately with auto-populated data
+    // This ensures the queue entry is actually recorded in the database
+    console.log('🚀 [FRONTEND] Submitting Enroll service to backend...');
+
+    // Submit immediately with explicit values to avoid state timing issues
+    handleEnrollSubmission();
   };
 
   // Role selection handlers
   const handleRoleSelect = (role) => {
     setSelectedRole(role);
-    // Only Visitor role goes to priority status check, others skip to form
-    if (role === 'Visitor') {
-      setCurrentStep('priority');
-    } else {
-      // Student, Alumni, Teacher bypass priority check and go directly to form
-      setCurrentStep('formStep1');
-      setFormStep(1);
-      setShowForm(true);
-      setShowKeyboard(true);
-      setActiveField('name');
-      // Reset form data when starting new form
-      setFormData({ name: '', contactNumber: '', email: '', address: '' });
-    }
+    // IMPORTANT CHANGE: Priority status check now applies to ALL roles, not just Visitor
+    setCurrentStep('priority');
   };
 
   // Priority status handlers
@@ -430,7 +668,7 @@ const Queue = () => {
       setActiveField('idNumber');
       setIdNumber(''); // Reset ID number
     } else {
-      // If NO, go directly to form
+      // For all services, go to visitation form (enrollment service will have simplified form)
       setCurrentStep('formStep1');
       setFormStep(1);
       setShowForm(true);
@@ -444,6 +682,7 @@ const Queue = () => {
   // ID verification handlers
   const handleIdVerificationNext = () => {
     if (idNumber.trim()) {
+      // For all services, go to visitation form (enrollment service will have simplified form)
       setCurrentStep('formStep1');
       setFormStep(1);
       setShowForm(true);
@@ -462,12 +701,21 @@ const Queue = () => {
   // Form step navigation handlers
   const handleFormStep1Next = () => {
     // Validate Step 1 fields
-    if (!formData.name.trim() || !formData.contactNumber.trim()) {
-      return;
+    const nameError = validateName(formData.name);
+    const contactError = validateContactNumber(formData.contactNumber);
+
+    setFormErrors(prev => ({
+      ...prev,
+      name: nameError,
+      contactNumber: contactError
+    }));
+
+    // Only proceed if no errors
+    if (!nameError && !contactError) {
+      setFormStep(2);
+      setCurrentStep('formStep2');
+      setActiveField('email');
     }
-    setFormStep(2);
-    setCurrentStep('formStep2');
-    setActiveField('email');
   };
 
   const handleFormStep1Previous = () => {
@@ -489,10 +737,23 @@ const Queue = () => {
 
   const handleFormStep2Next = () => {
     // Validate Step 2 fields - email is required, address is optional
-    if (!formData.email.trim()) {
-      return;
+    const emailError = validateEmail(formData.email);
+    const addressError = validateAddress(formData.address);
+
+    setFormErrors(prev => ({
+      ...prev,
+      email: emailError,
+      address: addressError
+    }));
+
+    // Only proceed if no errors
+    if (!emailError && !addressError) {
+      // For enrollment service, skip address collection and go directly to confirmation
+      if (selectedService === 'Enroll') {
+        setFormData(prev => ({ ...prev, address: '' })); // Set address to empty for enrollment
+      }
+      setShowConfirmationModal(true);
     }
-    setShowConfirmationModal(true);
   };
 
   const handleFormStep2Previous = () => {
@@ -501,9 +762,10 @@ const Queue = () => {
     setActiveField('name');
   };
 
-  const handleConfirmationYes = () => {
+  const handleConfirmationYes = async () => {
     setShowConfirmationModal(false);
-    setCurrentStep('result');
+    // Call the API to submit the queue request
+    await handleFormSubmit();
   };
 
   // Print button handler - moves to feedback step
@@ -511,13 +773,38 @@ const Queue = () => {
     setCurrentStep('feedback');
   };
 
-  // Star rating handler
+  // Star rating handler - Only updates visual state
   const handleStarClick = (rating) => {
     setStarRating(rating);
-    // Auto-advance to thank you step after rating
-    setTimeout(() => {
-      setCurrentStep('thankYou');
-    }, 500);
+  };
+
+  // Submit rating handler - Handles actual submission
+  const handleSubmitRating = async () => {
+    if (starRating === 0) return;
+
+    // Submit rating to backend if we have a queue ID
+    if (queueResult?.queueId) {
+      try {
+        const response = await fetch(`http://localhost:5000/api/public/queue/${queueResult.queueId}/rating`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ rating: starRating })
+        });
+
+        if (response.ok) {
+          console.log('Rating submitted successfully');
+        } else {
+          console.error('Failed to submit rating');
+        }
+      } catch (error) {
+        console.error('Error submitting rating:', error);
+      }
+    }
+
+    // Advance to thank you step after successful submission
+    setCurrentStep('thankYou');
   };
 
   const handleConfirmationNo = () => {
@@ -525,25 +812,189 @@ const Queue = () => {
     // Stay on Step 2
   };
 
-  const handleFormSubmit = () => {
-    // This is now used for the final result submission
-    // In a real application, this would submit to the backend
-    const submissionData = {
-      department: selectedDepartment.name,
-      service: selectedService,
-      role: selectedRole,
-      priorityStatus: priorityStatus,
-      name: formData.name,
-      contactNumber: formData.contactNumber,
-      email: formData.email,
-      address: formData.address,
-      timestamp: new Date().toISOString()
-    };
+  // Special handler for Enroll service submission with explicit values
+  const handleEnrollSubmission = async () => {
+    try {
+      console.log('🎓 [FRONTEND] Starting handleEnrollSubmission');
 
-    console.log('Queue request submitted:', submissionData);
+      // Map frontend studentStatus values to backend enum values
+      const mapStudentStatus = (status) => {
+        console.log('🔄 [FRONTEND] Mapping studentStatus:', status);
+        if (status === 'yes') {
+          console.log('🔄 [FRONTEND] Mapped "yes" to "incoming_new"');
+          return 'incoming_new';
+        }
+        if (status === 'no') {
+          console.log('🔄 [FRONTEND] Mapped "no" to "continuing"');
+          return 'continuing';
+        }
+        console.log('🔄 [FRONTEND] Returning status as-is:', status);
+        return status; // Return as-is if already in correct format
+      };
 
-    // Reset all form and state data
+      // Prepare submission data with explicit values for Enroll service
+      const submissionData = {
+        department: selectedDepartment.name === "Registrar's Office" ? 'registrar' : 'admissions',
+        service: 'Enroll',
+        role: 'Student', // Always Student for Enroll service
+        studentStatus: studentStatus ? mapStudentStatus(studentStatus) : 'continuing',
+        isPriority: false, // Always false for Enroll service
+        idNumber: '',
+        // Empty form data for Enroll service (no visitation form required)
+        customerName: '',
+        contactNumber: '',
+        email: '',
+        address: ''
+      };
+
+      console.log('📤 [FRONTEND] Enroll submission payload:', JSON.stringify(submissionData, null, 2));
+
+      // Submit to backend API
+      console.log('🌐 [FRONTEND] Making API request to:', 'http://localhost:5000/api/public/queue');
+      const response = await fetch('http://localhost:5000/api/public/queue', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(submissionData)
+      });
+
+      console.log('📡 [FRONTEND] API Response status:', response.status, response.statusText);
+
+      const result = await response.json();
+      console.log('📥 [FRONTEND] API Response body:', JSON.stringify(result, null, 2));
+
+      if (response.ok && result.success) {
+        console.log('✅ [FRONTEND] Enroll submission successful!');
+        console.log('✅ [FRONTEND] Queue ID received:', result.data?.queueId);
+        console.log('✅ [FRONTEND] Queue Number received:', result.data?.queueNumber);
+
+        // Store queue data for result display and rating submission
+        setQueueResult({
+          queueId: result.data.queueId,
+          queueNumber: result.data.queueNumber,
+          department: result.data.department,
+          service: result.data.service,
+          qrCode: result.data.qrCode,
+          estimatedWaitTime: result.data.estimatedWaitTime,
+          windowName: result.data.windowName
+        });
+
+        console.log('✅ [FRONTEND] Moving to result step');
+        // Move to result step
+        setCurrentStep('result');
+      } else {
+        console.error('❌ [FRONTEND] Enroll submission failed!');
+        console.error('❌ [FRONTEND] Error details:', result);
+        console.error('❌ [FRONTEND] Response status:', response.status);
+        alert(`Failed to submit queue request: ${result.error || 'Unknown error'}`);
+      }
+    } catch (error) {
+      console.error('💥 [FRONTEND] Enroll submission error:', error);
+      console.error('💥 [FRONTEND] Error stack:', error.stack);
+      alert('Network error. Please check your connection and try again.');
+    }
+  };
+
+  const handleFormSubmit = async () => {
+    try {
+      console.log('🚀 [FRONTEND] Starting handleFormSubmit for service:', selectedService);
+      console.log('🚀 [FRONTEND] Current state values:', {
+        selectedDepartment: selectedDepartment?.name,
+        selectedService,
+        selectedRole,
+        studentStatus,
+        priorityStatus,
+        idNumber,
+        formData
+      });
+
+      // Map frontend studentStatus values to backend enum values
+      const mapStudentStatus = (status) => {
+        console.log('🔄 [FRONTEND] Mapping studentStatus:', status);
+        if (status === 'yes') {
+          console.log('🔄 [FRONTEND] Mapped "yes" to "incoming_new"');
+          return 'incoming_new';
+        }
+        if (status === 'no') {
+          console.log('🔄 [FRONTEND] Mapped "no" to "continuing"');
+          return 'continuing';
+        }
+        console.log('🔄 [FRONTEND] Returning status as-is:', status);
+        return status; // Return as-is if already in correct format
+      };
+
+      // Prepare submission data
+      const submissionData = {
+        department: selectedDepartment.name === "Registrar's Office" ? 'registrar' : 'admissions',
+        service: selectedService,
+        role: selectedRole,
+        studentStatus: selectedService === 'Enroll' && studentStatus ? mapStudentStatus(studentStatus) : undefined,
+        isPriority: priorityStatus === 'yes',
+        idNumber: priorityStatus === 'yes' ? idNumber : '',
+        // For enrollment service, form data is still required but collected differently
+        customerName: formData.name || '',
+        contactNumber: formData.contactNumber || '',
+        email: formData.email || '',
+        address: formData.address || ''
+      };
+
+      console.log('📤 [FRONTEND] Final submission payload:', JSON.stringify(submissionData, null, 2));
+      console.log('📤 [FRONTEND] Payload size:', JSON.stringify(submissionData).length, 'characters');
+
+      // Submit to backend API
+      console.log('🌐 [FRONTEND] Making API request to:', 'http://localhost:5000/api/public/queue');
+      const response = await fetch('http://localhost:5000/api/public/queue', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(submissionData)
+      });
+
+      console.log('📡 [FRONTEND] API Response status:', response.status, response.statusText);
+      console.log('📡 [FRONTEND] API Response headers:', Object.fromEntries(response.headers.entries()));
+
+      const result = await response.json();
+      console.log('📥 [FRONTEND] API Response body:', JSON.stringify(result, null, 2));
+
+      if (response.ok && result.success) {
+        console.log('✅ [FRONTEND] Queue submission successful!');
+        console.log('✅ [FRONTEND] Queue ID received:', result.data?.queueId);
+        console.log('✅ [FRONTEND] Queue Number received:', result.data?.queueNumber);
+
+        // Store queue data for result display and rating submission
+        setQueueResult({
+          queueId: result.data.queueId, // Store queue ID for rating submission
+          queueNumber: result.data.queueNumber,
+          department: result.data.department,
+          service: result.data.service,
+          qrCode: result.data.qrCode,
+          estimatedWaitTime: result.data.estimatedWaitTime,
+          windowName: result.data.windowName
+        });
+
+        console.log('✅ [FRONTEND] Moving to result step');
+        // Move to result step
+        setCurrentStep('result');
+      } else {
+        console.error('❌ [FRONTEND] Queue submission failed!');
+        console.error('❌ [FRONTEND] Error details:', result);
+        console.error('❌ [FRONTEND] Response status:', response.status);
+        // Handle error - could show error modal
+        alert(`Failed to submit queue request: ${result.error || 'Unknown error'}`);
+      }
+    } catch (error) {
+      console.error('💥 [FRONTEND] Network/Exception error:', error);
+      console.error('💥 [FRONTEND] Error stack:', error.stack);
+      alert('Network error. Please check your connection and try again.');
+    }
+  };
+
+  // Reset all form and state data
+  const resetAllData = () => {
     setFormData({ name: '', contactNumber: '', email: '', address: '' });
+    setFormErrors({ name: '', contactNumber: '', email: '', address: '' }); // Clear all errors
     setShowForm(false);
     setSelectedService(null);
     setStudentStatus(null);
@@ -558,6 +1009,8 @@ const Queue = () => {
     setFormStep(1);
     setShowConfirmationModal(false);
     setStarRating(0);
+    setIdNumber('');
+    setQueueResult(null);
   };
 
   const handleFieldFocus = (fieldName) => {
@@ -567,19 +1020,23 @@ const Queue = () => {
   };
 
   // Office mismatch modal handlers
-  const handleOfficeMismatchConfirm = () => {
+  const handleOfficeMismatchConfirm = async () => {
     if (suggestedOffice) {
       // Switch to the suggested office and proceed directly to result
       setSelectedDepartment(departmentData[suggestedOffice.key]);
       setShowOfficeMismatchModal(false);
       setSuggestedOffice(null);
-      // Skip service selection and student status check - go directly to QR result
-      // Keep selectedService as "Enroll" and preserve studentStatus
-      setCurrentStep('result');
-      // Reset only the steps that come after result
-      setSelectedRole(null);
-      setPriorityStatus(null);
-      setShowForm(false);
+
+      // For Enroll service, set required fields and submit to backend
+      console.log('🔄 [FRONTEND] Office mismatch resolved - setting Enroll service defaults and submitting');
+      setSelectedRole('Student'); // Enroll is always for students
+      setPriorityStatus('no'); // Default priority status
+
+      // Submit to backend to ensure queue entry is recorded in database
+      console.log('🚀 [FRONTEND] Submitting Enroll service after office switch...');
+
+      // Submit immediately with explicit values to avoid state timing issues
+      handleEnrollSubmission();
     }
   };
 
@@ -594,12 +1051,98 @@ const Queue = () => {
 
 
 
+  // Handle back navigation - goes back one step in the process
+  const handleBackNavigation = () => {
+    switch (currentStep) {
+      case 'department':
+        // Already at the start, do nothing or navigate to home
+        break;
+
+      case 'privacy':
+        // Go back to department selection
+        handlePrivacyPrevious();
+        break;
+
+      case 'service':
+        // Go back to privacy modal
+        setCurrentStep('privacy');
+        setShowPrivacyModal(true);
+        setSelectedService(null);
+        break;
+
+      case 'studentStatus':
+        // Go back to service selection
+        setCurrentStep('service');
+        setStudentStatus(null);
+        break;
+
+      case 'role':
+        // Go back to service selection (or studentStatus if came from enrollment flow)
+        if (selectedService === 'Enroll') {
+          setCurrentStep('studentStatus');
+        } else {
+          setCurrentStep('service');
+        }
+        setSelectedRole(null);
+        break;
+
+      case 'priority':
+        // Go back to role selection
+        setCurrentStep('role');
+        setPriorityStatus(null);
+        break;
+
+      case 'idVerification':
+        // Go back to priority status
+        handleIdVerificationPrevious();
+        break;
+
+      case 'formStep1':
+        // Go back based on previous flow
+        handleFormStep1Previous();
+        break;
+
+      case 'formStep2':
+        // Go back to form step 1
+        handleFormStep2Previous();
+        break;
+
+      case 'result':
+        // Go back to form step 2 (or enrollment flow if applicable)
+        if (selectedService === 'Enroll') {
+          // For enrollment, go back to student status
+          setCurrentStep('studentStatus');
+        } else {
+          // For regular flow, go back to form step 2
+          setCurrentStep('formStep2');
+          setFormStep(2);
+          setShowForm(true);
+        }
+        break;
+
+      case 'feedback':
+        // Go back to result
+        setCurrentStep('result');
+        break;
+
+      case 'thankYou':
+        // Go back to feedback
+        setCurrentStep('feedback');
+        break;
+
+      default:
+        // Fallback to department selection
+        handleBackToOffices();
+        break;
+    }
+  };
+
   // Back Button Component
   const BackButton = () => (
     <button
-      onClick={handleBackToOffices}
+      onClick={handleBackNavigation}
       className="fixed bottom-6 left-6 w-20 h-20 bg-[#FFE251] text-black border-2 border-white rounded-full shadow-lg transition-all duration-200 flex items-center justify-center z-50 focus:outline-none focus:ring-4 focus:ring-blue-200"
-      aria-label="Go back to office selection"
+      aria-label="Go back one step"
     >
       BACK
     </button>
@@ -643,7 +1186,8 @@ const Queue = () => {
                       type="text"
                       value={idNumber}
                       onFocus={() => handleFieldFocus('idNumber')}
-                      readOnly
+                      onChange={(e) => handlePhysicalInputChange('idNumber', e.target.value)}
+                      // TEMPORARY: readOnly removed for testing - restore for production
                       className={`w-full px-3 py-3 border-2 rounded-lg text-xl focus:outline-none ${
                         activeField === 'idNumber'
                           ? 'border-blue-500 bg-blue-50'
@@ -655,29 +1199,7 @@ const Queue = () => {
                 </div>
               </div>
 
-              {/* Buttons positioned to the right of form - Fixed positioning */}
-              <div className="absolute left-[calc(50%+250px+1rem)] top-1/2 transform -translate-y-1/2 flex flex-col space-y-4">
-                {/* Next Button */}
-                <button
-                  onClick={handleIdVerificationNext}
-                  disabled={!idNumber.trim()}
-                  className={`w-24 h-24 rounded-full border-2 border-white font-bold text-sm transition-all duration-150 shadow-lg ${
-                    idNumber.trim()
-                      ? 'bg-[#1F3463] text-white active:bg-[#1A2E56] active:shadow-md active:scale-95'
-                      : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                  }`}
-                >
-                  NEXT
-                </button>
-
-                {/* Previous Button */}
-                <button
-                  onClick={handleIdVerificationPrevious}
-                  className="w-24 h-24 rounded-full border-2 border-white bg-[#1F3463] text-white font-bold text-sm active:bg-[#1A2E56] transition-all duration-150 shadow-lg active:shadow-md active:scale-95"
-                >
-                  PREVIOUS
-                </button>
-              </div>
+              {/* Navigation buttons are now handled within the HolographicKeyboard overlay */}
             </div>
           </div>
 
@@ -696,6 +1218,22 @@ const Queue = () => {
           activeInputValue={idNumber}
           activeInputLabel="ID NUMBER *"
           activeInputPlaceholder="Enter your ID number"
+          // Navigation buttons for ID verification step
+          showNavigationButtons={true}
+          navigationButtons={[
+            {
+              label: 'NEXT',
+              onClick: handleIdVerificationNext,
+              disabled: !idNumber.trim(),
+              variant: 'next'
+            },
+            {
+              label: 'PREVIOUS',
+              onClick: handleIdVerificationPrevious,
+              disabled: false,
+              variant: 'previous'
+            }
+          ]}
         />
       </>
     );
@@ -728,14 +1266,22 @@ const Queue = () => {
                       type="text"
                       value={formData.name}
                       onFocus={() => handleFieldFocus('name')}
-                      readOnly
+                      onChange={(e) => handlePhysicalInputChange('name', e.target.value)}
+                      // TEMPORARY: readOnly removed for testing - restore for production
                       className={`w-full px-3 py-3 border-2 rounded-lg text-xl focus:outline-none ${
                         activeField === 'name'
                           ? 'border-blue-500 bg-blue-50'
+                          : formErrors.name
+                          ? 'border-red-500 bg-red-50'
                           : 'border-gray-300 bg-gray-50'
                       }`}
                       placeholder="Enter your full name"
                     />
+                    {formErrors.name && (
+                      <p className="mt-1 text-sm text-red-600 font-medium">
+                        {formErrors.name}
+                      </p>
+                    )}
                   </div>
 
                   {/* Contact Number Field */}
@@ -748,41 +1294,27 @@ const Queue = () => {
                       type="text"
                       value={formData.contactNumber}
                       onFocus={() => handleFieldFocus('contactNumber')}
-                      readOnly
+                      onChange={(e) => handlePhysicalInputChange('contactNumber', e.target.value)}
+                      // TEMPORARY: readOnly removed for testing - restore for production
                       className={`w-full px-3 py-3 border-2 rounded-lg text-xl focus:outline-none ${
                         activeField === 'contactNumber'
                           ? 'border-blue-500 bg-blue-50'
+                          : formErrors.contactNumber
+                          ? 'border-red-500 bg-red-50'
                           : 'border-gray-300 bg-gray-50'
                       }`}
-                      placeholder="Enter your contact number"
+                      placeholder="e.g., +639123456789 or 09123456789"
                     />
+                    {formErrors.contactNumber && (
+                      <p className="mt-1 text-sm text-red-600 font-medium">
+                        {formErrors.contactNumber}
+                      </p>
+                    )}
                   </div>
                 </div>
               </div>
 
-              {/* Buttons positioned to the right of form - Fixed positioning */}
-              <div className="absolute left-[calc(50%+250px+1rem)] top-1/2 transform -translate-y-1/2 flex flex-col space-y-4">
-                {/* Next Button */}
-                <button
-                  onClick={handleFormStep1Next}
-                  disabled={!isFormStep1Valid}
-                  className={`w-24 h-24 rounded-full border-2 border-white font-bold text-sm transition-all duration-150 shadow-lg ${
-                    isFormStep1Valid
-                      ? 'bg-[#1F3463] text-white active:bg-[#1A2E56] active:shadow-md active:scale-95'
-                      : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                  }`}
-                >
-                  NEXT
-                </button>
-
-                {/* Previous Button */}
-                <button
-                  onClick={handleFormStep1Previous}
-                  className="w-24 h-24 rounded-full border-2 border-white bg-[#1F3463] text-white font-bold text-sm active:bg-[#1A2E56] transition-all duration-150 shadow-lg active:shadow-md active:scale-95"
-                >
-                  PREVIOUS
-                </button>
-              </div>
+              {/* Navigation buttons are now handled within the HolographicKeyboard overlay */}
             </div>
           </div>
 
@@ -815,6 +1347,24 @@ const Queue = () => {
           ]}
           activeFieldName={activeField}
           onFieldFocus={handleFieldFocus}
+          // Validation errors for overlay display
+          formErrors={formErrors}
+          // Navigation buttons for form step 1
+          showNavigationButtons={true}
+          navigationButtons={[
+            {
+              label: 'NEXT',
+              onClick: handleFormStep1Next,
+              disabled: !isFormStep1Valid,
+              variant: 'next'
+            },
+            {
+              label: 'PREVIOUS',
+              onClick: handleFormStep1Previous,
+              disabled: false,
+              variant: 'previous'
+            }
+          ]}
         />
       </>
     );
@@ -849,14 +1399,22 @@ const Queue = () => {
                       type="email"
                       value={formData.email}
                       onFocus={() => handleFieldFocus('email')}
-                      readOnly
+                      onChange={(e) => handlePhysicalInputChange('email', e.target.value)}
+                      // TEMPORARY: readOnly removed for testing - restore for production
                       className={`w-full px-3 py-3 border-2 rounded-lg text-xl focus:outline-none ${
                         activeField === 'email'
                           ? 'border-blue-500 bg-blue-50'
+                          : formErrors.email
+                          ? 'border-red-500 bg-red-50'
                           : 'border-gray-300 bg-gray-50'
                       }`}
-                      placeholder="Enter your email address"
+                      placeholder="e.g., user@example.com"
                     />
+                    {formErrors.email && (
+                      <p className="mt-1 text-sm text-red-600 font-medium">
+                        {formErrors.email}
+                      </p>
+                    )}
                   </div>
 
                   {/* Address Field */}
@@ -872,41 +1430,27 @@ const Queue = () => {
                       type="text"
                       value={formData.address}
                       onFocus={() => handleFieldFocus('address')}
-                      readOnly
+                      onChange={(e) => handlePhysicalInputChange('address', e.target.value)}
+                      // TEMPORARY: readOnly removed for testing - restore for production
                       className={`w-full px-3 py-3 border-2 rounded-lg text-xl focus:outline-none ${
                         activeField === 'address'
                           ? 'border-blue-500 bg-blue-50'
+                          : formErrors.address
+                          ? 'border-red-500 bg-red-50'
                           : 'border-gray-300 bg-gray-50'
                       }`}
-                      placeholder="Enter your address"
+                      placeholder="Enter your address (optional)"
                     />
+                    {formErrors.address && (
+                      <p className="mt-1 text-sm text-red-600 font-medium">
+                        {formErrors.address}
+                      </p>
+                    )}
                   </div>
                 </div>
               </div>
 
-              {/* Buttons positioned to the right of form - Fixed positioning */}
-              <div className="absolute left-[calc(50%+250px+1rem)] top-1/2 transform -translate-y-1/2 flex flex-col space-y-4">
-                {/* Next Button */}
-                <button
-                  onClick={handleFormStep2Next}
-                  disabled={!isFormStep2Valid}
-                  className={`w-24 h-24 rounded-full border-2 border-white font-bold text-sm transition-all duration-150 shadow-lg ${
-                    isFormStep2Valid
-                      ? 'bg-[#1F3463] text-white active:bg-[#1A2E56] active:shadow-md active:scale-95'
-                      : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                  }`}
-                >
-                  NEXT
-                </button>
-
-                {/* Previous Button */}
-                <button
-                  onClick={handleFormStep2Previous}
-                  className="w-24 h-24 rounded-full border-2 border-white bg-[#1F3463] text-white font-bold text-sm active:bg-[#1A2E56] transition-all duration-150 shadow-lg active:shadow-md active:scale-95"
-                >
-                  PREVIOUS
-                </button>
-              </div>
+              {/* Navigation buttons are now handled within the HolographicKeyboard overlay */}
             </div>
           </div>
 
@@ -939,6 +1483,24 @@ const Queue = () => {
           ]}
           activeFieldName={activeField}
           onFieldFocus={handleFieldFocus}
+          // Validation errors for overlay display
+          formErrors={formErrors}
+          // Navigation buttons for form step 2
+          showNavigationButtons={true}
+          navigationButtons={[
+            {
+              label: 'NEXT',
+              onClick: handleFormStep2Next,
+              disabled: !isFormStep2Valid,
+              variant: 'next'
+            },
+            {
+              label: 'PREVIOUS',
+              onClick: handleFormStep2Previous,
+              disabled: false,
+              variant: 'previous'
+            }
+          ]}
         />
 
         {/* Confirmation Modal */}
@@ -953,14 +1515,9 @@ const Queue = () => {
 
   // Queue Result Layout
   if (currentStep === 'result') {
-    // Generate dummy queue data
-    const queueNumber = Math.floor(Math.random() * 99) + 1;
-    const windowNumber = Math.floor(Math.random() * 3) + 1;
-    const queueNumbers = [
-      { number: queueNumber - 1 > 0 ? queueNumber - 1 : 99, isActive: false },
-      { number: queueNumber, isActive: true },
-      { number: queueNumber + 1 <= 99 ? queueNumber + 1 : 1, isActive: false }
-    ];
+    // Use actual queue data from submission
+    const queueNumber = queueResult?.queueNumber || 1;
+    const windowName = queueResult?.windowName || 'Window 1'; // Use actual window name from backend
 
     // Format current date for validity notice
     const formatCurrentDate = () => {
@@ -1014,10 +1571,23 @@ const Queue = () => {
                 Queue Number
               </h3>
 
+              {/* Location Text */}
+              <div className="mb-6 text-center">
+                <span className="text-xl text-gray-700">Location:<br /></span>
+                <span className="text-4xl text-gray-700">
+                  {(() => {
+                    if (!selectedDepartment) return 'Location not set';
+                    const departmentKey = selectedDepartment.name === "Registrar's Office" ? 'registrar' : 'admissions';
+                    return departmentLocations[departmentKey] || 'Location not set';
+                  })()}
+                </span>
+              </div>
+
+
               {/* Instruction Text */}
               <div className="mb-6 text-center">
                 <span className="text-xl text-gray-700">Please Proceed to <br /></span>
-                <span className="text-4xl text-gray-700">Window {windowNumber}</span>
+                <span className="text-4xl text-gray-700">{windowName}</span>
               </div>
 
               {/* Validity Notice */}
@@ -1074,7 +1644,7 @@ const Queue = () => {
                 {[1, 2, 3, 4, 5].map((star) => (
                   <button
                     key={star}
-                    onClick={() => setStarRating(star)}
+                    onClick={() => handleStarClick(star)}
                     className="text-6xl transition-all duration-150 active:scale-95 focus:outline-none focus:ring-4 focus:ring-yellow-200 rounded-lg p-2"
                     aria-label={`Rate ${star} star${star > 1 ? 's' : ''}`}
                   >
@@ -1098,7 +1668,7 @@ const Queue = () => {
           {/* Submit Button - Positioned outside and below the star rating container */}
           <div className="flex justify-center">
             <button
-              onClick={() => setCurrentStep('thankYou')}
+              onClick={handleSubmitRating}
               disabled={starRating === 0}
               className={`px-8 py-4 rounded-full font-bold text-xl transition-all duration-150 shadow-lg ${
                 starRating > 0
@@ -1160,29 +1730,62 @@ const Queue = () => {
                 </p>
               </div>
 
-              {/* Responsive Grid Container - Fixed positioning below header */}
-              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 mt-8">
-                <ResponsiveGrid
-                  items={offices}
-                  onItemClick={(office) => handleOfficeSelect(office.key)}
-                  renderItem={(office) => (
-                    <div className="text-center flex flex-col items-center">
-                      {/* Office Image */}
-                      <div className="mb-4">
-                        <img
-                          src={`/queue/${office.key}.png`}
-                          alt={`${office.name} Icon`}
-                          className="w-34 h-34 object-contain rounded-xl"
-                        />
-                      </div>
-                      {/* Office Name */}
-                      <h3 className="text-2xl font-semibold text-white">
-                        {office.name}
-                      </h3>
-                    </div>
-                  )}
-                  showPagination={offices.length > 6}
-                />
+              {/* Office Grid Container - Fixed positioning below header */}
+              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 mt-14">
+                <div className="grid grid-cols-2 gap-x-32 gap-y-8 max-w-4xl mx-auto">
+                  {offices.filter(office => office && office.key).map((office) => {
+                    const status = officeStatus[office.key] || { isEnabled: false, loading: false };
+                    const isDisabled = !status.isEnabled;
+                    const isLoading = status.loading;
+
+                    return (
+                      <button
+                        key={office.key}
+                        onClick={() => !isDisabled && handleOfficeSelect(office.key)}
+                        disabled={isDisabled || isLoading}
+                        className={`w-80 text-white rounded-3xl shadow-lg drop-shadow-md p-6 transition-all duration-200 border-2 border-transparent focus:outline-none focus:ring-4 focus:ring-blue-200 relative ${
+                          isDisabled
+                            ? 'opacity-90 cursor-not-allowed bg-gray-500'
+                            : isLoading
+                            ? 'opacity-75 cursor-wait'
+                            : 'active:shadow-md active:scale-95 hover:opacity-90'
+                        }`}
+                        style={{
+                          backgroundColor: isDisabled ? '#6B7280' : '#1F3463'
+                        }}
+                      >
+                        <div className="text-center flex flex-col items-center">
+                          {/* Office Image */}
+                          <div className="mb-4">
+                            <img
+                              src={`/queue/${office.key}.png`}
+                              alt={`${office.name} Icon`}
+                              className={`w-34 h-34 object-contain rounded-xl ${isDisabled ? 'grayscale' : ''}`}
+                            />
+                          </div>
+                          {/* Office Name */}
+                          <h3 className="text-2xl font-semibold text-white">
+                            {office.name}
+                          </h3>
+                          {/* Status Badge */}
+                          {isLoading ? (
+                            <div className="mt-2 px-3 py-1 bg-yellow-500 text-white text-sm rounded-full">
+                              Checking...
+                            </div>
+                          ) : isDisabled ? (
+                            <div className="mt-2 px-3 py-1 bg-red-500 text-white text-sm rounded-full">
+                              Closed
+                            </div>
+                          ) : (
+                            <div className="mt-2 px-3 py-1 bg-green-500 text-white text-sm rounded-full">
+                              Open
+                            </div>
+                          )}
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
             </div>
           </div>
@@ -1212,11 +1815,11 @@ const Queue = () => {
                 <div className="pt-4">
                   {/* 2 Office Grid - Disabled state */}
                   <div className="grid grid-cols-2 gap-x-32 gap-y-8 max-w-4xl mx-auto">
-                  {offices.map((office) => (
+                  {offices.filter(office => office && office.key).map((office) => (
                     <button
                       key={office.key}
                       disabled
-                      className="w-80 text-white rounded-3xl shadow-lg drop-shadow-md p-6 opacity-50 cursor-not-allowed border-2 border-transparent"
+                      className="w-80 text-white rounded-3xl shadow-lg drop-shadow-md p-6 opacity-60 cursor-not-allowed border-2 border-transparent"
                       style={{ backgroundColor: '#1F3463' }}
                     >
                       <div className="text-center flex flex-col items-center">
@@ -1259,37 +1862,39 @@ const Queue = () => {
     return (
       <QueueLayout>
         <div className="h-full flex flex-col">
-          <div className="flex-1 flex items-center justify-center">
-            {/* Centered Header-Grid Unit with Fixed Positioning */}
-            <div className="flex flex-col items-center w-full relative">
-              {/* Fixed Header - Absolute positioning to prevent movement */}
-              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 -mt-32">
-                <h2 className="text-5xl font-semibold text-center drop-shadow-lg whitespace-nowrap mb-6" style={{ color: '#1F3463' }}>
+          {/* Service Selection Grid */}
+          <div className="flex-grow flex items-center justify-center h-full">
+            {/* Centered Header-Grid Unit with Flexible Positioning */}
+            <div className="flex flex-col items-center justify-center w-full px-20 h-full">
+              {/* Header - Positioned above grid with proper spacing */}
+              <div className="mb-8">
+                <h2 className="text-5xl font-semibold text-center drop-shadow-lg whitespace-nowrap" style={{ color: '#1F3463' }}>
                   WHAT WOULD YOU LIKE TO DO?
                 </h2>
               </div>
 
-              {/* Responsive Grid Container - Fixed positioning below header */}
-              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 mt-8">
+              {/* Responsive Grid Container - Natural flow positioning */}
+              <div className="flex-shrink-0">
                 <ResponsiveGrid
-                items={serviceOptions}
-                onItemClick={(service) => handleServiceSelect(service)}
-                renderItem={(service) => (
-                  <div className="text-center">
-                  <h3 className="text-2xl font-semibold text-white">
-                    {service}
-                  </h3>
-                </div>
-              )}
-              showPagination={serviceOptions.length > 6}
-            />
+                  items={serviceOptions}
+                  onItemClick={(service) => handleServiceSelect(service)}
+                  renderItem={(service) => (
+                    <div className="text-center">
+                      <h3 className="text-2xl font-semibold text-white">
+                        {service}
+                      </h3>
+                    </div>
+                  )}
+                  showPagination={serviceOptions.length > 6}
+                  isDirectoryPage={true}
+                />
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <BackButton />
-    </QueueLayout>
+        <BackButton />
+      </QueueLayout>
     );
   }
 
@@ -1303,37 +1908,32 @@ const Queue = () => {
     return (
       <>
         <QueueLayout>
-          <div className="h-full flex flex-col">
-            <div className="flex-1 flex items-center justify-center">
-              {/* Centered Header-Grid Unit with Fixed Positioning */}
-              <div className="flex flex-col items-center w-full relative">
-                {/* Fixed Header - Absolute positioning to prevent movement */}
-                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 -mt-40">
-                  <h2 className="text-5xl font-semibold text-center drop-shadow-lg whitespace-nowrap mb-4" style={{ color: '#1F3463' }}>
-                    ARE YOU AN INCOMING NEW STUDENT?
-                  </h2>
-                  {/* Subheader */}
-                  <p className="text-3xl font-light text-center drop-shadow-lg" style={{ color: '#1F3463' }}>
-                    *A MINOR OF AGE ISN'T ALLOWED TO PROCESS ENROLLMENT
-                  </p>
-                </div>
+          <div className="h-full flex flex-col items-center justify-center">
+            {/* Header */}
+            <div className="mb-12">
+              <h2 className="text-5xl font-semibold text-center drop-shadow-lg whitespace-nowrap mb-4" style={{ color: '#1F3463' }}>
+                ARE YOU AN INCOMING NEW STUDENT?
+              </h2>
+              {/* Subheader */}
+              <p className="text-3xl font-light text-center drop-shadow-lg" style={{ color: '#1F3463' }}>
+                *A MINOR OF AGE ISN'T ALLOWED TO PROCESS ENROLLMENT
+              </p>
+            </div>
 
-                {/* Responsive Grid Container - Fixed positioning below header */}
-                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 mt-8">
-                  <ResponsiveGrid
-                    items={studentStatusOptions}
-                    onItemClick={(option) => handleStudentStatusSelect(option.key)}
-                    renderItem={(option) => (
-                      <div className="text-center">
-                        <h3 className="text-2xl font-semibold text-white">
-                          {option.label}
-                        </h3>
-                      </div>
-                    )}
-                    showPagination={studentStatusOptions.length > 6}
-                  />
-                </div>
-              </div>
+            {/* Responsive Grid Container */}
+            <div className="w-full flex justify-center">
+              <ResponsiveGrid
+                items={studentStatusOptions}
+                onItemClick={(option) => handleStudentStatusSelect(option.key)}
+                renderItem={(option) => (
+                  <div className="text-center">
+                    <h3 className="text-2xl font-semibold text-white">
+                      {option.label}
+                    </h3>
+                  </div>
+                )}
+                showPagination={studentStatusOptions.length > 6}
+              />
             </div>
           </div>
 
@@ -1354,26 +1954,24 @@ const Queue = () => {
 
   // Role Selection Step
   if (currentStep === 'role') {
+    console.log('🎭 ROLE STEP - Rendering with roleOptions:', roleOptions);
     return (
       <QueueLayout>
-        <div className="h-full flex flex-col">
-          <div className="flex-1 flex items-center justify-center">
-            {/* Centered Header-Grid Unit with Fixed Positioning */}
-            <div className="flex flex-col items-center w-full relative">
-              {/* Fixed Header - Absolute positioning to prevent movement */}
-              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 -mt-32">
-                <h2 className="text-4xl font-semibold text-center drop-shadow-lg whitespace-nowrap mb-6" style={{ color: '#1F3463' }}>
-                  SELECT ROLE
-                </h2>
-              </div>
+        <div className="h-full flex flex-col items-center justify-center">
+          {/* Header */}
+          <div className="mb-12">
+            <h2 className="text-5xl font-semibold text-center drop-shadow-lg whitespace-nowrap" style={{ color: '#1F3463' }}>
+              SELECT ROLE
+            </h2>
+          </div>
 
-              {/* Responsive Grid Container - Fixed positioning below header */}
-              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 mt-8">
-                <ResponsiveGrid
-                items={roleOptions}
-                onItemClick={(role) => handleRoleSelect(role)}
-                renderItem={(role) => (
-                  <div className="text-center">
+          {/* Responsive Grid Container */}
+          <div className="w-full flex justify-center">
+            <ResponsiveGrid
+              items={roleOptions}
+              onItemClick={(role) => handleRoleSelect(role)}
+              renderItem={(role) => (
+                <div className="text-center">
                   <h3 className="text-xl font-semibold text-white">
                     {role}
                   </h3>
@@ -1381,53 +1979,45 @@ const Queue = () => {
               )}
               showPagination={roleOptions.length > 6}
             />
-            </div>
           </div>
         </div>
-      </div>
 
-      <BackButton />
-    </QueueLayout>
-  );
-}
+        <BackButton />
+      </QueueLayout>
+    );
+  }
 
   // Priority Status Step
   if (currentStep === 'priority') {
     return (
       <QueueLayout>
-        <div className="h-full flex flex-col">
-          <div className="flex-1 flex items-center justify-center">
-            {/* Centered Header-Grid Unit with Fixed Positioning */}
-            <div className="flex flex-col items-center w-full relative">
-              {/* Fixed Header - Absolute positioning to prevent movement */}
-              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 -mt-40">
-                <h2 className="text-4xl font-semibold text-center drop-shadow-lg whitespace-nowrap mb-4" style={{ color: '#1F3463' }}>
-                  DO YOU BELONG TO THE FOLLOWING?
-                </h2>
-                {/* Subheader with bulleted format */}
-                <div className="text-2xl font-medium text-center drop-shadow-lg" style={{ color: '#1F3463' }}>
-                  <div className="mb-2">• PERSON WITH DISABILITIES (PWD)</div>
-                  <div className="mb-2">• SENIOR CITIZEN</div>
-                  <div className="mb-2">• PREGNANT</div>
-                </div>
-              </div>
-
-              {/* Responsive Grid Container - Fixed positioning below header */}
-              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 mt-8">
-                <ResponsiveGrid
-                items={priorityOptions}
-                onItemClick={(option) => handlePrioritySelect(option.key)}
-                renderItem={(option) => (
-                  <div className="text-center">
-                    <h3 className="text-xl font-semibold text-white">
-                      {option.label}
-                    </h3>
-                  </div>
-                )}
-                showPagination={priorityOptions.length > 6}
-              />
-              </div>
+        <div className="h-full flex flex-col items-center justify-center">
+          {/* Header */}
+          <div className="mb-12">
+            <h2 className="text-5xl font-semibold text-center drop-shadow-lg whitespace-nowrap mb-4" style={{ color: '#1F3463' }}>
+              DO YOU BELONG TO THE FOLLOWING?
+            </h2>
+            {/* Subheader with bulleted format */}
+            <div className="text-3xl font-semibold text-center drop-shadow-lg" style={{ color: '#1F3463' }}>
+              <div className="mb-2">• PERSON WITH DISABILITIES (PWD)</div>
+              <div className="mb-2">• SENIOR CITIZEN</div>
             </div>
+          </div>
+
+          {/* Responsive Grid Container */}
+          <div className="w-full flex justify-center">
+            <ResponsiveGrid
+              items={priorityOptions}
+              onItemClick={(option) => handlePrioritySelect(option.key)}
+              renderItem={(option) => (
+                <div className="text-center">
+                  <h3 className="text-xl font-semibold text-white">
+                    {option.label}
+                  </h3>
+                </div>
+              )}
+              showPagination={priorityOptions.length > 6}
+            />
           </div>
         </div>
 
