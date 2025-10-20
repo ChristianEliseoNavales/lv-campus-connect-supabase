@@ -3,6 +3,7 @@
 
 # Exception: Allow the frontend folder to be tracked
 !/frontend
+!/backend
 
 # Exception: Allow .gitignore itself to be tracked
 !/.gitignore
